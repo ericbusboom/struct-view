@@ -1,9 +1,12 @@
 ---
-id: "007"
+id: '007'
 title: 2D-to-3D Workflow Completion and 3D Viewport Fixes
-status: planning
+status: done
 branch: sprint/007-2d-to-3d-workflow-completion-and-3d-viewport-fixes
-use-cases: [SUC-004, SUC-005, SUC-006]
+use-cases:
+- SUC-004
+- SUC-005
+- SUC-006
 ---
 
 # Sprint 007 (002A): 2D-to-3D Workflow Completion and 3D Viewport Fixes
