@@ -1,9 +1,12 @@
 ---
-id: "004"
+id: '004'
 title: Node and member rendering in Three.js
-status: todo
-use-cases: [SUC-003]
-depends-on: ["002", "003"]
+status: in-progress
+use-cases:
+- SUC-003
+depends-on:
+- '002'
+- '003'
 ---
 
 # Node and member rendering in Three.js
