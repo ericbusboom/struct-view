@@ -1,9 +1,12 @@
 ---
-id: "002"
+id: '002'
 title: Core data model schema and validators
-status: todo
-use-cases: [SUC-001, SUC-002]
-depends-on: ["001"]
+status: in-progress
+use-cases:
+- SUC-001
+- SUC-002
+depends-on:
+- '001'
 ---
 
 # Core data model schema and validators
