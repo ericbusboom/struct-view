@@ -4,6 +4,7 @@ import SceneModel from './SceneModel'
 import GroundPlane from './GroundPlane'
 import NodeDragger from './NodeDragger'
 import TargetEdgePicker from './TargetEdgePicker'
+import PlacementPreview from './PlacementPreview'
 
 export default function Viewport3D() {
   return (
@@ -32,6 +33,7 @@ export default function Viewport3D() {
       <SceneModel />
       <NodeDragger />
       <TargetEdgePicker />
+      <PlacementPreview />
 
       <OrbitControls makeDefault />
 
