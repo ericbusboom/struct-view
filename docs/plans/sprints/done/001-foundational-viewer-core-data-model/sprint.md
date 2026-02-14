@@ -1,9 +1,12 @@
 ---
-id: "001"
+id: '001'
 title: Foundational Viewer and Core Data Model
-status: planning
+status: done
 branch: sprint/001-foundational-viewer-core-data-model
-use-cases: [SUC-001, SUC-002, SUC-003]
+use-cases:
+- SUC-001
+- SUC-002
+- SUC-003
 ---
 
 # Sprint 001

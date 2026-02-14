@@ -1,7 +1,7 @@
 ---
 id: '003'
 title: 3D viewport with camera controls
-status: in-progress
+status: done
 use-cases:
 - SUC-003
 depends-on:

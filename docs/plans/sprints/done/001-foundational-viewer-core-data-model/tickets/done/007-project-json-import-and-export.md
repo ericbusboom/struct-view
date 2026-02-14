@@ -1,7 +1,7 @@
 ---
 id: '007'
 title: Project JSON import and export
-status: in-progress
+status: done
 use-cases:
 - SUC-002
 depends-on:

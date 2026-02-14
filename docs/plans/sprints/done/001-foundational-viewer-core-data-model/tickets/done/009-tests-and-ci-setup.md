@@ -1,7 +1,7 @@
 ---
 id: 009
 title: Tests and CI setup
-status: in-progress
+status: done
 use-cases:
 - SUC-001
 - SUC-002

@@ -1,7 +1,7 @@
 ---
 id: 008
 title: Backend API contract and stub server
-status: in-progress
+status: done
 use-cases: []
 depends-on:
 - '001'

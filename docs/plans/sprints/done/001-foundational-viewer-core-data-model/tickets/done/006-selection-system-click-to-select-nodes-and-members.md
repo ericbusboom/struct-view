@@ -1,7 +1,7 @@
 ---
 id: '006'
 title: Selection system - click to select nodes and members
-status: in-progress
+status: done
 use-cases:
 - SUC-003
 depends-on:

@@ -1,7 +1,7 @@
 ---
 id: '005'
 title: Editor commands - create, move, delete nodes and members
-status: in-progress
+status: done
 use-cases:
 - SUC-001
 depends-on:

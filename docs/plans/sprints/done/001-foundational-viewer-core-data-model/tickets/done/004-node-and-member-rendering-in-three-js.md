@@ -1,7 +1,7 @@
 ---
 id: '004'
 title: Node and member rendering in Three.js
-status: in-progress
+status: done
 use-cases:
 - SUC-003
 depends-on:
