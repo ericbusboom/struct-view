@@ -3,6 +3,7 @@ import { OrbitControls, GizmoHelper, GizmoViewport, Grid } from '@react-three/dr
 import SceneModel from './SceneModel'
 import GroundPlane from './GroundPlane'
 import NodeDragger from './NodeDragger'
+import TargetEdgePicker from './TargetEdgePicker'
 
 export default function Viewport3D() {
   return (
@@ -30,6 +31,7 @@ export default function Viewport3D() {
       <GroundPlane />
       <SceneModel />
       <NodeDragger />
+      <TargetEdgePicker />
 
       <OrbitControls makeDefault />
 

@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import type { ThreeEvent } from '@react-three/fiber'
 import type { Member, Node } from '../model'
 import { useEditorStore } from '../store/useEditorStore'
+import { usePlacementStore } from '../store/usePlacementStore'
 
 const MEMBER_COLOR = '#cccccc'
 const SELECTED_COLOR = '#ffff00'
@@ -30,8 +31,21 @@ export default function MemberLine({ member, nodes }: Props) {
     return new THREE.TubeGeometry(path, 1, TUBE_RADIUS, TUBE_SEGMENTS, false)
   }, [startNode, endNode])
 
+  const placementPhase = usePlacementStore((s) => s.phase)
+  const setTargetEdge = usePlacementStore((s) => s.setTargetEdge)
+
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
+
+    // During placement edge picking, clicking a member uses its endpoints
+    if (placementPhase === 'picking-edge' && startNode && endNode) {
+      setTargetEdge({
+        start: { ...startNode.position },
+        end: { ...endNode.position },
+      })
+      return
+    }
+
     if (mode === 'select') {
       if (e.nativeEvent.shiftKey) {
         toggleSelect(member.id, 'member')
