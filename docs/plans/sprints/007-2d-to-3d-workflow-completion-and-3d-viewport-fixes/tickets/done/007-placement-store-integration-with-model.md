@@ -1,7 +1,7 @@
 ---
 id: '007'
 title: Placement store integration with model
-status: in-progress
+status: done
 use-cases: []
 depends-on: []
 ---

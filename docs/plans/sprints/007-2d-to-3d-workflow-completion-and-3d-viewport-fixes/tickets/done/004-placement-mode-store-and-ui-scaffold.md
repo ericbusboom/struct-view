@@ -1,7 +1,7 @@
 ---
 id: '004'
 title: Placement mode store and UI scaffold
-status: in-progress
+status: done
 use-cases: []
 depends-on: []
 ---

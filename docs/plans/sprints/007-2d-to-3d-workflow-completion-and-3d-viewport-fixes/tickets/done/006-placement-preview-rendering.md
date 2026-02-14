@@ -1,7 +1,7 @@
 ---
 id: '006'
 title: Placement preview rendering
-status: in-progress
+status: done
 use-cases: []
 depends-on: []
 ---

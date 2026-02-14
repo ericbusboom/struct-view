@@ -1,7 +1,7 @@
 ---
 id: '003'
 title: Multi-shape management in 2D editor
-status: in-progress
+status: done
 use-cases: []
 depends-on: []
 ---

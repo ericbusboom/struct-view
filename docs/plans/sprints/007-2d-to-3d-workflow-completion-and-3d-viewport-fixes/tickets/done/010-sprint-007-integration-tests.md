@@ -1,7 +1,7 @@
 ---
 id: '010'
 title: Sprint 007 integration tests
-status: in-progress
+status: done
 use-cases: []
 depends-on: []
 ---

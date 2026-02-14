@@ -1,7 +1,7 @@
 ---
 id: '005'
 title: Target edge picker
-status: in-progress
+status: done
 use-cases: []
 depends-on: []
 ---
