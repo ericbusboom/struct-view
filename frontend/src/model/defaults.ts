@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid'
-import type { Node, Member, Panel, Load, Project, LoadCase, LoadCombination } from './schemas'
+import type { Node, Member, Panel, Load, Project, LoadCase, LoadCombination, Shape2D } from './schemas'
 
 const NO_RELEASE = { fx: false, fy: false, fz: false, mx: false, my: false, mz: false }
 
@@ -109,6 +109,15 @@ export function createLoadCombination(
   }
 }
 
+export function createShape2D(name: string = 'Untitled Shape'): Shape2D {
+  return {
+    id: nanoid(),
+    name,
+    nodes: [],
+    members: [],
+  }
+}
+
 export function createProject(overrides: Partial<Project> = {}): Project {
   return {
     name: 'Untitled Project',
@@ -118,6 +127,7 @@ export function createProject(overrides: Partial<Project> = {}): Project {
     loads: [],
     load_cases: [],
     combinations: [],
+    shapes: [],
     ...overrides,
   }
 }

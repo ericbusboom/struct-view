@@ -1,9 +1,21 @@
 ---
-id: "010"
+id: '010'
 title: Sprint 002 integration tests
-status: todo
-use-cases: [SUC-004, SUC-005, SUC-006]
-depends-on: ["001", "002", "003", "004", "005", "006", "007", "008", "009"]
+status: done
+use-cases:
+- SUC-004
+- SUC-005
+- SUC-006
+depends-on:
+- '001'
+- '002'
+- '003'
+- '004'
+- '005'
+- '006'
+- '007'
+- 008
+- 009
 ---
 
 # Sprint 002 integration tests

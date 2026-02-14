@@ -1,9 +1,11 @@
 ---
-id: "005"
+id: '005'
 title: Truss templates
-status: todo
-use-cases: [SUC-005]
-depends-on: ["001"]
+status: done
+use-cases:
+- SUC-005
+depends-on:
+- '001'
 ---
 
 # Truss templates

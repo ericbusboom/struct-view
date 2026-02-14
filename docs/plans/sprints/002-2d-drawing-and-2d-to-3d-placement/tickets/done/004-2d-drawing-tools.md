@@ -1,9 +1,12 @@
 ---
-id: "004"
+id: '004'
 title: 2D drawing tools
-status: todo
-use-cases: [SUC-004]
-depends-on: ["002", "003"]
+status: done
+use-cases:
+- SUC-004
+depends-on:
+- '002'
+- '003'
 ---
 
 # 2D drawing tools
