@@ -1,9 +1,11 @@
 ---
-id: "008"
+id: 008
 title: Backend API contract and stub server
-status: todo
+status: in-progress
 use-cases: []
-depends-on: ["001", "002"]
+depends-on:
+- '001'
+- '002'
 ---
 
 # Backend API contract and stub server
