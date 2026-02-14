@@ -12,6 +12,7 @@ export default function FileToolbar() {
       loads: state.loads,
       load_cases: state.load_cases,
       combinations: state.combinations,
+      shapes: state.shapes,
     })
   }
 

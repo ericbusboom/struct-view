@@ -1,9 +1,11 @@
 ---
-id: "002"
+id: '002'
 title: 2D canvas editor with pan and zoom
-status: todo
-use-cases: [SUC-004]
-depends-on: ["001"]
+status: done
+use-cases:
+- SUC-004
+depends-on:
+- '001'
 ---
 
 # 2D canvas editor with pan and zoom

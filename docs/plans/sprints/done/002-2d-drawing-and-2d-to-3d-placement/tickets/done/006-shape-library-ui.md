@@ -1,9 +1,13 @@
 ---
-id: "006"
+id: '006'
 title: Shape library UI
-status: todo
-use-cases: [SUC-004, SUC-005]
-depends-on: ["001", "004"]
+status: done
+use-cases:
+- SUC-004
+- SUC-005
+depends-on:
+- '001'
+- '004'
 ---
 
 # Shape library UI

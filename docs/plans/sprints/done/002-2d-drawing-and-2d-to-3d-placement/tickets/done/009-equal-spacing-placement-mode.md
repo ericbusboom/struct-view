@@ -1,9 +1,12 @@
 ---
-id: "009"
+id: 009
 title: Equal-spacing placement mode
-status: todo
-use-cases: [SUC-006]
-depends-on: ["007", "008"]
+status: done
+use-cases:
+- SUC-006
+depends-on:
+- '007'
+- 008
 ---
 
 # Equal-spacing placement mode

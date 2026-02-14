@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Node, Member, Panel, Load, LoadCase, LoadCombination } from '../model'
+import type { Node, Member, Panel, Load, LoadCase, LoadCombination, Shape2D } from '../model'
 import { createNode, createMember } from '../model'
 
 export interface ModelState {
@@ -10,6 +10,7 @@ export interface ModelState {
   loads: Load[]
   load_cases: LoadCase[]
   combinations: LoadCombination[]
+  shapes: Shape2D[]
 
   // Node operations
   addNode: (node: Node) => void
@@ -21,6 +22,11 @@ export interface ModelState {
   removeMember: (id: string) => void
   updateMember: (id: string, updates: Partial<Member>) => void
 
+  // Shape operations
+  addShape: (shape: Shape2D) => void
+  updateShape: (id: string, updates: Partial<Shape2D>) => void
+  removeShape: (id: string) => void
+
   // Bulk replace (for import)
   loadProject: (project: {
     name: string
@@ -30,6 +36,7 @@ export interface ModelState {
     loads: Load[]
     load_cases: LoadCase[]
     combinations: LoadCombination[]
+    shapes?: Shape2D[]
   }) => void
 }
 
@@ -52,6 +59,7 @@ function createSampleModel() {
     loads: [] as Load[],
     load_cases: [] as LoadCase[],
     combinations: [] as LoadCombination[],
+    shapes: [] as Shape2D[],
   }
 }
 
@@ -85,5 +93,16 @@ export const useModelStore = create<ModelState>((set) => ({
       members: state.members.map((m) => (m.id === id ? { ...m, ...updates } : m)),
     })),
 
-  loadProject: (project) => set(project),
+  addShape: (shape) =>
+    set((state) => ({ shapes: [...state.shapes, shape] })),
+
+  updateShape: (id, updates) =>
+    set((state) => ({
+      shapes: state.shapes.map((s) => (s.id === id ? { ...s, ...updates } : s)),
+    })),
+
+  removeShape: (id) =>
+    set((state) => ({ shapes: state.shapes.filter((s) => s.id !== id) })),
+
+  loadProject: (project) => set({ ...project, shapes: project.shapes ?? [] }),
 }))

@@ -71,6 +71,13 @@ Before tickets can be created, all of the following must be true:
 - [ ] Architecture review passed
 - [ ] Stakeholder has approved the sprint plan
 
+## Planned Tickets (from TODOs)
+
+These items should become tickets during the ticketing phase:
+
+1. **STL import scale correction** — AABB display, user-editable dimension for uniform scale correction, stored scale factor. See `docs/plans/todo/done/stl-import-scale-correction.md`.
+2. **Demonstration STL test fixtures** — Use `data/Cabinet.stl` and `data/cube.stl` as test fixtures and demo assets for STL import/rendering/snapping. See `docs/plans/todo/done/demonstration-stl-files-in-data-directory.md`.
+
 ## Tickets
 
 (To be created after sprint approval.)

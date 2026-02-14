@@ -1,9 +1,12 @@
 ---
-id: "007"
+id: '007'
 title: 3D placement engine
-status: todo
-use-cases: [SUC-006]
-depends-on: ["001", "006"]
+status: done
+use-cases:
+- SUC-006
+depends-on:
+- '001'
+- '006'
 ---
 
 # 3D placement engine

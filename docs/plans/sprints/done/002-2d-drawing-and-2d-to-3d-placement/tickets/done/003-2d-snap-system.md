@@ -1,9 +1,11 @@
 ---
-id: "003"
+id: '003'
 title: 2D snap system
-status: todo
-use-cases: [SUC-004]
-depends-on: ["002"]
+status: done
+use-cases:
+- SUC-004
+depends-on:
+- '002'
 ---
 
 # 2D snap system

@@ -1,8 +1,11 @@
 ---
-id: "001"
+id: '001'
 title: Shape data model and project integration
-status: todo
-use-cases: [SUC-004, SUC-005, SUC-006]
+status: done
+use-cases:
+- SUC-004
+- SUC-005
+- SUC-006
 depends-on: []
 ---
 

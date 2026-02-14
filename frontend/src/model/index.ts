@@ -5,6 +5,9 @@ export {
   LoadSchema,
   LoadCaseSchema,
   LoadCombinationSchema,
+  Shape2DNodeSchema,
+  Shape2DMemberSchema,
+  Shape2DSchema,
   ProjectSchema,
   SupportTypeSchema,
   ConnectionTypeSchema,
@@ -34,6 +37,9 @@ export type {
   LoadCase,
   CombinationFactor,
   LoadCombination,
+  Shape2DNode,
+  Shape2DMember,
+  Shape2D,
   Project,
 } from './schemas'
 
@@ -47,5 +53,6 @@ export {
   createLoad,
   createLoadCase,
   createLoadCombination,
+  createShape2D,
   createProject,
 } from './defaults'

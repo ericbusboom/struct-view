@@ -1,9 +1,12 @@
 ---
-id: "002"
+id: '002'
 title: 2D Drawing and 2D-to-3D Placement
-status: planning
+status: done
 branch: sprint/002-2d-drawing-and-2d-to-3d-placement
-use-cases: [SUC-004, SUC-005, SUC-006]
+use-cases:
+- SUC-004
+- SUC-005
+- SUC-006
 ---
 
 # Sprint 002: 2D Drawing and 2D-to-3D Placement

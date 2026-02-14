@@ -151,6 +151,28 @@ export const LoadCombinationSchema = z.object({
   factors: z.array(CombinationFactorSchema).min(1),
 })
 
+// --- Shape2D ---
+
+export const Shape2DNodeSchema = z.object({
+  id: z.string().min(1),
+  x: z.number().finite(),
+  y: z.number().finite(),
+})
+
+export const Shape2DMemberSchema = z.object({
+  id: z.string().min(1),
+  startNode: z.string().min(1),
+  endNode: z.string().min(1),
+  isSnapEdge: z.boolean().default(false),
+})
+
+export const Shape2DSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  nodes: z.array(Shape2DNodeSchema),
+  members: z.array(Shape2DMemberSchema),
+})
+
 // --- Project ---
 
 export const ProjectSchema = z.object({
@@ -161,6 +183,7 @@ export const ProjectSchema = z.object({
   loads: z.array(LoadSchema),
   load_cases: z.array(LoadCaseSchema),
   combinations: z.array(LoadCombinationSchema),
+  shapes: z.array(Shape2DSchema).optional().default([]),
 })
 
 // --- Inferred Types ---
@@ -185,4 +208,7 @@ export type LoadCaseType = z.infer<typeof LoadCaseTypeSchema>
 export type LoadCase = z.infer<typeof LoadCaseSchema>
 export type CombinationFactor = z.infer<typeof CombinationFactorSchema>
 export type LoadCombination = z.infer<typeof LoadCombinationSchema>
+export type Shape2DNode = z.infer<typeof Shape2DNodeSchema>
+export type Shape2DMember = z.infer<typeof Shape2DMemberSchema>
+export type Shape2D = z.infer<typeof Shape2DSchema>
 export type Project = z.infer<typeof ProjectSchema>

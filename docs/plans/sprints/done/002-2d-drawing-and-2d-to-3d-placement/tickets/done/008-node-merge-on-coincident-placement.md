@@ -1,9 +1,11 @@
 ---
-id: "008"
+id: 008
 title: Node merge on coincident placement
-status: todo
-use-cases: [SUC-006]
-depends-on: ["007"]
+status: done
+use-cases:
+- SUC-006
+depends-on:
+- '007'
 ---
 
 # Node merge on coincident placement
