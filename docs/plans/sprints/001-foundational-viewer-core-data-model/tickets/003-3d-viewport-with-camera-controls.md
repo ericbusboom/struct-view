@@ -1,9 +1,11 @@
 ---
-id: "003"
+id: '003'
 title: 3D viewport with camera controls
-status: todo
-use-cases: [SUC-003]
-depends-on: ["001"]
+status: in-progress
+use-cases:
+- SUC-003
+depends-on:
+- '001'
 ---
 
 # 3D viewport with camera controls

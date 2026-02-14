@@ -1,4 +1,5 @@
 import './App.css'
+import Viewport3D from './components/Viewport3D'
 
 function App() {
   return (
@@ -7,9 +8,7 @@ function App() {
         <h1>StructView</h1>
       </header>
       <main className="viewport-container">
-        <p style={{ color: '#888', textAlign: 'center', marginTop: '2rem' }}>
-          3D viewport will be rendered here (Ticket 003)
-        </p>
+        <Viewport3D />
       </main>
     </div>
   )
