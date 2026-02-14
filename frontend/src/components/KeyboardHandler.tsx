@@ -15,25 +15,24 @@ export default function KeyboardHandler() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore when typing in an input
       if ((e.target as HTMLElement).tagName === 'INPUT') return
 
-      // Mode shortcuts
       const newMode = MODE_KEYS[e.key.toLowerCase()]
       if (newMode) {
         setMode(newMode)
         return
       }
 
-      // Delete / Backspace — remove selected entity
+      // Delete / Backspace — remove all selected entities
       if (e.key === 'Delete' || e.key === 'Backspace') {
-        const { selectedId, selectedType, clearSelection } = useEditorStore.getState()
-        if (!selectedId || !selectedType) return
+        const { selectedNodeIds, selectedMemberIds, clearSelection } = useEditorStore.getState()
+        const model = useModelStore.getState()
 
-        if (selectedType === 'node') {
-          useModelStore.getState().removeNode(selectedId)
-        } else if (selectedType === 'member') {
-          useModelStore.getState().removeMember(selectedId)
+        for (const id of selectedMemberIds) {
+          model.removeMember(id)
+        }
+        for (const id of selectedNodeIds) {
+          useModelStore.getState().removeNode(id)
         }
         clearSelection()
       }

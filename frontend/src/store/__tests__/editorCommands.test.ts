@@ -15,8 +15,8 @@ function resetStores() {
   })
   useEditorStore.setState({
     mode: 'select',
-    selectedId: null,
-    selectedType: null,
+    selectedNodeIds: new Set(),
+    selectedMemberIds: new Set(),
     memberStartNode: null,
   })
 }
@@ -85,17 +85,65 @@ describe('editor commands', () => {
     useEditorStore.getState().setMode('select')
     expect(useEditorStore.getState().memberStartNode).toBeNull()
   })
+})
 
-  it('select sets selectedId and type', () => {
-    useEditorStore.getState().select('m1', 'member')
-    expect(useEditorStore.getState().selectedId).toBe('m1')
-    expect(useEditorStore.getState().selectedType).toBe('member')
+describe('selection system', () => {
+  beforeEach(resetStores)
+
+  it('select sets a single node', () => {
+    useEditorStore.getState().select('n1', 'node')
+    expect(useEditorStore.getState().selectedNodeIds.has('n1')).toBe(true)
+    expect(useEditorStore.getState().selectedNodeIds.size).toBe(1)
+    expect(useEditorStore.getState().selectedMemberIds.size).toBe(0)
   })
 
-  it('clearSelection resets selection', () => {
+  it('select sets a single member and clears nodes', () => {
     useEditorStore.getState().select('n1', 'node')
+    useEditorStore.getState().select('m1', 'member')
+    expect(useEditorStore.getState().selectedMemberIds.has('m1')).toBe(true)
+    expect(useEditorStore.getState().selectedNodeIds.size).toBe(0)
+  })
+
+  it('toggleSelect adds to selection', () => {
+    useEditorStore.getState().select('n1', 'node')
+    useEditorStore.getState().toggleSelect('n2', 'node')
+    expect(useEditorStore.getState().selectedNodeIds.size).toBe(2)
+    expect(useEditorStore.getState().selectedNodeIds.has('n1')).toBe(true)
+    expect(useEditorStore.getState().selectedNodeIds.has('n2')).toBe(true)
+  })
+
+  it('toggleSelect removes if already selected', () => {
+    useEditorStore.getState().select('n1', 'node')
+    useEditorStore.getState().toggleSelect('n1', 'node')
+    expect(useEditorStore.getState().selectedNodeIds.size).toBe(0)
+  })
+
+  it('toggleSelect works for members', () => {
+    useEditorStore.getState().toggleSelect('m1', 'member')
+    useEditorStore.getState().toggleSelect('m2', 'member')
+    expect(useEditorStore.getState().selectedMemberIds.size).toBe(2)
+    useEditorStore.getState().toggleSelect('m1', 'member')
+    expect(useEditorStore.getState().selectedMemberIds.size).toBe(1)
+    expect(useEditorStore.getState().selectedMemberIds.has('m2')).toBe(true)
+  })
+
+  it('clearSelection resets all selections', () => {
+    useEditorStore.getState().select('n1', 'node')
+    useEditorStore.getState().toggleSelect('n2', 'node')
     useEditorStore.getState().clearSelection()
-    expect(useEditorStore.getState().selectedId).toBeNull()
-    expect(useEditorStore.getState().selectedType).toBeNull()
+    expect(useEditorStore.getState().selectedNodeIds.size).toBe(0)
+    expect(useEditorStore.getState().selectedMemberIds.size).toBe(0)
+  })
+
+  it('isNodeSelected returns correct state', () => {
+    useEditorStore.getState().select('n1', 'node')
+    expect(useEditorStore.getState().isNodeSelected('n1')).toBe(true)
+    expect(useEditorStore.getState().isNodeSelected('n2')).toBe(false)
+  })
+
+  it('isMemberSelected returns correct state', () => {
+    useEditorStore.getState().select('m1', 'member')
+    expect(useEditorStore.getState().isMemberSelected('m1')).toBe(true)
+    expect(useEditorStore.getState().isMemberSelected('m2')).toBe(false)
   })
 })

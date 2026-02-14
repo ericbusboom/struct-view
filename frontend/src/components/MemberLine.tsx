@@ -17,11 +17,10 @@ interface Props {
 export default function MemberLine({ member, nodes }: Props) {
   const startNode = nodes.get(member.start_node)
   const endNode = nodes.get(member.end_node)
-  const selectedId = useEditorStore((s) => s.selectedId)
+  const isSelected = useEditorStore((s) => s.selectedMemberIds.has(member.id))
   const mode = useEditorStore((s) => s.mode)
   const select = useEditorStore((s) => s.select)
-
-  const isSelected = selectedId === member.id
+  const toggleSelect = useEditorStore((s) => s.toggleSelect)
 
   const geometry = useMemo(() => {
     if (!startNode || !endNode) return null
@@ -34,7 +33,11 @@ export default function MemberLine({ member, nodes }: Props) {
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
     if (mode === 'select') {
-      select(member.id, 'member')
+      if (e.nativeEvent.shiftKey) {
+        toggleSelect(member.id, 'member')
+      } else {
+        select(member.id, 'member')
+      }
     }
   }
 

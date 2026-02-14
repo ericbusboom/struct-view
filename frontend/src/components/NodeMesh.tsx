@@ -26,13 +26,13 @@ export default function NodeMesh({ node }: Props) {
   const { x, y, z } = node.position
 
   const mode = useEditorStore((s) => s.mode)
-  const selectedId = useEditorStore((s) => s.selectedId)
+  const isSelected = useEditorStore((s) => s.selectedNodeIds.has(node.id))
   const select = useEditorStore((s) => s.select)
+  const toggleSelect = useEditorStore((s) => s.toggleSelect)
   const memberStartNode = useEditorStore((s) => s.memberStartNode)
   const setMemberStartNode = useEditorStore((s) => s.setMemberStartNode)
   const addMember = useModelStore((s) => s.addMember)
 
-  const isSelected = selectedId === node.id
   const isMemberStart = memberStartNode === node.id
   const highlighted = isSelected || isMemberStart
 
@@ -40,7 +40,11 @@ export default function NodeMesh({ node }: Props) {
     e.stopPropagation()
 
     if (mode === 'select' || mode === 'move') {
-      select(node.id, 'node')
+      if (e.nativeEvent.shiftKey) {
+        toggleSelect(node.id, 'node')
+      } else {
+        select(node.id, 'node')
+      }
     } else if (mode === 'add-member') {
       if (!memberStartNode) {
         setMemberStartNode(node.id)

@@ -1,9 +1,11 @@
 ---
-id: "006"
+id: '006'
 title: Selection system - click to select nodes and members
-status: todo
-use-cases: [SUC-003]
-depends-on: ["004"]
+status: in-progress
+use-cases:
+- SUC-003
+depends-on:
+- '004'
 ---
 
 # Selection system - click to select nodes and members
