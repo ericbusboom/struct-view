@@ -1,12 +1,15 @@
 ---
-id: "003"
+id: '004'
 title: STL Reference, Advanced Snapping, and Auto-Layout
 status: planning
-branch: sprint/003-stl-reference-advanced-snapping-and-auto-layout
-use-cases: [SUC-007, SUC-008, SUC-009]
+branch: sprint/004-stl-reference-advanced-snapping-and-auto-layout
+use-cases:
+- SUC-007
+- SUC-008
+- SUC-009
 ---
 
-# Sprint 003: STL Reference, Advanced Snapping, and Auto-Layout
+# Sprint 004: STL Reference, Advanced Snapping, and Auto-Layout
 
 ## Goals
 

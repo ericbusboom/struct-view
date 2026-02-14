@@ -1,12 +1,15 @@
 ---
-id: "005"
+id: '006'
 title: Analysis Pipeline and Results Visualization
 status: planning
-branch: sprint/005-analysis-pipeline-and-results-visualization
-use-cases: [SUC-015, SUC-016, SUC-017]
+branch: sprint/006-analysis-pipeline-and-results-visualization
+use-cases:
+- SUC-015
+- SUC-016
+- SUC-017
 ---
 
-# Sprint 005: Analysis Pipeline and Results Visualization
+# Sprint 006: Analysis Pipeline and Results Visualization
 
 ## Goals
 

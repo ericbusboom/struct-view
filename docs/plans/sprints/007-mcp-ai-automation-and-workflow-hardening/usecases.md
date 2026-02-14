@@ -2,7 +2,7 @@
 status: draft
 ---
 
-# Sprint 006 Use Cases
+# Sprint 007 Use Cases
 
 ## SUC-018: Automate model changes via MCP/AI
 Parent: UC-007 (Automate model changes via per-project MCP server)

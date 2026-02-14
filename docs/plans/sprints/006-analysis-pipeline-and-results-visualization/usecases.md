@@ -2,7 +2,7 @@
 status: draft
 ---
 
-# Sprint 005 Use Cases
+# Sprint 006 Use Cases
 
 ## SUC-015: Run structural analysis
 Parent: UC-005 (Run server-side analysis and view results)

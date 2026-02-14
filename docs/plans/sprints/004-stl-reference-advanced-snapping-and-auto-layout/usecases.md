@@ -2,7 +2,7 @@
 status: draft
 ---
 
-# Sprint 003 Use Cases
+# Sprint 004 Use Cases
 
 ## SUC-007: Import and display an STL reference shape
 Parent: UC-001 (Build structural wireframes)

@@ -2,7 +2,7 @@
 status: draft
 ---
 
-# Sprint 005 Technical Plan
+# Sprint 006 Technical Plan
 
 ## Architecture Overview
 

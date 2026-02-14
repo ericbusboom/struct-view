@@ -1,12 +1,16 @@
 ---
-id: "006"
+id: '007'
 title: MCP AI Automation and Workflow Hardening
 status: planning
-branch: sprint/006-mcp-ai-automation-and-workflow-hardening
-use-cases: [SUC-018, SUC-019, SUC-020, SUC-021]
+branch: sprint/007-mcp-ai-automation-and-workflow-hardening
+use-cases:
+- SUC-018
+- SUC-019
+- SUC-020
+- SUC-021
 ---
 
-# Sprint 006: MCP AI Automation and Workflow Hardening
+# Sprint 007: MCP AI Automation and Workflow Hardening
 
 ## Goals
 

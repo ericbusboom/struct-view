@@ -1,12 +1,17 @@
 ---
-id: "004"
+id: '005'
 title: Properties, Supports, Loads, and Load Cases
 status: planning
-branch: sprint/004-properties-supports-loads-and-load-cases
-use-cases: [SUC-010, SUC-011, SUC-012, SUC-013, SUC-014]
+branch: sprint/005-properties-supports-loads-and-load-cases
+use-cases:
+- SUC-010
+- SUC-011
+- SUC-012
+- SUC-013
+- SUC-014
 ---
 
-# Sprint 004: Properties, Supports, Loads, and Load Cases
+# Sprint 005: Properties, Supports, Loads, and Load Cases
 
 ## Goals
 

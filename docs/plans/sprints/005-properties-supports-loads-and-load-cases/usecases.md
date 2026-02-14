@@ -2,7 +2,7 @@
 status: draft
 ---
 
-# Sprint 004 Use Cases
+# Sprint 005 Use Cases
 
 ## SUC-010: Assign material and section to members
 Parent: UC-002 (Define member material/section)
