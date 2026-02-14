@@ -1,4 +1,5 @@
 import { usePlacementStore } from '../store/usePlacementStore'
+import { commitPlacement } from '../editor3d/commitPlacement'
 
 export default function PlacementPanel() {
   const phase = usePlacementStore((s) => s.phase)
@@ -8,7 +9,6 @@ export default function PlacementPanel() {
   const setOffset = usePlacementStore((s) => s.setOffset)
   const setCount = usePlacementStore((s) => s.setCount)
   const cancel = usePlacementStore((s) => s.cancel)
-  const confirmPlacement = usePlacementStore((s) => s.confirmPlacement)
 
   if (phase === 'idle') return null
 
@@ -50,7 +50,7 @@ export default function PlacementPanel() {
             />
           </label>
           <div className="placement-panel-actions">
-            <button className="tool-btn" onClick={confirmPlacement}>
+            <button className="tool-btn" onClick={commitPlacement}>
               Confirm
             </button>
             <button className="tool-btn" onClick={cancel}>
