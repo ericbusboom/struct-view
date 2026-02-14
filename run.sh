@@ -12,7 +12,6 @@ cleanup() {
       kill -TERM "$pid" 2>/dev/null || true
     fi
   done
-  # Wait briefly, then force-kill any stragglers
   sleep 1
   for pid in "${PIDS[@]}"; do
     if kill -0 "$pid" 2>/dev/null; then
@@ -44,8 +43,5 @@ echo ""
 echo "Both servers running. Press Ctrl-C to stop."
 echo ""
 
-# Wait for any child to exit
-wait -n 2>/dev/null || true
-
-# If one exits, clean up the other
-cleanup
+# Wait for all background processes (compatible with bash 3.x)
+wait
