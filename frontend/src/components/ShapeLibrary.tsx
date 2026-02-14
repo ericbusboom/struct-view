@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid'
 import { useModelStore } from '../store/useModelStore'
 import { useEditor2DStore } from '../store/useEditor2DStore'
+import { usePlacementStore } from '../store/usePlacementStore'
 import type { Shape2D } from '../model'
 
 function deepCopyShape(shape: Shape2D): Shape2D {
@@ -24,6 +25,7 @@ export default function ShapeLibrary({ onClose }: { onClose: () => void }) {
   const editingShapeId = useEditor2DStore((s) => s.editingShapeId)
   const isDirty = useEditor2DStore((s) => s.isDirty)
   const markClean = useEditor2DStore((s) => s.markClean)
+  const startPlacement = usePlacementStore((s) => s.startPlacement)
 
   const handleNew = () => {
     if (!confirmIfDirty(isDirty)) return
@@ -61,6 +63,11 @@ export default function ShapeLibrary({ onClose }: { onClose: () => void }) {
   const handleLoad = (shape: Shape2D) => {
     if (!confirmIfDirty(isDirty)) return
     loadShape(deepCopyShape(shape), shape.id)
+    onClose()
+  }
+
+  const handlePlace = (shape: Shape2D) => {
+    startPlacement(shape)
     onClose()
   }
 
@@ -111,6 +118,7 @@ export default function ShapeLibrary({ onClose }: { onClose: () => void }) {
               </span>
             </div>
             <div className="shape-library-item-actions">
+              <button className="tool-btn" onClick={() => handlePlace(shape)}>Place</button>
               <button className="tool-btn" onClick={() => handleLoad(shape)}>Load</button>
               <button className="tool-btn" onClick={() => handleRename(shape)}>Rename</button>
               <button className="tool-btn" onClick={() => handleDelete(shape)}>Del</button>
