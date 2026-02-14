@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, GizmoHelper, GizmoViewport, Grid } from '@react-three/drei'
 import SceneModel from './SceneModel'
+import GroundPlane from './GroundPlane'
 
 export default function Viewport3D() {
   return (
@@ -25,6 +26,7 @@ export default function Viewport3D() {
 
       <axesHelper args={[5]} />
 
+      <GroundPlane />
       <SceneModel />
 
       <OrbitControls makeDefault />

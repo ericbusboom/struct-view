@@ -23,6 +23,32 @@
   font-weight: 600;
 }
 
+.editor-toolbar {
+  display: flex;
+  gap: 4px;
+  margin-left: 1.5rem;
+}
+
+.tool-btn {
+  padding: 4px 12px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background: transparent;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.tool-btn:hover {
+  background: #333;
+}
+
+.tool-btn.active {
+  background: #4a9eff;
+  color: #fff;
+  border-color: #4a9eff;
+}
+
 .viewport-container {
   flex: 1;
   position: relative;

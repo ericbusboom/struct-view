@@ -1,11 +1,18 @@
+import type { ThreeEvent } from '@react-three/fiber'
 import type { Node } from '../model'
+import { createMember } from '../model'
+import { useEditorStore } from '../store/useEditorStore'
+import { useModelStore } from '../store/useModelStore'
 
 const NODE_RADIUS = 0.08
+const NODE_RADIUS_SELECTED = 0.1
 const NODE_COLOR = '#4a9eff'
+const SELECTED_COLOR = '#ffff00'
 const SUPPORT_FIXED_COLOR = '#ff6b4a'
 const SUPPORT_PINNED_COLOR = '#ffb84a'
 
-function nodeColor(node: Node): string {
+function nodeColor(node: Node, isHighlighted: boolean): string {
+  if (isHighlighted) return SELECTED_COLOR
   if (node.support.type === 'fixed') return SUPPORT_FIXED_COLOR
   if (node.support.type !== 'free') return SUPPORT_PINNED_COLOR
   return NODE_COLOR
@@ -17,10 +24,38 @@ interface Props {
 
 export default function NodeMesh({ node }: Props) {
   const { x, y, z } = node.position
+
+  const mode = useEditorStore((s) => s.mode)
+  const selectedId = useEditorStore((s) => s.selectedId)
+  const select = useEditorStore((s) => s.select)
+  const memberStartNode = useEditorStore((s) => s.memberStartNode)
+  const setMemberStartNode = useEditorStore((s) => s.setMemberStartNode)
+  const addMember = useModelStore((s) => s.addMember)
+
+  const isSelected = selectedId === node.id
+  const isMemberStart = memberStartNode === node.id
+  const highlighted = isSelected || isMemberStart
+
+  const handleClick = (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation()
+
+    if (mode === 'select' || mode === 'move') {
+      select(node.id, 'node')
+    } else if (mode === 'add-member') {
+      if (!memberStartNode) {
+        setMemberStartNode(node.id)
+      } else if (memberStartNode !== node.id) {
+        const member = createMember(memberStartNode, node.id)
+        addMember(member)
+        setMemberStartNode(null)
+      }
+    }
+  }
+
   return (
-    <mesh position={[x, y, z]}>
-      <sphereGeometry args={[NODE_RADIUS, 16, 16]} />
-      <meshStandardMaterial color={nodeColor(node)} />
+    <mesh position={[x, y, z]} onClick={handleClick}>
+      <sphereGeometry args={[highlighted ? NODE_RADIUS_SELECTED : NODE_RADIUS, 16, 16]} />
+      <meshStandardMaterial color={nodeColor(node, highlighted)} />
     </mesh>
   )
 }

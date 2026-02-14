@@ -1,9 +1,12 @@
 ---
-id: "005"
+id: '005'
 title: Editor commands - create, move, delete nodes and members
-status: todo
-use-cases: [SUC-001]
-depends-on: ["002", "004"]
+status: in-progress
+use-cases:
+- SUC-001
+depends-on:
+- '002'
+- '004'
 ---
 
 # Editor commands - create, move, delete nodes and members
