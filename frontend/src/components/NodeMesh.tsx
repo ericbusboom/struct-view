@@ -31,6 +31,7 @@ export default function NodeMesh({ node }: Props) {
   const toggleSelect = useEditorStore((s) => s.toggleSelect)
   const memberStartNode = useEditorStore((s) => s.memberStartNode)
   const setMemberStartNode = useEditorStore((s) => s.setMemberStartNode)
+  const setDragNodeId = useEditorStore((s) => s.setDragNodeId)
   const addMember = useModelStore((s) => s.addMember)
 
   const isMemberStart = memberStartNode === node.id
@@ -39,7 +40,7 @@ export default function NodeMesh({ node }: Props) {
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
 
-    if (mode === 'select' || mode === 'move') {
+    if (mode === 'select') {
       if (e.nativeEvent.shiftKey) {
         toggleSelect(node.id, 'node')
       } else {
@@ -56,8 +57,16 @@ export default function NodeMesh({ node }: Props) {
     }
   }
 
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+    if (mode === 'move') {
+      e.stopPropagation()
+      select(node.id, 'node')
+      setDragNodeId(node.id)
+    }
+  }
+
   return (
-    <mesh position={[x, y, z]} onClick={handleClick}>
+    <mesh position={[x, y, z]} onClick={handleClick} onPointerDown={handlePointerDown}>
       <sphereGeometry args={[highlighted ? NODE_RADIUS_SELECTED : NODE_RADIUS, 16, 16]} />
       <meshStandardMaterial color={nodeColor(node, highlighted)} />
     </mesh>
