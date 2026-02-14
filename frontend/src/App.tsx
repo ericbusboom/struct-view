@@ -4,6 +4,7 @@ import EditorToolbar from './components/EditorToolbar'
 import FileToolbar from './components/FileToolbar'
 import KeyboardHandler from './components/KeyboardHandler'
 import Canvas2DEditor from './components/Canvas2DEditor'
+import PlacementPanel from './components/PlacementPanel'
 import { useCanvas2DStore } from './store/useCanvas2DStore'
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
       <main className="viewport-container">
         <Viewport3D />
       </main>
+      <PlacementPanel />
       {is2DOpen && <Canvas2DEditor />}
     </div>
   )

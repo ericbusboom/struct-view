@@ -10,6 +10,8 @@ export interface Editor2DState {
   shape: Shape2D
   selectedIds: Set<string>
   pendingSegmentStart: string | null
+  editingShapeId: string | null
+  isDirty: boolean
 
   setTool: (tool: Tool2D) => void
   addNode: (x: number, y: number) => string
@@ -19,8 +21,9 @@ export interface Editor2DState {
   selectEntity: (id: string | null) => void
   setPendingSegmentStart: (nodeId: string | null) => void
   toggleSnapEdge: (memberId: string) => void
-  loadShape: (shape: Shape2D) => void
+  loadShape: (shape: Shape2D, shapeId?: string) => void
   resetShape: (name?: string) => void
+  markClean: () => void
 }
 
 export const useEditor2DStore = create<Editor2DState>((set) => ({
@@ -28,6 +31,8 @@ export const useEditor2DStore = create<Editor2DState>((set) => ({
   shape: createShape2D('New Shape'),
   selectedIds: new Set(),
   pendingSegmentStart: null,
+  editingShapeId: null,
+  isDirty: false,
 
   setTool: (tool) =>
     set({ currentTool: tool, pendingSegmentStart: null, selectedIds: new Set() }),
@@ -39,6 +44,7 @@ export const useEditor2DStore = create<Editor2DState>((set) => ({
         ...state.shape,
         nodes: [...state.shape.nodes, { id, x, y }],
       },
+      isDirty: true,
     }))
     return id
   },
@@ -61,6 +67,7 @@ export const useEditor2DStore = create<Editor2DState>((set) => ({
             { id: nanoid(), startNode, endNode, isSnapEdge: false },
           ],
         },
+        isDirty: true,
       }
     }),
 
@@ -78,6 +85,7 @@ export const useEditor2DStore = create<Editor2DState>((set) => ({
             ),
           },
           selectedIds: new Set(),
+          isDirty: true,
         }
       }
       // Otherwise treat as a member
@@ -87,6 +95,7 @@ export const useEditor2DStore = create<Editor2DState>((set) => ({
           members: state.shape.members.filter((m) => m.id !== id),
         },
         selectedIds: new Set(),
+        isDirty: true,
       }
     }),
 
@@ -98,6 +107,7 @@ export const useEditor2DStore = create<Editor2DState>((set) => ({
           n.id === id ? { ...n, x, y } : n,
         ),
       },
+      isDirty: true,
     })),
 
   selectEntity: (id) =>
@@ -114,17 +124,22 @@ export const useEditor2DStore = create<Editor2DState>((set) => ({
           m.id === memberId ? { ...m, isSnapEdge: !m.isSnapEdge } : m,
         ),
       },
+      isDirty: true,
     })),
 
-  loadShape: (shape) =>
-    set({ shape, selectedIds: new Set(), pendingSegmentStart: null }),
+  loadShape: (shape, shapeId) =>
+    set({ shape, editingShapeId: shapeId ?? null, isDirty: false, selectedIds: new Set(), pendingSegmentStart: null }),
 
   resetShape: (name) =>
     set({
       shape: createShape2D(name ?? 'New Shape'),
+      editingShapeId: null,
+      isDirty: false,
       selectedIds: new Set(),
       pendingSegmentStart: null,
     }),
+
+  markClean: () => set({ isDirty: false }),
 }))
 
 /** Find node at a given world position within a tolerance. */

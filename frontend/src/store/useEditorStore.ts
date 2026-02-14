@@ -8,6 +8,8 @@ export interface EditorState {
   selectedMemberIds: Set<string>
   /** First node picked in add-member mode */
   memberStartNode: string | null
+  /** Node currently being dragged in move mode */
+  dragNodeId: string | null
 
   setMode: (mode: EditorMode) => void
   /** Select a single entity (replaces current selection). */
@@ -18,6 +20,7 @@ export interface EditorState {
   isNodeSelected: (id: string) => boolean
   isMemberSelected: (id: string) => boolean
   setMemberStartNode: (id: string | null) => void
+  setDragNodeId: (id: string | null) => void
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
@@ -25,9 +28,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   selectedNodeIds: new Set(),
   selectedMemberIds: new Set(),
   memberStartNode: null,
+  dragNodeId: null,
 
   setMode: (mode) =>
-    set({ mode, memberStartNode: null }),
+    set({ mode, memberStartNode: null, dragNodeId: null }),
 
   select: (id, type) =>
     set({
@@ -58,6 +62,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   setMemberStartNode: (id) =>
     set({ memberStartNode: id }),
+
+  setDragNodeId: (id) =>
+    set({ dragNodeId: id }),
 }))
 
 // Convenience helpers for components
