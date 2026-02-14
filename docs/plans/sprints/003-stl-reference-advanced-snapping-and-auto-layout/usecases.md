@@ -12,13 +12,20 @@ Parent: UC-001 (Build structural wireframes)
 - **Main Flow**:
   1. User clicks "Import STL" and selects a file.
   2. System parses the STL, extracts vertices/edges, builds spatial index.
-  3. STL renders as a semi-transparent shell in the 3D viewport.
-  4. User can toggle STL visibility and adjust transparency.
-- **Postconditions**: STL is displayed and available as snap target.
+  3. System computes the axis-aligned bounding box (AABB) and displays X/Y/Z extents in project display units.
+  4. User verifies dimensions. If incorrect, user edits any single dimension to its known real-world value; system computes a uniform scale factor and applies it to all axes.
+  5. STL renders as a semi-transparent shell in the 3D viewport at the corrected scale.
+  6. User can toggle STL visibility and adjust transparency.
+- **Alternate Flow (non-uniform scale)**:
+  4a. User edits more than one dimension — system warns that this distorts geometry, applies non-uniform scale if confirmed.
+- **Postconditions**: STL is displayed at correct real-world scale and available as snap target. Scale factor is stored in the project.
 - **Acceptance Criteria**:
   - [ ] STL renders without blocking the UI (web worker processing).
   - [ ] Files exceeding 100k triangles are rejected with a clear message.
   - [ ] Both binary and ASCII STL formats are supported.
+  - [ ] AABB dimensions are displayed immediately after import.
+  - [ ] User can correct scale by editing a single known dimension.
+  - [ ] Scale factor is stored in the project and applied on reload.
   - [ ] STL reference persists across save/load.
 
 ## SUC-008: Draw beams snapping to STL reference geometry

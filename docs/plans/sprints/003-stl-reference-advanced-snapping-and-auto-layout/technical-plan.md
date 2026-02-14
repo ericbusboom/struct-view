@@ -9,8 +9,9 @@ status: draft
 ```mermaid
 flowchart LR
   UPLOAD[STL Upload] --> WORKER[Web Worker: Parse + Index]
-  WORKER --> SPATIAL[Spatial Index - Octree/BVH]
-  WORKER --> RENDER[Three.js Mesh Renderer]
+  WORKER --> AABB[AABB + Scale Correction UI]
+  AABB --> SPATIAL[Spatial Index - Octree/BVH]
+  AABB --> RENDER[Three.js Mesh Renderer]
   SPATIAL --> SNAP3D[3D Snap Engine]
   SNAP3D --> DRAW[3D Beam Drawing]
   SPATIAL --> AUTOLAYOUT[Auto-Layout Engine]
@@ -18,7 +19,7 @@ flowchart LR
   DRAW --> MODEL
 ```
 
-STL processing happens entirely in a web worker. The worker parses the file, extracts unique vertices and edges, optionally simplifies the mesh, builds a spatial index, and returns both the renderable mesh data and the index to the main thread.
+STL processing happens entirely in a web worker. The worker parses the file, extracts unique vertices and edges, optionally simplifies the mesh, builds a spatial index, and returns both the renderable mesh data and the index to the main thread. Before the STL is committed to the scene, the user sees an AABB dimensions overlay and can correct the scale.
 
 ## Component Design
 
@@ -27,6 +28,14 @@ STL processing happens entirely in a web worker. The worker parses the file, ext
 **Use Cases**: SUC-007
 
 Handles binary and ASCII STL formats. Extracts triangle list, deduplicates vertices (0.1mm tolerance), derives edges from triangle adjacency. Applies mesh simplification if triangle count exceeds target. Rejects meshes above 100k triangles after simplification.
+
+### Component: Scale Correction (`stl/scale-correction`)
+
+**Use Cases**: SUC-007
+
+Computes the axis-aligned bounding box (AABB) from parsed mesh vertices and returns X/Y/Z extents. Provides a `computeScaleFactor(knownAxis, knownValue)` function that returns a uniform scale factor. For non-uniform scaling, accepts per-axis overrides. The scale factor is applied to all vertex positions before spatial index construction and rendering. The factor is stored in the project's STL reference record so it persists across save/load.
+
+UI: A modal/overlay shown after import displaying the three extents in project display units. The user can edit any dimension; on change, the uniform scale factor is recomputed and a scaled preview is shown. Confirm commits the scale; cancel discards the import.
 
 ### Component: Spatial Index (`stl/spatial-index`)
 
@@ -67,7 +76,9 @@ Takes selected STL face IDs, computes bounding rectangle in the face plane, gene
 ## Data Rules
 
 - STL stored in project as file reference or base64-encoded geometry.
-- Spatial index rebuilt on load (not serialized).
+- STL reference record includes: filename, scale factor (uniform or per-axis), AABB extents (post-scale), and visibility/opacity settings.
+- Scale factor defaults to 1.0. Applied to all vertices before indexing and rendering.
+- Spatial index rebuilt on load (not serialized). Rebuilt after scale correction.
 - Triangle limit: 100k. Reject above with guidance to simplify externally.
 - Mesh simplification merges vertices within 0.1mm, collapses edges < 1mm.
 - Auto-layout respects 1mm node merge tolerance from Sprint 002.

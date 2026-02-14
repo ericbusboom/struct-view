@@ -18,11 +18,11 @@ Users often have a 3D envelope shape (from Tinkercad, Fusion 360, etc.) and need
 
 ## Solution
 
-STL import with spatial indexing for fast snap queries, semi-transparent rendering as a reference shell, 3D beam drawing with STL snapping, and an auto-layout engine that generates beams on selected STL faces at user-specified spacing.
+STL import with scale correction (AABB dimension verification), spatial indexing for fast snap queries, semi-transparent rendering as a reference shell, 3D beam drawing with STL snapping, and an auto-layout engine that generates beams on selected STL faces at user-specified spacing.
 
 ## Success Criteria
 
-- User can import an STL and see it rendered semi-transparently.
+- User can import an STL, verify/correct its scale via AABB dimensions, and see it rendered semi-transparently.
 - Beam endpoints snap to STL vertices, edges, and faces during 3D drawing.
 - Auto-layout generates correctly spaced studs/joists on a selected STL face.
 - Overly complex STL files are rejected with helpful guidance.
@@ -32,6 +32,7 @@ STL import with spatial indexing for fast snap queries, semi-transparent renderi
 ### In Scope
 
 - STL file import (binary and ASCII), parsing, vertex/edge extraction
+- Scale correction: AABB display, user-editable dimensions, uniform/non-uniform scale factor, persisted in project
 - Mesh simplification and triangle count limit (100k)
 - Spatial index (octree or BVH) for snap queries
 - Semi-transparent Three.js mesh rendering with visibility toggle
