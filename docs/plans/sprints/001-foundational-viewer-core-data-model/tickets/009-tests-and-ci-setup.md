@@ -1,9 +1,16 @@
 ---
-id: "009"
+id: 009
 title: Tests and CI setup
-status: todo
-use-cases: [SUC-001, SUC-002, SUC-003]
-depends-on: ["002", "005", "007", "008"]
+status: in-progress
+use-cases:
+- SUC-001
+- SUC-002
+- SUC-003
+depends-on:
+- '002'
+- '005'
+- '007'
+- 008
 ---
 
 # Tests and CI setup
