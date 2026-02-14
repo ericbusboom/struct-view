@@ -77,3 +77,89 @@ describe('Shape library operations', () => {
     expect(Shape2DSchema.safeParse(saved).success).toBe(true)
   })
 })
+
+describe('Multi-shape management', () => {
+  it('isDirty starts false and becomes true on addNode', () => {
+    expect(useEditor2DStore.getState().isDirty).toBe(false)
+    useEditor2DStore.getState().addNode(1, 1)
+    expect(useEditor2DStore.getState().isDirty).toBe(true)
+  })
+
+  it('isDirty becomes true on addMember', () => {
+    const a = useEditor2DStore.getState().addNode(0, 0)
+    const b = useEditor2DStore.getState().addNode(5, 0)
+    useEditor2DStore.setState({ isDirty: false })
+    useEditor2DStore.getState().addMember(a, b)
+    expect(useEditor2DStore.getState().isDirty).toBe(true)
+  })
+
+  it('isDirty becomes true on deleteEntity', () => {
+    const n1 = useEditor2DStore.getState().addNode(0, 0)
+    useEditor2DStore.setState({ isDirty: false })
+    useEditor2DStore.getState().deleteEntity(n1)
+    expect(useEditor2DStore.getState().isDirty).toBe(true)
+  })
+
+  it('isDirty becomes true on moveNode', () => {
+    const n1 = useEditor2DStore.getState().addNode(0, 0)
+    useEditor2DStore.setState({ isDirty: false })
+    useEditor2DStore.getState().moveNode(n1, 5, 5)
+    expect(useEditor2DStore.getState().isDirty).toBe(true)
+  })
+
+  it('isDirty becomes true on toggleSnapEdge', () => {
+    const n1 = useEditor2DStore.getState().addNode(0, 0)
+    const n2 = useEditor2DStore.getState().addNode(5, 0)
+    useEditor2DStore.getState().addMember(n1, n2)
+    useEditor2DStore.setState({ isDirty: false })
+    const memberId = useEditor2DStore.getState().shape.members[0].id
+    useEditor2DStore.getState().toggleSnapEdge(memberId)
+    expect(useEditor2DStore.getState().isDirty).toBe(true)
+  })
+
+  it('loadShape sets editingShapeId and clears isDirty', () => {
+    useEditor2DStore.getState().addNode(0, 0)
+    expect(useEditor2DStore.getState().isDirty).toBe(true)
+
+    const shape = generatePrattTruss(10, 2, 4)
+    useModelStore.getState().addShape(shape)
+    const stored = useModelStore.getState().shapes[0]
+
+    useEditor2DStore.getState().loadShape(JSON.parse(JSON.stringify(stored)), stored.id)
+    expect(useEditor2DStore.getState().editingShapeId).toBe(stored.id)
+    expect(useEditor2DStore.getState().isDirty).toBe(false)
+  })
+
+  it('resetShape clears editingShapeId and isDirty', () => {
+    const shape = generatePrattTruss(10, 2, 4)
+    useModelStore.getState().addShape(shape)
+    useEditor2DStore.getState().loadShape(JSON.parse(JSON.stringify(shape)), shape.id)
+    useEditor2DStore.getState().addNode(99, 99)
+
+    expect(useEditor2DStore.getState().editingShapeId).toBe(shape.id)
+    expect(useEditor2DStore.getState().isDirty).toBe(true)
+
+    useEditor2DStore.getState().resetShape()
+    expect(useEditor2DStore.getState().editingShapeId).toBeNull()
+    expect(useEditor2DStore.getState().isDirty).toBe(false)
+  })
+
+  it('markClean clears isDirty without changing editingShapeId', () => {
+    const shape = generatePrattTruss(10, 2, 4)
+    useModelStore.getState().addShape(shape)
+    useEditor2DStore.getState().loadShape(JSON.parse(JSON.stringify(shape)), shape.id)
+    useEditor2DStore.getState().addNode(99, 99)
+
+    expect(useEditor2DStore.getState().isDirty).toBe(true)
+    useEditor2DStore.getState().markClean()
+    expect(useEditor2DStore.getState().isDirty).toBe(false)
+    expect(useEditor2DStore.getState().editingShapeId).toBe(shape.id)
+  })
+
+  it('loadShape without shapeId sets editingShapeId to null (template load)', () => {
+    const shape = generatePrattTruss(10, 2, 4)
+    useEditor2DStore.getState().loadShape(JSON.parse(JSON.stringify(shape)))
+    expect(useEditor2DStore.getState().editingShapeId).toBeNull()
+    expect(useEditor2DStore.getState().isDirty).toBe(false)
+  })
+})
