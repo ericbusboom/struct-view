@@ -12,12 +12,13 @@ import FocusCameraController from './FocusCameraController'
 export default function Viewport3D() {
   return (
     <Canvas
-      camera={{ position: [10, 8, 10], fov: 50, near: 0.1, far: 1000 }}
+      camera={{ position: [10, -8, 10], fov: 50, near: 0.1, far: 1000, up: [0, 0, 1] }}
       style={{ background: '#2a2a2a' }}
     >
       <ambientLight intensity={0.4} />
-      <directionalLight position={[10, 15, 10]} intensity={0.8} />
+      <directionalLight position={[10, 10, 15]} intensity={0.8} />
 
+      {/* Ground grid in XY plane (Z-up) */}
       <Grid
         args={[100, 100]}
         cellSize={1}
@@ -28,6 +29,7 @@ export default function Viewport3D() {
         sectionColor="#666"
         fadeDistance={50}
         infiniteGrid
+        rotation={[Math.PI / 2, 0, 0]}
       />
 
       <axesHelper args={[5]} />

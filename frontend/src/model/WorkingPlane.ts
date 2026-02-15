@@ -108,7 +108,7 @@ export function createPlaneFromPoints(points: Vec3[]): WorkingPlane {
   const id = `plane-${nextId++}`
 
   if (points.length === 0) {
-    const normal = { ...WORLD_Y }
+    const normal = { ...WORLD_Z }
     const point = { x: 0, y: 0, z: 0 }
     const { tangentU, tangentV } = computeTangents(normal)
     return {
@@ -123,7 +123,7 @@ export function createPlaneFromPoints(points: Vec3[]): WorkingPlane {
   }
 
   if (points.length === 1) {
-    const normal = { ...WORLD_Y }
+    const normal = { ...WORLD_Z }
     const point = { ...points[0] }
     const { tangentU, tangentV } = computeTangents(normal)
     return {
@@ -179,8 +179,8 @@ export function createPlaneFromPoints(points: Vec3[]): WorkingPlane {
   }
 
   const normal = normalize(rawNormal)
-  // Ensure normal points "upward" (positive Y component) for consistency
-  const finalNormal = normal.y < 0 ? negate(normal) : normal
+  // Ensure normal points "upward" (positive Z component) for consistency (Z-up)
+  const finalNormal = normal.z < 0 ? negate(normal) : normal
   const point = { ...p0 }
   const { tangentU, tangentV } = computeTangents(finalNormal)
   return {

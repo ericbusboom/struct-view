@@ -60,7 +60,7 @@ export default function FocusCameraController() {
         savedCameraState.quaternion.z,
         savedCameraState.quaternion.w,
       )
-      camera.up.set(0, 1, 0) // Restore default up
+      camera.up.set(0, 0, 1) // Restore default up (Z-up)
       camera.updateProjectionMatrix()
     }
 

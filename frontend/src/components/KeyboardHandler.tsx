@@ -23,8 +23,13 @@ export default function KeyboardHandler() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement).tagName === 'INPUT') return
 
-      const newMode = MODE_KEYS[e.key.toLowerCase()]
+      const key = e.key.toLowerCase()
+      console.log(`[key] '${e.key}' (lower: '${key}')`)
+
+      // Mode keys
+      const newMode = MODE_KEYS[key]
       if (newMode) {
+        console.log(`[key] mode → ${newMode}`)
         setMode(newMode)
         return
       }
@@ -32,6 +37,7 @@ export default function KeyboardHandler() {
       // Delete / Backspace — remove all selected entities
       if (e.key === 'Delete' || e.key === 'Backspace') {
         const { selectedNodeIds, selectedMemberIds, clearSelection } = useEditorStore.getState()
+        console.log(`[key] delete: ${selectedNodeIds.size} nodes, ${selectedMemberIds.size} members`)
         const model = useModelStore.getState()
 
         for (const id of selectedMemberIds) {
@@ -41,6 +47,7 @@ export default function KeyboardHandler() {
           useModelStore.getState().removeNode(id)
         }
         clearSelection()
+        return
       }
 
       // Arrow keys — nudge (move mode) or rotate (rotate mode) selected truss
@@ -58,7 +65,6 @@ export default function KeyboardHandler() {
           const trussNodes = useModelStore.getState().getNodesByGroupId(selectedGroupId)
 
           if (currentMode === 'rotate') {
-            // Arrow left/right rotate by +/-15 degrees
             const angleDeg = (arrowDir === 'right' || arrowDir === 'up') ? 15 : -15
             const { rotatePivotNodeId } = useEditorStore.getState()
             const pivotNode = rotatePivotNodeId ? useModelStore.getState().nodes.find((n) => n.id === rotatePivotNodeId) : null
@@ -69,7 +75,6 @@ export default function KeyboardHandler() {
               useModelStore.getState().updateNode(trussNodes[i].id, { position: rotated[i] })
             }
           } else {
-            // Move mode: nudge by step size
             const stepSize = e.shiftKey ? 0.1 : 0.5
             const delta = computeNudgeDelta(arrowDir, activePlane, stepSize)
             for (const node of trussNodes) {
@@ -83,21 +88,19 @@ export default function KeyboardHandler() {
             }
           }
         }
+        return
       }
 
       // P key — create working plane from selection
-      if (e.key.toLowerCase() === 'p') {
+      if (key === 'p') {
         const { selectedNodeIds, selectedMemberIds } = useEditorStore.getState()
         const { nodes, members } = useModelStore.getState()
 
-        // Collect points from selected nodes
         const points: Vec3[] = []
         for (const id of selectedNodeIds) {
           const node = nodes.find((n) => n.id === id)
           if (node) points.push({ ...node.position })
         }
-
-        // Add beam endpoints for selected members
         for (const id of selectedMemberIds) {
           const member = members.find((m) => m.id === id)
           if (member) {
@@ -108,25 +111,32 @@ export default function KeyboardHandler() {
           }
         }
 
-        // setActivePlane resets focus and savedCameraState automatically
         const plane = createPlaneFromPoints(points.slice(0, 3))
+        console.log(`[key] p → plane from ${points.length} points, normal=(${plane.normal.x.toFixed(2)}, ${plane.normal.y.toFixed(2)}, ${plane.normal.z.toFixed(2)}), type=${plane.constraintType}`)
         usePlaneStore.getState().setActivePlane(plane)
+        return
       }
 
       // F key — toggle focus on active plane
-      if (e.key.toLowerCase() === 'f' && !e.ctrlKey && !e.metaKey) {
-        const { activePlane } = usePlaneStore.getState()
+      if (key === 'f' && !e.ctrlKey && !e.metaKey) {
+        const { activePlane, isFocused } = usePlaneStore.getState()
         if (activePlane) {
           usePlaneStore.getState().toggleFocus()
+          console.log(`[key] f → focus ${isFocused ? 'OFF' : 'ON'}`)
+        } else {
+          console.log(`[key] f → no active plane, ignoring`)
         }
+        return
       }
 
       // Escape — clear selection, clear active plane, and reset to select mode
       if (e.key === 'Escape') {
+        console.log(`[key] Escape → clear all`)
         useEditorStore.getState().clearSelection()
         useEditorStore.getState().setMemberStartNode(null)
         usePlaneStore.getState().clearActivePlane()
         setMode('select')
+        return
       }
     }
 

@@ -15,7 +15,7 @@ export default function GroundPlane() {
     e.stopPropagation()
 
     if (mode === 'add-node') {
-      const cursor = { x: e.point.x, y: 0, z: e.point.z }
+      const cursor = { x: e.point.x, y: e.point.y, z: 0 }
       const snapped = snapPoint3D(cursor, nodes, members, {
         snapRadius: 0.5,
         gridSize: 1.0,
@@ -28,7 +28,7 @@ export default function GroundPlane() {
   }
 
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} onClick={handleClick}>
+    <mesh position={[0, 0, 0]} onClick={handleClick}>
       <planeGeometry args={[200, 200]} />
       <meshBasicMaterial visible={false} />
     </mesh>

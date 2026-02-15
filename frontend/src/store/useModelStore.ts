@@ -51,23 +51,23 @@ export interface ModelState {
   }) => void
 }
 
-// Sample 3D shed frame for visual verification and plane testing.
-// Front frame (z=0), back frame (z=4), ridge, and connecting beams
+// Sample 3D shed frame for visual verification and plane testing (Z-up).
+// Front frame (y=0), back frame (y=4), ridge, and connecting beams
 // give nodes in all three principal planes plus oblique selections.
 function createSampleModel() {
-  // Front frame (z = 0)
+  // Front frame (y = 0)
   const n1 = createNode({ id: 'n1', position: { x: 0, y: 0, z: 0 }, support: { type: 'fixed' } })
-  const n2 = createNode({ id: 'n2', position: { x: 0, y: 3, z: 0 } })
-  const n3 = createNode({ id: 'n3', position: { x: 2.5, y: 4.5, z: 0 } }) // ridge
-  const n4 = createNode({ id: 'n4', position: { x: 5, y: 3, z: 0 } })
+  const n2 = createNode({ id: 'n2', position: { x: 0, y: 0, z: 3 } })
+  const n3 = createNode({ id: 'n3', position: { x: 2.5, y: 0, z: 4.5 } }) // ridge
+  const n4 = createNode({ id: 'n4', position: { x: 5, y: 0, z: 3 } })
   const n5 = createNode({ id: 'n5', position: { x: 5, y: 0, z: 0 }, support: { type: 'fixed' } })
 
-  // Back frame (z = 4)
-  const n6 = createNode({ id: 'n6', position: { x: 0, y: 0, z: 4 }, support: { type: 'fixed' } })
-  const n7 = createNode({ id: 'n7', position: { x: 0, y: 3, z: 4 } })
-  const n8 = createNode({ id: 'n8', position: { x: 2.5, y: 4.5, z: 4 } }) // ridge
-  const n9 = createNode({ id: 'n9', position: { x: 5, y: 3, z: 4 } })
-  const n10 = createNode({ id: 'n10', position: { x: 5, y: 0, z: 4 }, support: { type: 'fixed' } })
+  // Back frame (y = 4)
+  const n6 = createNode({ id: 'n6', position: { x: 0, y: 4, z: 0 }, support: { type: 'fixed' } })
+  const n7 = createNode({ id: 'n7', position: { x: 0, y: 4, z: 3 } })
+  const n8 = createNode({ id: 'n8', position: { x: 2.5, y: 4, z: 4.5 } }) // ridge
+  const n9 = createNode({ id: 'n9', position: { x: 5, y: 4, z: 3 } })
+  const n10 = createNode({ id: 'n10', position: { x: 5, y: 4, z: 0 }, support: { type: 'fixed' } })
 
   // Front frame members
   const m1 = createMember('n1', 'n2', { id: 'm1' })
@@ -81,7 +81,7 @@ function createSampleModel() {
   const m7 = createMember('n8', 'n9', { id: 'm7' })
   const m8 = createMember('n9', 'n10', { id: 'm8' })
 
-  // Connecting beams (along Z axis)
+  // Connecting beams (along Y axis)
   const m9 = createMember('n2', 'n7', { id: 'm9' })
   const m10 = createMember('n3', 'n8', { id: 'm10' }) // ridge beam
   const m11 = createMember('n4', 'n9', { id: 'm11' })
