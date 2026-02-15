@@ -51,23 +51,37 @@ const WORLD_AXES: Vec3[] = [WORLD_X, WORLD_Y, WORLD_Z]
 
 /**
  * Compute tangent vectors from a normal.
- * tangentU is the world axis most perpendicular to the normal (via cross product).
- * tangentV = normal × tangentU to complete the right-handed frame.
+ * tangentV is always the projection of world-Z onto the plane ("up" in the
+ * plane), so the 2D focus view shows Z-up on screen.  For horizontal planes
+ * where Z is the normal, we fall back to projecting world-Y as screen-up.
+ * tangentU completes the right-handed frame (U × V = N).
  */
 function computeTangents(normal: Vec3): { tangentU: Vec3; tangentV: Vec3 } {
-  // Pick the world axis least aligned with the normal (smallest |dot|)
-  let bestAxis = WORLD_X
-  let minDot = Math.abs(dot(normal, WORLD_X))
-  for (const axis of WORLD_AXES) {
-    const d = Math.abs(dot(normal, axis))
-    if (d < minDot) {
-      minDot = d
-      bestAxis = axis
-    }
+  // Project world-Z onto the plane: projZ = Z - dot(Z, N) * N
+  const dotZN = dot(WORLD_Z, normal)
+  const projZ: Vec3 = {
+    x: WORLD_Z.x - dotZN * normal.x,
+    y: WORLD_Z.y - dotZN * normal.y,
+    z: WORLD_Z.z - dotZN * normal.z,
   }
 
-  const tangentU = normalize(cross(normal, bestAxis))
-  const tangentV = normalize(cross(normal, tangentU))
+  let tangentV: Vec3
+  if (length(projZ) > 1e-6) {
+    // Non-horizontal plane: Z projected onto plane is "up"
+    tangentV = normalize(projZ)
+  } else {
+    // Horizontal plane (normal ≈ ±Z): use world-Y as "up" on screen
+    const dotYN = dot(WORLD_Y, normal)
+    const projY: Vec3 = {
+      x: WORLD_Y.x - dotYN * normal.x,
+      y: WORLD_Y.y - dotYN * normal.y,
+      z: WORLD_Y.z - dotYN * normal.z,
+    }
+    tangentV = normalize(projY)
+  }
+
+  // tangentU = "right" in the plane, completing right-handed frame (U × V = N)
+  const tangentU = normalize(cross(tangentV, normal))
   return { tangentU, tangentV }
 }
 
