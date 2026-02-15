@@ -1,9 +1,10 @@
 ---
-id: "004"
+id: '004'
 title: Plane visualization in 3D viewport (translucent grid on active plane)
-status: todo
+status: done
 use-cases: []
-depends-on: ["002"]
+depends-on:
+- '002'
 ---
 
 # Plane visualization in 3D viewport (translucent grid on active plane)

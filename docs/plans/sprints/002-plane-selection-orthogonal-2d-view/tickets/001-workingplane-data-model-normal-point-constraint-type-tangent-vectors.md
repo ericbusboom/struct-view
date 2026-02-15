@@ -1,7 +1,7 @@
 ---
-id: "001"
+id: '001'
 title: WorkingPlane data model (normal, point, constraint type, tangent vectors)
-status: todo
+status: done
 use-cases: []
 depends-on: []
 ---

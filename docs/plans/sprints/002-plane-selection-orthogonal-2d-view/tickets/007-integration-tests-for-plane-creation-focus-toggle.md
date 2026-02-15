@@ -1,9 +1,11 @@
 ---
-id: "007"
+id: '007'
 title: Integration tests for plane creation + focus toggle
-status: todo
+status: done
 use-cases: []
-depends-on: ["003", "005"]
+depends-on:
+- '003'
+- '005'
 ---
 
 # Integration tests for plane creation + focus toggle

@@ -1,9 +1,11 @@
 ---
-id: "006"
+id: '006'
 title: Plane rendering in 2D focus mode (grid overlay, axis labels)
-status: todo
+status: done
 use-cases: []
-depends-on: ["004", "005"]
+depends-on:
+- '004'
+- '005'
 ---
 
 # Plane rendering in 2D focus mode (grid overlay, axis labels)

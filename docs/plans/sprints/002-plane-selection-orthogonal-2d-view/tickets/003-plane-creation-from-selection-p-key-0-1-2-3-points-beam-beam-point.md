@@ -1,9 +1,11 @@
 ---
-id: "003"
-title: Plane creation from selection (p key — 0/1/2/3 points, beam, beam+point)
-status: todo
+id: '003'
+title: "Plane creation from selection (p key \u2014 0/1/2/3 points, beam, beam+point)"
+status: done
 use-cases: []
-depends-on: ["001", "002"]
+depends-on:
+- '001'
+- '002'
 ---
 
 # Plane creation from selection (p key — 0/1/2/3 points, beam, beam+point)

@@ -1,9 +1,10 @@
 ---
-id: "002"
+id: '002'
 title: usePlaneStore (active plane, constraint data, CRUD)
-status: todo
+status: done
 use-cases: []
-depends-on: ["001"]
+depends-on:
+- '001'
 ---
 
 # usePlaneStore (active plane, constraint data, CRUD)

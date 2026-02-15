@@ -1,9 +1,10 @@
 ---
-id: "005"
-title: "f key toggle — orthogonal camera snap to plane / back to 3D perspective"
-status: todo
+id: '005'
+title: "f key toggle \u2014 orthogonal camera snap to plane / back to 3D perspective"
+status: done
 use-cases: []
-depends-on: ["002"]
+depends-on:
+- '002'
 ---
 
 # f key toggle: orthogonal camera snap to plane / back to 3D perspective
