@@ -1,7 +1,7 @@
 ---
-id: "004"
+id: '004'
 title: Move connection info from Node to Member end_releases
-status: todo
+status: done
 use-cases: []
 depends-on: []
 ---

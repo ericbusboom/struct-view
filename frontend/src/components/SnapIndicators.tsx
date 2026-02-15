@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import * as THREE from 'three'
 import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
-import { findGroupSnap } from '../editor3d/snapGroup'
+import { findGroupSnap } from '../editor3d/groupSnap'
 
 const SNAP_THRESHOLD = 0.5
 const INDICATOR_COLOR = '#00ff88'
@@ -14,24 +14,24 @@ const LINE_COLOR = '#00ff88'
  * during move or rotate operations.
  */
 export default function SnapIndicators() {
-  const selectedTrussId = useEditorStore((s) => s.selectedTrussId)
+  const selectedGroupId = useEditorStore((s) => s.selectedGroupId)
   const mode = useEditorStore((s) => s.mode)
   const nodes = useModelStore((s) => s.nodes)
-  const getNodesByTrussId = useModelStore((s) => s.getNodesByTrussId)
+  const getNodesByGroupId = useModelStore((s) => s.getNodesByGroupId)
 
-  const isActive = (mode === 'move' || mode === 'rotate') && !!selectedTrussId
+  const isActive = (mode === 'move' || mode === 'rotate') && !!selectedGroupId
 
   const snap = useMemo(() => {
-    if (!isActive || !selectedTrussId) return null
-    const trussNodes = getNodesByTrussId(selectedTrussId)
-    return findGroupSnap(trussNodes, nodes, selectedTrussId, SNAP_THRESHOLD)
+    if (!isActive || !selectedGroupId) return null
+    const trussNodes = getNodesByGroupId(selectedGroupId)
+    return findGroupSnap(trussNodes, nodes, selectedGroupId, SNAP_THRESHOLD)
     // Re-evaluate whenever node positions change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive, selectedTrussId, nodes])
+  }, [isActive, selectedGroupId, nodes])
 
   if (!snap) return null
 
-  const trussNode = nodes.find((n) => n.id === snap.trussNodeId)
+  const trussNode = nodes.find((n) => n.id === snap.groupNodeId)
   if (!trussNode) return null
 
   // Line from truss node to target node

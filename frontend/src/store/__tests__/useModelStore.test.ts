@@ -7,6 +7,7 @@ function resetStore() {
     name: 'Test',
     nodes: [],
     members: [],
+    groups: [],
     panels: [],
     loads: [],
     load_cases: [],

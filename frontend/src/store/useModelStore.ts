@@ -1,11 +1,12 @@
 import { create } from 'zustand'
-import type { Node, Member, Panel, Load, LoadCase, LoadCombination, Shape2D } from '../model'
+import type { Node, Member, Group, Panel, Load, LoadCase, LoadCombination, Shape2D } from '../model'
 import { createNode, createMember } from '../model'
 
 export interface ModelState {
   name: string
   nodes: Node[]
   members: Member[]
+  groups: Group[]
   panels: Panel[]
   loads: Load[]
   load_cases: LoadCase[]
@@ -27,15 +28,21 @@ export interface ModelState {
   updateShape: (id: string, updates: Partial<Shape2D>) => void
   removeShape: (id: string) => void
 
-  // Truss queries
-  getNodesByTrussId: (trussId: string) => Node[]
-  getMembersByTrussId: (trussId: string) => Member[]
+  // Group operations
+  addGroup: (group: Group) => void
+  removeGroup: (id: string) => void
+  updateGroup: (id: string, updates: Partial<Group>) => void
+
+  // Group queries
+  getNodesByGroupId: (groupId: string) => Node[]
+  getMembersByGroupId: (groupId: string) => Member[]
 
   // Bulk replace (for import)
   loadProject: (project: {
     name: string
     nodes: Node[]
     members: Member[]
+    groups?: Group[]
     panels: Panel[]
     loads: Load[]
     load_cases: LoadCase[]
@@ -59,6 +66,7 @@ function createSampleModel() {
     name: 'Sample Portal Frame',
     nodes: [n1, n2, n3, n4],
     members: [m1, m2, m3],
+    groups: [] as Group[],
     panels: [] as Panel[],
     loads: [] as Load[],
     load_cases: [] as LoadCase[],
@@ -108,8 +116,27 @@ export const useModelStore = create<ModelState>((set) => ({
   removeShape: (id) =>
     set((state) => ({ shapes: state.shapes.filter((s) => s.id !== id) })),
 
-  getNodesByTrussId: (trussId): Node[] => useModelStore.getState().nodes.filter((n: Node) => n.trussId === trussId),
-  getMembersByTrussId: (trussId): Member[] => useModelStore.getState().members.filter((m: Member) => m.trussId === trussId),
+  addGroup: (group) =>
+    set((state) => ({ groups: [...state.groups, group] })),
 
-  loadProject: (project) => set({ ...project, shapes: project.shapes ?? [] }),
+  removeGroup: (id) =>
+    set((state) => ({
+      groups: state.groups.filter((g) => g.id !== id),
+      nodes: state.nodes.map((n) => n.groupId === id ? { ...n, groupId: undefined } : n),
+      members: state.members.map((m) => m.groupId === id ? { ...m, groupId: undefined } : m),
+    })),
+
+  updateGroup: (id, updates) =>
+    set((state) => ({
+      groups: state.groups.map((g) => (g.id === id ? { ...g, ...updates } : g)),
+    })),
+
+  getNodesByGroupId: (groupId): Node[] => useModelStore.getState().nodes.filter((n: Node) => n.groupId === groupId),
+  getMembersByGroupId: (groupId): Member[] => useModelStore.getState().members.filter((m: Member) => m.groupId === groupId),
+
+  loadProject: (project) => set({
+    ...project,
+    groups: project.groups ?? [],
+    shapes: project.shapes ?? [],
+  }),
 }))

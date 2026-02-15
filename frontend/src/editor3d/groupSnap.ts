@@ -1,48 +1,48 @@
 import type { Vec3, Node } from '../model'
 
 export interface GroupSnapResult {
-  /** The truss node that is near a model node */
-  trussNodeId: string
+  /** The group node that is near a model node */
+  groupNodeId: string
   /** The model node it is near */
   targetNodeId: string
   /** Position of the target node */
   targetPosition: Vec3
   /** Distance between the two */
   distance: number
-  /** Delta to apply to the entire truss to co-locate these nodes */
+  /** Delta to apply to the entire group to co-locate these nodes */
   delta: Vec3
 }
 
 /**
- * Find the closest snap candidate between truss nodes and non-truss model nodes.
+ * Find the closest snap candidate between group nodes and non-group model nodes.
  * Returns null if no candidate is within the threshold.
  *
- * @param trussNodes - Nodes belonging to the selected truss
+ * @param groupNodes - Nodes belonging to the selected group
  * @param allNodes - All model nodes
- * @param trussId - The trussId of the selected truss (to exclude from targets)
+ * @param groupId - The groupId of the selected group (to exclude from targets)
  * @param threshold - Snap distance threshold
  */
 export function findGroupSnap(
-  trussNodes: Node[],
+  groupNodes: Node[],
   allNodes: Node[],
-  trussId: string,
+  groupId: string,
   threshold: number,
 ): GroupSnapResult | null {
-  // Target nodes: all nodes NOT in the selected truss
-  const targets = allNodes.filter((n) => n.trussId !== trussId)
+  // Target nodes: all nodes NOT in the selected group
+  const targets = allNodes.filter((n) => n.groupId !== groupId)
 
   let best: GroupSnapResult | null = null
 
-  for (const tn of trussNodes) {
+  for (const gn of groupNodes) {
     for (const target of targets) {
-      const dx = target.position.x - tn.position.x
-      const dy = target.position.y - tn.position.y
-      const dz = target.position.z - tn.position.z
+      const dx = target.position.x - gn.position.x
+      const dy = target.position.y - gn.position.y
+      const dz = target.position.z - gn.position.z
       const dist = Math.sqrt(dx * dx + dy * dy + dz * dz)
 
       if (dist <= threshold && (!best || dist < best.distance)) {
         best = {
-          trussNodeId: tn.id,
+          groupNodeId: gn.id,
           targetNodeId: target.id,
           targetPosition: { ...target.position },
           distance: dist,

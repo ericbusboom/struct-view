@@ -1,7 +1,11 @@
 import { nanoid } from 'nanoid'
-import type { Node, Member, Panel, Load, Project, LoadCase, LoadCombination, Shape2D } from './schemas'
+import type { Node, Member, Group, Panel, Load, Project, LoadCase, LoadCombination, Shape2D } from './schemas'
 
-const NO_RELEASE = { fx: false, fy: false, fz: false, mx: false, my: false, mz: false }
+const DEFAULT_END_RELEASE = {
+  fx: false, fy: false, fz: false,
+  mx: false, my: false, mz: false,
+  connection_type: 'rigid' as const,
+}
 
 /** Structural steel defaults (A36 / S275). */
 const DEFAULT_MATERIAL = {
@@ -28,7 +32,6 @@ export function createNode(overrides: Partial<Node> = {}): Node {
     id: nanoid(),
     position: { x: 0, y: 0, z: 0 },
     support: { type: 'free' },
-    connection_type: 'rigid',
     tags: [],
     ...overrides,
   }
@@ -45,7 +48,7 @@ export function createMember(
     end_node: endNode,
     material: { ...DEFAULT_MATERIAL },
     section: { ...DEFAULT_SECTION },
-    end_releases: { start: { ...NO_RELEASE }, end: { ...NO_RELEASE } },
+    end_releases: { start: { ...DEFAULT_END_RELEASE }, end: { ...DEFAULT_END_RELEASE } },
     tags: [],
     ...overrides,
   }
@@ -109,6 +112,19 @@ export function createLoadCombination(
   }
 }
 
+export function createGroup(
+  name: string,
+  overrides: Partial<Group> = {},
+): Group {
+  return {
+    id: nanoid(),
+    name,
+    nodeIds: [],
+    memberIds: [],
+    ...overrides,
+  }
+}
+
 export function createShape2D(name: string = 'Untitled Shape'): Shape2D {
   return {
     id: nanoid(),
@@ -124,6 +140,7 @@ export function createProject(overrides: Partial<Project> = {}): Project {
     name: 'Untitled Project',
     nodes: [],
     members: [],
+    groups: [],
     panels: [],
     loads: [],
     load_cases: [],

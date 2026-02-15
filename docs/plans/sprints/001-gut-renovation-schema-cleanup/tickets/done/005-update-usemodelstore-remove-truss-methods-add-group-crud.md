@@ -1,12 +1,12 @@
 ---
-id: "002"
-title: Remove trussId from Node/Member schemas; add groupId field
-status: todo
+id: '005'
+title: Update useModelStore (remove truss methods, add group CRUD)
+status: done
 use-cases: []
 depends-on: []
 ---
 
-# Remove trussId from Node/Member schemas; add groupId field
+# Update useModelStore (remove truss methods, add group CRUD)
 
 ## Description
 

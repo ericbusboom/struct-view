@@ -1,12 +1,12 @@
 ---
-id: "006"
-title: Update useEditorStore (selectedTrussId to selectedGroupId)
-status: todo
+id: 008
+title: Verify clean tsc build + all tests pass
+status: done
 use-cases: []
 depends-on: []
 ---
 
-# Update useEditorStore (selectedTrussId to selectedGroupId)
+# Verify clean tsc build + all tests pass
 
 ## Description
 

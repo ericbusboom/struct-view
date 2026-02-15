@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
 import type { EditorMode } from '../store/useEditorStore'
-import { computeNudgeDelta, computeTrussCentroid } from '../editor3d/trussMove'
+import { computeNudgeDelta, computeGroupCentroid } from '../editor3d/groupMove'
 import { rotatePositionsAroundPivot } from '../editor3d/planeRotate'
 
 const MODE_KEYS: Record<string, EditorMode> = {
@@ -49,17 +49,17 @@ export default function KeyboardHandler() {
       }
       const arrowDir = ARROW_DIRS[e.key]
       if (arrowDir) {
-        const { selectedTrussId, activePlane, mode: currentMode } = useEditorStore.getState()
-        if (selectedTrussId) {
+        const { selectedGroupId, activePlane, mode: currentMode } = useEditorStore.getState()
+        if (selectedGroupId) {
           e.preventDefault()
-          const trussNodes = useModelStore.getState().getNodesByTrussId(selectedTrussId)
+          const trussNodes = useModelStore.getState().getNodesByGroupId(selectedGroupId)
 
           if (currentMode === 'rotate') {
             // Arrow left/right rotate by +/-15 degrees
             const angleDeg = (arrowDir === 'right' || arrowDir === 'up') ? 15 : -15
             const { rotatePivotNodeId } = useEditorStore.getState()
             const pivotNode = rotatePivotNodeId ? useModelStore.getState().nodes.find((n) => n.id === rotatePivotNodeId) : null
-            const pivot = pivotNode ? { ...pivotNode.position } : computeTrussCentroid(trussNodes)
+            const pivot = pivotNode ? { ...pivotNode.position } : computeGroupCentroid(trussNodes)
             const positions = trussNodes.map((n) => n.position)
             const rotated = rotatePositionsAroundPivot(positions, pivot, angleDeg, activePlane)
             for (let i = 0; i < trussNodes.length; i++) {

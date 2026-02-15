@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { findGroupSnap } from '../snapGroup'
+import { findGroupSnap } from '../groupSnap'
 import { createNode } from '../../model'
 
 describe('findGroupSnap', () => {
   it('returns null when no targets are within threshold', () => {
     const trussNodes = [
-      createNode({ id: 't1', position: { x: 0, y: 0, z: 0 }, trussId: 'truss-1' }),
+      createNode({ id: 't1', position: { x: 0, y: 0, z: 0 }, groupId: 'truss-1' }),
     ]
     const allNodes = [
       ...trussNodes,
@@ -17,8 +17,8 @@ describe('findGroupSnap', () => {
 
   it('finds the closest snap candidate', () => {
     const trussNodes = [
-      createNode({ id: 't1', position: { x: 0, y: 0, z: 0 }, trussId: 'truss-1' }),
-      createNode({ id: 't2', position: { x: 5, y: 0, z: 0 }, trussId: 'truss-1' }),
+      createNode({ id: 't1', position: { x: 0, y: 0, z: 0 }, groupId: 'truss-1' }),
+      createNode({ id: 't2', position: { x: 5, y: 0, z: 0 }, groupId: 'truss-1' }),
     ]
     const allNodes = [
       ...trussNodes,
@@ -27,18 +27,18 @@ describe('findGroupSnap', () => {
     ]
     const result = findGroupSnap(trussNodes, allNodes, 'truss-1', 0.5)
     expect(result).not.toBeNull()
-    expect(result!.trussNodeId).toBe('t2')
+    expect(result!.groupNodeId).toBe('t2')
     expect(result!.targetNodeId).toBe('n1')
     expect(result!.distance).toBeCloseTo(0.2)
   })
 
   it('ignores nodes from the same truss', () => {
     const trussNodes = [
-      createNode({ id: 't1', position: { x: 0, y: 0, z: 0 }, trussId: 'truss-1' }),
+      createNode({ id: 't1', position: { x: 0, y: 0, z: 0 }, groupId: 'truss-1' }),
     ]
     const allNodes = [
       ...trussNodes,
-      createNode({ id: 't2', position: { x: 0.1, y: 0, z: 0 }, trussId: 'truss-1' }),
+      createNode({ id: 't2', position: { x: 0.1, y: 0, z: 0 }, groupId: 'truss-1' }),
     ]
     const result = findGroupSnap(trussNodes, allNodes, 'truss-1', 0.5)
     expect(result).toBeNull()
@@ -46,7 +46,7 @@ describe('findGroupSnap', () => {
 
   it('computes correct delta for co-location', () => {
     const trussNodes = [
-      createNode({ id: 't1', position: { x: 1, y: 2, z: 3 }, trussId: 'truss-1' }),
+      createNode({ id: 't1', position: { x: 1, y: 2, z: 3 }, groupId: 'truss-1' }),
     ]
     const allNodes = [
       ...trussNodes,
@@ -66,11 +66,11 @@ describe('findGroupSnap', () => {
 
   it('works with nodes from a different truss as targets', () => {
     const trussNodes = [
-      createNode({ id: 't1', position: { x: 0, y: 0, z: 0 }, trussId: 'truss-1' }),
+      createNode({ id: 't1', position: { x: 0, y: 0, z: 0 }, groupId: 'truss-1' }),
     ]
     const allNodes = [
       ...trussNodes,
-      createNode({ id: 'o1', position: { x: 0.3, y: 0, z: 0 }, trussId: 'truss-2' }),
+      createNode({ id: 'o1', position: { x: 0.3, y: 0, z: 0 }, groupId: 'truss-2' }),
     ]
     const result = findGroupSnap(trussNodes, allNodes, 'truss-1', 0.5)
     expect(result).not.toBeNull()
@@ -79,7 +79,7 @@ describe('findGroupSnap', () => {
 
   it('respects threshold exactly', () => {
     const trussNodes = [
-      createNode({ id: 't1', position: { x: 0, y: 0, z: 0 }, trussId: 'truss-1' }),
+      createNode({ id: 't1', position: { x: 0, y: 0, z: 0 }, groupId: 'truss-1' }),
     ]
     const allNodes = [
       ...trussNodes,

@@ -1,12 +1,13 @@
 ---
-id: "008"
-title: Verify clean tsc build + all tests pass
-status: todo
+id: '001'
+title: Delete obsolete files (placement pipeline, mergeNodes, equalSpacing, commitPlacement,
+  old placement components)
+status: done
 use-cases: []
 depends-on: []
 ---
 
-# Verify clean tsc build + all tests pass
+# Delete obsolete files (placement pipeline, mergeNodes, equalSpacing, commitPlacement, old placement components)
 
 ## Description
 

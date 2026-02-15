@@ -31,10 +31,10 @@ export default function NodeMesh({ node }: Props) {
 
   const mode = useEditorStore((s) => s.mode)
   const isSelected = useEditorStore((s) => s.selectedNodeIds.has(node.id))
-  const selectedTrussId = useEditorStore((s) => s.selectedTrussId)
+  const selectedGroupId = useEditorStore((s) => s.selectedGroupId)
   const select = useEditorStore((s) => s.select)
   const toggleSelect = useEditorStore((s) => s.toggleSelect)
-  const selectTruss = useEditorStore((s) => s.selectTruss)
+  const selectGroup = useEditorStore((s) => s.selectGroup)
   const memberStartNode = useEditorStore((s) => s.memberStartNode)
   const setMemberStartNode = useEditorStore((s) => s.setMemberStartNode)
   const setDragNodeId = useEditorStore((s) => s.setDragNodeId)
@@ -43,14 +43,14 @@ export default function NodeMesh({ node }: Props) {
   const addMember = useModelStore((s) => s.addMember)
 
   const isMemberStart = memberStartNode === node.id
-  const isTrussHighlighted = !!(node.trussId && selectedTrussId && node.trussId === selectedTrussId)
+  const isTrussHighlighted = !!(node.groupId && selectedGroupId && node.groupId === selectedGroupId)
   const isPivot = rotatePivotNodeId === node.id
   const highlighted = isSelected || isMemberStart
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
 
-    if (mode === 'rotate' && selectedTrussId && node.trussId === selectedTrussId) {
+    if (mode === 'rotate' && selectedGroupId && node.groupId === selectedGroupId) {
       setRotatePivotNodeId(node.id)
       return
     }
@@ -58,8 +58,8 @@ export default function NodeMesh({ node }: Props) {
     if (mode === 'select') {
       if (e.nativeEvent.shiftKey) {
         toggleSelect(node.id, 'node')
-      } else if (node.trussId) {
-        selectTruss(node.trussId)
+      } else if (node.groupId) {
+        selectGroup(node.groupId)
       } else {
         select(node.id, 'node')
       }

@@ -8,6 +8,7 @@ function resetStores() {
     name: 'Test',
     nodes: [],
     members: [],
+    groups: [],
     panels: [],
     loads: [],
     load_cases: [],
@@ -17,7 +18,7 @@ function resetStores() {
     mode: 'select',
     selectedNodeIds: new Set(),
     selectedMemberIds: new Set(),
-    selectedTrussId: null,
+    selectedGroupId: null,
     memberStartNode: null,
   })
 }
@@ -149,33 +150,33 @@ describe('selection system', () => {
   })
 })
 
-describe('truss selection', () => {
+describe('group selection', () => {
   beforeEach(resetStores)
 
-  it('selectTruss sets selectedTrussId and clears node/member selection', () => {
+  it('selectGroup sets selectedGroupId and clears node/member selection', () => {
     useEditorStore.getState().select('n1', 'node')
-    useEditorStore.getState().selectTruss('truss-1')
-    expect(useEditorStore.getState().selectedTrussId).toBe('truss-1')
+    useEditorStore.getState().selectGroup('truss-1')
+    expect(useEditorStore.getState().selectedGroupId).toBe('truss-1')
     expect(useEditorStore.getState().selectedNodeIds.size).toBe(0)
     expect(useEditorStore.getState().selectedMemberIds.size).toBe(0)
   })
 
-  it('clearSelection clears selectedTrussId', () => {
-    useEditorStore.getState().selectTruss('truss-1')
+  it('clearSelection clears selectedGroupId', () => {
+    useEditorStore.getState().selectGroup('truss-1')
     useEditorStore.getState().clearSelection()
-    expect(useEditorStore.getState().selectedTrussId).toBeNull()
+    expect(useEditorStore.getState().selectedGroupId).toBeNull()
   })
 
-  it('selecting a node clears truss selection', () => {
-    useEditorStore.getState().selectTruss('truss-1')
+  it('selecting a node clears group selection', () => {
+    useEditorStore.getState().selectGroup('truss-1')
     useEditorStore.getState().select('n1', 'node')
-    expect(useEditorStore.getState().selectedTrussId).toBeNull()
+    expect(useEditorStore.getState().selectedGroupId).toBeNull()
   })
 
-  it('selecting a member clears truss selection', () => {
-    useEditorStore.getState().selectTruss('truss-1')
+  it('selecting a member clears group selection', () => {
+    useEditorStore.getState().selectGroup('truss-1')
     useEditorStore.getState().select('m1', 'member')
-    expect(useEditorStore.getState().selectedTrussId).toBeNull()
+    expect(useEditorStore.getState().selectedGroupId).toBeNull()
   })
 })
 
@@ -193,9 +194,9 @@ describe('rotate pivot', () => {
     expect(useEditorStore.getState().rotatePivotNodeId).toBeNull()
   })
 
-  it('selectTruss clears pivot', () => {
+  it('selectGroup clears pivot', () => {
     useEditorStore.getState().setRotatePivotNodeId('n1')
-    useEditorStore.getState().selectTruss('truss-2')
+    useEditorStore.getState().selectGroup('truss-2')
     expect(useEditorStore.getState().rotatePivotNodeId).toBeNull()
   })
 

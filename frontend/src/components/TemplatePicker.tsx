@@ -5,7 +5,7 @@ import {
   generateWarrenTruss,
   generateScissorsTruss,
 } from '../editor2d/trussTemplates'
-import { useEditor2DStore } from '../store/useEditor2DStore'
+import { useModelStore } from '../store/useModelStore'
 import type { Shape2D } from '../model'
 
 type TemplateType = 'pratt' | 'howe' | 'warren' | 'scissors'
@@ -29,11 +29,11 @@ export default function TemplatePicker({ onClose }: { onClose: () => void }) {
   const [span, setSpan] = useState(10)
   const [depth, setDepth] = useState(2)
   const [panels, setPanels] = useState(4)
-  const loadShape = useEditor2DStore((s) => s.loadShape)
+  const addShape = useModelStore((s) => s.addShape)
 
   const handleGenerate = () => {
     const shape = GENERATORS[template](span, depth, panels)
-    loadShape(shape)
+    addShape(shape)
     onClose()
   }
 

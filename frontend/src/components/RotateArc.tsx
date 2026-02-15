@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { useThree } from '@react-three/fiber'
 import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
-import { computeTrussCentroid } from '../editor3d/trussMove'
+import { computeGroupCentroid } from '../editor3d/groupMove'
 import { projectToPlane } from '../editor3d/planeMove'
 import { rotatePositionsAroundPivot, snapAngle } from '../editor3d/planeRotate'
 
@@ -24,11 +24,11 @@ const PLANE_ROTATION: Record<string, [number, number, number]> = {
  * rotate mode is active with a truss selected.
  */
 export default function RotateArc() {
-  const selectedTrussId = useEditorStore((s) => s.selectedTrussId)
+  const selectedGroupId = useEditorStore((s) => s.selectedGroupId)
   const mode = useEditorStore((s) => s.mode)
   const activePlane = useEditorStore((s) => s.activePlane)
   const rotatePivotNodeId = useEditorStore((s) => s.rotatePivotNodeId)
-  const getNodesByTrussId = useModelStore((s) => s.getNodesByTrussId)
+  const getNodesByGroupId = useModelStore((s) => s.getNodesByGroupId)
   const nodes = useModelStore((s) => s.nodes)
   const updateNode = useModelStore((s) => s.updateNode)
   const { camera } = useThree()
@@ -39,15 +39,15 @@ export default function RotateArc() {
   const startPositions = useRef<{ id: string; position: { x: number; y: number; z: number } }[]>([])
   const pivotRef = useRef<{ x: number; y: number; z: number }>({ x: 0, y: 0, z: 0 })
 
-  const isActive = mode === 'rotate' && !!selectedTrussId
+  const isActive = mode === 'rotate' && !!selectedGroupId
 
-  const trussNodes = isActive ? getNodesByTrussId(selectedTrussId!) : []
+  const trussNodes = isActive ? getNodesByGroupId(selectedGroupId!) : []
 
   // Use pivot node position if set, otherwise centroid
   const pivotNode = rotatePivotNodeId ? nodes.find((n) => n.id === rotatePivotNodeId) : null
   const arcCenter = useMemo(() => {
     if (pivotNode) return { ...pivotNode.position }
-    return trussNodes.length > 0 ? computeTrussCentroid(trussNodes) : { x: 0, y: 0, z: 0 }
+    return trussNodes.length > 0 ? computeGroupCentroid(trussNodes) : { x: 0, y: 0, z: 0 }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pivotNode?.position.x, pivotNode?.position.y, pivotNode?.position.z, trussNodes.length, isActive, ...trussNodes.map((n) => `${n.position.x},${n.position.y},${n.position.z}`)])
 
@@ -85,12 +85,12 @@ export default function RotateArc() {
 
   const handlePointerDown = useCallback(
     (e: { nativeEvent: PointerEvent; stopPropagation: () => void }) => {
-      if (!isActive || !selectedTrussId) return
+      if (!isActive || !selectedGroupId) return
       e.stopPropagation()
 
-      const tNodes = getNodesByTrussId(selectedTrussId)
+      const tNodes = getNodesByGroupId(selectedGroupId)
       const pNode = rotatePivotNodeId ? nodes.find((n) => n.id === rotatePivotNodeId) : null
-      const pivot = pNode ? { ...pNode.position } : computeTrussCentroid(tNodes)
+      const pivot = pNode ? { ...pNode.position } : computeGroupCentroid(tNodes)
       pivotRef.current = pivot
 
       const angle = computeAngleFromEvent(e.nativeEvent.clientX, e.nativeEvent.clientY, pivot)
@@ -101,12 +101,12 @@ export default function RotateArc() {
       accumulatedAngle.current = 0
       startPositions.current = tNodes.map((n) => ({ id: n.id, position: { ...n.position } }))
     },
-    [isActive, selectedTrussId, getNodesByTrussId, computeAngleFromEvent, rotatePivotNodeId, nodes],
+    [isActive, selectedGroupId, getNodesByGroupId, computeAngleFromEvent, rotatePivotNodeId, nodes],
   )
 
   const handlePointerMove = useCallback(
     (e: { nativeEvent: PointerEvent }) => {
-      if (!isDragging.current || !selectedTrussId) return
+      if (!isDragging.current || !selectedGroupId) return
 
       const angle = computeAngleFromEvent(e.nativeEvent.clientX, e.nativeEvent.clientY, pivotRef.current)
       if (angle === null) return
@@ -123,7 +123,7 @@ export default function RotateArc() {
         }
       }
     },
-    [selectedTrussId, activePlane, computeAngleFromEvent, updateNode],
+    [selectedGroupId, activePlane, computeAngleFromEvent, updateNode],
   )
 
   const handlePointerUp = useCallback(() => {

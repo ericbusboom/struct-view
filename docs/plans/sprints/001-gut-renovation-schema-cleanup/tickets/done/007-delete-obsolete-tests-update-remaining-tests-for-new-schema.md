@@ -1,7 +1,7 @@
 ---
-id: "007"
+id: '007'
 title: Delete obsolete tests; update remaining tests for new schema
-status: todo
+status: done
 use-cases: []
 depends-on: []
 ---

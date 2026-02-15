@@ -4,18 +4,18 @@ import { useThree } from '@react-three/fiber'
 import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
 import { projectToPlane } from '../editor3d/planeMove'
-import { computeTrussCentroid, constrainDeltaToPlane } from '../editor3d/trussMove'
-import { findGroupSnap } from '../editor3d/snapGroup'
+import { computeGroupCentroid, constrainDeltaToPlane } from '../editor3d/groupMove'
+import { findGroupSnap } from '../editor3d/groupSnap'
 
 /**
  * Invisible overlay that captures pointer events for truss dragging.
  * Active when a truss is selected and the move tool is active.
  */
 export default function TrussDragger() {
-  const selectedTrussId = useEditorStore((s) => s.selectedTrussId)
+  const selectedGroupId = useEditorStore((s) => s.selectedGroupId)
   const mode = useEditorStore((s) => s.mode)
   const activePlane = useEditorStore((s) => s.activePlane)
-  const getNodesByTrussId = useModelStore((s) => s.getNodesByTrussId)
+  const getNodesByGroupId = useModelStore((s) => s.getNodesByGroupId)
   const allNodes = useModelStore((s) => s.nodes)
   const updateNode = useModelStore((s) => s.updateNode)
   const { camera } = useThree()
@@ -23,15 +23,15 @@ export default function TrussDragger() {
   const isDragging = useRef(false)
   const lastHit = useRef<{ x: number; y: number; z: number } | null>(null)
 
-  const isActive = mode === 'move' && !!selectedTrussId
+  const isActive = mode === 'move' && !!selectedGroupId
 
   const getIntersection = useCallback(
     (clientX: number, clientY: number) => {
-      if (!selectedTrussId) return null
-      const trussNodes = getNodesByTrussId(selectedTrussId)
+      if (!selectedGroupId) return null
+      const trussNodes = getNodesByGroupId(selectedGroupId)
       if (trussNodes.length === 0) return null
 
-      const centroid = computeTrussCentroid(trussNodes)
+      const centroid = computeGroupCentroid(trussNodes)
       const ndc = new THREE.Vector2(
         (clientX / window.innerWidth) * 2 - 1,
         -(clientY / window.innerHeight) * 2 + 1,
@@ -52,7 +52,7 @@ export default function TrussDragger() {
 
       return projectToPlane(rayOrigin, rayDir, centroid, activePlane)
     },
-    [selectedTrussId, getNodesByTrussId, camera, activePlane],
+    [selectedGroupId, getNodesByGroupId, camera, activePlane],
   )
 
   const handlePointerDown = useCallback(
@@ -69,7 +69,7 @@ export default function TrussDragger() {
 
   const handlePointerMove = useCallback(
     (e: { nativeEvent: PointerEvent }) => {
-      if (!isDragging.current || !lastHit.current || !selectedTrussId) return
+      if (!isDragging.current || !lastHit.current || !selectedGroupId) return
 
       const hit = getIntersection(e.nativeEvent.clientX, e.nativeEvent.clientY)
       if (!hit) return
@@ -81,7 +81,7 @@ export default function TrussDragger() {
       }
       const delta = constrainDeltaToPlane(rawDelta, activePlane)
 
-      const trussNodes = getNodesByTrussId(selectedTrussId)
+      const trussNodes = getNodesByGroupId(selectedGroupId)
       for (const node of trussNodes) {
         updateNode(node.id, {
           position: {
@@ -94,17 +94,17 @@ export default function TrussDragger() {
 
       lastHit.current = hit
     },
-    [selectedTrussId, getNodesByTrussId, updateNode, activePlane, getIntersection],
+    [selectedGroupId, getNodesByGroupId, updateNode, activePlane, getIntersection],
   )
 
   const handlePointerUp = useCallback(() => {
-    if (isDragging.current && selectedTrussId) {
+    if (isDragging.current && selectedGroupId) {
       // Apply snap on release
-      const trussNodes = getNodesByTrussId(selectedTrussId)
-      const snap = findGroupSnap(trussNodes, allNodes, selectedTrussId, 0.5)
+      const trussNodes = getNodesByGroupId(selectedGroupId)
+      const snap = findGroupSnap(trussNodes, allNodes, selectedGroupId, 0.5)
       if (snap) {
         // Re-read truss nodes after potential updates
-        const currentNodes = getNodesByTrussId(selectedTrussId)
+        const currentNodes = getNodesByGroupId(selectedGroupId)
         for (const node of currentNodes) {
           updateNode(node.id, {
             position: {
@@ -118,7 +118,7 @@ export default function TrussDragger() {
     }
     isDragging.current = false
     lastHit.current = null
-  }, [selectedTrussId, getNodesByTrussId, allNodes, updateNode])
+  }, [selectedGroupId, getNodesByGroupId, allNodes, updateNode])
 
   if (!isActive) return null
 

@@ -3,7 +3,6 @@ import * as THREE from 'three'
 import type { ThreeEvent } from '@react-three/fiber'
 import type { Member, Node } from '../model'
 import { useEditorStore } from '../store/useEditorStore'
-import { usePlacementStore } from '../store/usePlacementStore'
 
 const MEMBER_COLOR = '#cccccc'
 const SELECTED_COLOR = '#ffff00'
@@ -20,13 +19,13 @@ export default function MemberLine({ member, nodes }: Props) {
   const startNode = nodes.get(member.start_node)
   const endNode = nodes.get(member.end_node)
   const isSelected = useEditorStore((s) => s.selectedMemberIds.has(member.id))
-  const selectedTrussId = useEditorStore((s) => s.selectedTrussId)
+  const selectedGroupId = useEditorStore((s) => s.selectedGroupId)
   const mode = useEditorStore((s) => s.mode)
   const select = useEditorStore((s) => s.select)
   const toggleSelect = useEditorStore((s) => s.toggleSelect)
-  const selectTruss = useEditorStore((s) => s.selectTruss)
+  const selectGroup = useEditorStore((s) => s.selectGroup)
 
-  const isTrussHighlighted = !!(member.trussId && selectedTrussId && member.trussId === selectedTrussId)
+  const isTrussHighlighted = !!(member.groupId && selectedGroupId && member.groupId === selectedGroupId)
 
   const geometry = useMemo(() => {
     if (!startNode || !endNode) return null
@@ -36,26 +35,14 @@ export default function MemberLine({ member, nodes }: Props) {
     return new THREE.TubeGeometry(path, 1, TUBE_RADIUS, TUBE_SEGMENTS, false)
   }, [startNode, endNode])
 
-  const placementPhase = usePlacementStore((s) => s.phase)
-  const setTargetEdge = usePlacementStore((s) => s.setTargetEdge)
-
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
-
-    // During placement edge picking, clicking a member uses its endpoints
-    if (placementPhase === 'picking-edge' && startNode && endNode) {
-      setTargetEdge({
-        start: { ...startNode.position },
-        end: { ...endNode.position },
-      })
-      return
-    }
 
     if (mode === 'select') {
       if (e.nativeEvent.shiftKey) {
         toggleSelect(member.id, 'member')
-      } else if (member.trussId) {
-        selectTruss(member.trussId)
+      } else if (member.groupId) {
+        selectGroup(member.groupId)
       } else {
         select(member.id, 'member')
       }
@@ -64,9 +51,16 @@ export default function MemberLine({ member, nodes }: Props) {
 
   if (!geometry) return null
 
+  let color = MEMBER_COLOR
+  if (isSelected) {
+    color = SELECTED_COLOR
+  } else if (isTrussHighlighted) {
+    color = TRUSS_HIGHLIGHT_COLOR
+  }
+
   return (
     <mesh geometry={geometry} onClick={handleClick}>
-      <meshStandardMaterial color={isSelected ? SELECTED_COLOR : isTrussHighlighted ? TRUSS_HIGHLIGHT_COLOR : MEMBER_COLOR} />
+      <meshStandardMaterial color={color} />
     </mesh>
   )
 }

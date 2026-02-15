@@ -1,7 +1,7 @@
 ---
-id: "003"
+id: '003'
 title: Add Group schema to model (id, name, nodeIds, memberIds)
-status: todo
+status: done
 use-cases: []
 depends-on: []
 ---

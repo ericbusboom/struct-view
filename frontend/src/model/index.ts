@@ -1,6 +1,7 @@
 export {
   NodeSchema,
   MemberSchema,
+  GroupSchema,
   PanelSchema,
   LoadSchema,
   LoadCaseSchema,
@@ -30,6 +31,7 @@ export type {
   EndRelease,
   EndReleases,
   Member,
+  Group,
   PanelMaterial,
   Panel,
   LoadType,
@@ -55,6 +57,7 @@ export {
   createLoad,
   createLoadCase,
   createLoadCombination,
+  createGroup,
   createShape2D,
   createProject,
 } from './defaults'

@@ -10,7 +10,7 @@ const PLANE_AXES: Record<PlacementPlane, [keyof Vec3, keyof Vec3]> = {
 /**
  * Compute the centroid of a set of nodes.
  */
-export function computeTrussCentroid(nodes: Node[]): Vec3 {
+export function computeGroupCentroid(nodes: Node[]): Vec3 {
   if (nodes.length === 0) return { x: 0, y: 0, z: 0 }
   const sum = { x: 0, y: 0, z: 0 }
   for (const n of nodes) {

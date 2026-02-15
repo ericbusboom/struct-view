@@ -1,12 +1,12 @@
 ---
-id: "001"
-title: Delete obsolete files (placement pipeline, mergeNodes, equalSpacing, commitPlacement, old placement components)
-status: todo
+id: '006'
+title: Update useEditorStore (selectedTrussId to selectedGroupId)
+status: done
 use-cases: []
 depends-on: []
 ---
 
-# Delete obsolete files (placement pipeline, mergeNodes, equalSpacing, commitPlacement, old placement components)
+# Update useEditorStore (selectedTrussId to selectedGroupId)
 
 ## Description
 

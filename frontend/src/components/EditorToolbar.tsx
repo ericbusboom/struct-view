@@ -13,7 +13,7 @@ const TOOLS: { mode: EditorMode; label: string; shortcut: string }[] = [
 export default function EditorToolbar() {
   const mode = useEditorStore((s) => s.mode)
   const setMode = useEditorStore((s) => s.setMode)
-  const selectedTrussId = useEditorStore((s) => s.selectedTrussId)
+  const selectedGroupId = useEditorStore((s) => s.selectedGroupId)
   const activePlane = useEditorStore((s) => s.activePlane)
   const setActivePlane = useEditorStore((s) => s.setActivePlane)
 
@@ -29,7 +29,7 @@ export default function EditorToolbar() {
           {tool.label}
         </button>
       ))}
-      {selectedTrussId && (
+      {selectedGroupId && (
         <PlaneSelector value={activePlane} onChange={setActivePlane} />
       )}
     </div>

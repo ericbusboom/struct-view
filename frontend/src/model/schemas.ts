@@ -45,9 +45,7 @@ export const NodeSchema = z.object({
   id: z.string().min(1),
   position: Vec3Schema,
   support: SupportSchema,
-  connection_type: ConnectionTypeSchema,
-  connection_method: ConnectionMethodSchema.optional(),
-  trussId: z.string().min(1).optional(),
+  groupId: z.string().optional(),
   tags: z.array(z.string()),
 })
 
@@ -78,6 +76,8 @@ const EndReleaseSchema = z.object({
   mx: z.boolean(),
   my: z.boolean(),
   mz: z.boolean(),
+  connection_type: ConnectionTypeSchema,
+  connection_method: ConnectionMethodSchema.optional(),
 })
 
 const EndReleasesSchema = z.object({
@@ -92,8 +92,17 @@ export const MemberSchema = z.object({
   material: MaterialSchema,
   section: SectionSchema,
   end_releases: EndReleasesSchema,
-  trussId: z.string().min(1).optional(),
+  groupId: z.string().optional(),
   tags: z.array(z.string()),
+})
+
+// --- Group ---
+
+export const GroupSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  nodeIds: z.array(z.string()),
+  memberIds: z.array(z.string()),
 })
 
 // --- Panel ---
@@ -186,6 +195,7 @@ export const ProjectSchema = z.object({
   name: z.string().min(1),
   nodes: z.array(NodeSchema),
   members: z.array(MemberSchema),
+  groups: z.array(GroupSchema).default([]),
   panels: z.array(PanelSchema),
   loads: z.array(LoadSchema),
   load_cases: z.array(LoadCaseSchema),
@@ -207,6 +217,7 @@ export type Section = z.infer<typeof SectionSchema>
 export type EndRelease = z.infer<typeof EndReleaseSchema>
 export type EndReleases = z.infer<typeof EndReleasesSchema>
 export type Member = z.infer<typeof MemberSchema>
+export type Group = z.infer<typeof GroupSchema>
 export type PanelMaterial = z.infer<typeof PanelMaterialSchema>
 export type Panel = z.infer<typeof PanelSchema>
 export type LoadType = z.infer<typeof LoadTypeSchema>

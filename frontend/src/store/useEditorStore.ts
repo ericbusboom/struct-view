@@ -7,8 +7,8 @@ export interface EditorState {
   mode: EditorMode
   selectedNodeIds: Set<string>
   selectedMemberIds: Set<string>
-  /** Currently selected truss (by trussId) */
-  selectedTrussId: string | null
+  /** Currently selected group (by groupId) */
+  selectedGroupId: string | null
   /** First node picked in add-member mode */
   memberStartNode: string | null
   /** Node currently being dragged in move mode */
@@ -24,8 +24,8 @@ export interface EditorState {
   /** Toggle entity in multi-select (shift+click). */
   toggleSelect: (id: string, type: 'node' | 'member') => void
   clearSelection: () => void
-  /** Select an entire truss by its trussId. */
-  selectTruss: (trussId: string) => void
+  /** Select an entire group by its groupId. */
+  selectGroup: (trussId: string) => void
   isNodeSelected: (id: string) => boolean
   isMemberSelected: (id: string) => boolean
   setMemberStartNode: (id: string | null) => void
@@ -38,7 +38,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   mode: 'select',
   selectedNodeIds: new Set(),
   selectedMemberIds: new Set(),
-  selectedTrussId: null,
+  selectedGroupId: null,
   memberStartNode: null,
   dragNodeId: null,
   activePlane: 'XZ' as PlacementPlane,
@@ -51,7 +51,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set({
       selectedNodeIds: type === 'node' ? new Set([id]) : new Set(),
       selectedMemberIds: type === 'member' ? new Set([id]) : new Set(),
-      selectedTrussId: null,
+      selectedGroupId: null,
     }),
 
   toggleSelect: (id, type) =>
@@ -70,10 +70,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     }),
 
   clearSelection: () =>
-    set({ selectedNodeIds: new Set(), selectedMemberIds: new Set(), selectedTrussId: null, rotatePivotNodeId: null }),
+    set({ selectedNodeIds: new Set(), selectedMemberIds: new Set(), selectedGroupId: null, rotatePivotNodeId: null }),
 
-  selectTruss: (trussId) =>
-    set({ selectedNodeIds: new Set(), selectedMemberIds: new Set(), selectedTrussId: trussId, rotatePivotNodeId: null }),
+  selectGroup: (trussId) =>
+    set({ selectedNodeIds: new Set(), selectedMemberIds: new Set(), selectedGroupId: trussId, rotatePivotNodeId: null }),
 
   isNodeSelected: (id) => get().selectedNodeIds.has(id),
   isMemberSelected: (id) => get().selectedMemberIds.has(id),

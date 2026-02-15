@@ -6,8 +6,6 @@ import NodeDragger from './NodeDragger'
 import TrussDragger from './TrussDragger'
 import RotateArc from './RotateArc'
 import SnapIndicators from './SnapIndicators'
-import TargetEdgePicker from './TargetEdgePicker'
-import PlacementPreview from './PlacementPreview'
 
 export default function Viewport3D() {
   return (
@@ -38,8 +36,6 @@ export default function Viewport3D() {
       <TrussDragger />
       <RotateArc />
       <SnapIndicators />
-      <TargetEdgePicker />
-      <PlacementPreview />
 
       <OrbitControls makeDefault />
 
