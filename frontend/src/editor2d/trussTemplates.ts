@@ -61,7 +61,7 @@ export function generatePrattTruss(span: number, depth: number, panels: number):
     }
   }
 
-  return { id: nanoid(), name: 'Pratt Truss', nodes, members }
+  return { id: nanoid(), name: 'Pratt Truss', nodes, members, placementPlane: 'XZ' as const }
 }
 
 /**
@@ -106,7 +106,7 @@ export function generateHoweTruss(span: number, depth: number, panels: number): 
     }
   }
 
-  return { id: nanoid(), name: 'Howe Truss', nodes, members }
+  return { id: nanoid(), name: 'Howe Truss', nodes, members, placementPlane: 'XZ' as const }
 }
 
 /**
@@ -147,7 +147,7 @@ export function generateWarrenTruss(span: number, depth: number, panels: number)
     }
   }
 
-  return { id: nanoid(), name: 'Warren Truss', nodes, members }
+  return { id: nanoid(), name: 'Warren Truss', nodes, members, placementPlane: 'XZ' as const }
 }
 
 /**
@@ -185,5 +185,5 @@ export function generateScissorsTruss(span: number, depth: number, panels: numbe
     members.push(member(bottom[i + 1].id, top[i].id))
   }
 
-  return { id: nanoid(), name: 'Scissors Truss', nodes, members }
+  return { id: nanoid(), name: 'Scissors Truss', nodes, members, placementPlane: 'XZ' as const }
 }

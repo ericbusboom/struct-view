@@ -53,6 +53,7 @@ describe('placeEqualSpacing', () => {
   const simpleShape: Shape2D = {
     id: 'simple',
     name: 'Simple',
+    placementPlane: 'XZ',
     nodes: [
       { id: 'a', x: 0, y: 0 },
       { id: 'b', x: 2, y: 0 },

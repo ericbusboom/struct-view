@@ -108,8 +108,8 @@ export const useModelStore = create<ModelState>((set) => ({
   removeShape: (id) =>
     set((state) => ({ shapes: state.shapes.filter((s) => s.id !== id) })),
 
-  getNodesByTrussId: (trussId) => useModelStore.getState().nodes.filter((n) => n.trussId === trussId),
-  getMembersByTrussId: (trussId) => useModelStore.getState().members.filter((m) => m.trussId === trussId),
+  getNodesByTrussId: (trussId): Node[] => useModelStore.getState().nodes.filter((n: Node) => n.trussId === trussId),
+  getMembersByTrussId: (trussId): Member[] => useModelStore.getState().members.filter((m: Member) => m.trussId === trussId),
 
   loadProject: (project) => set({ ...project, shapes: project.shapes ?? [] }),
 }))

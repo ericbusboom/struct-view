@@ -102,6 +102,7 @@ describe('ProjectSchema with shapes', () => {
         {
           id: 's1',
           name: 'Triangle',
+          placementPlane: 'XZ',
           nodes: [
             { id: 'n1', x: 0, y: 0 },
             { id: 'n2', x: 3, y: 0 },

@@ -49,6 +49,7 @@ describe('Workflow 1: Custom shape draw → save → place → merge → validat
   const triangleShape: Shape2D = {
     id: 'tri',
     name: 'Triangle',
+    placementPlane: 'XZ',
     nodes: [
       { id: 'n1', x: 0, y: 0 },
       { id: 'n2', x: 4, y: 0 },
@@ -185,6 +186,7 @@ describe('Workflow 3: Model validation after placement', () => {
   const shape: Shape2D = {
     id: 'beam',
     name: 'Simple Beam',
+    placementPlane: 'XZ',
     nodes: [
       { id: 'a', x: 0, y: 0 },
       { id: 'b', x: 5, y: 0 },

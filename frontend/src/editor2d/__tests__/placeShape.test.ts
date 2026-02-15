@@ -8,6 +8,7 @@ function makeTestShape(): Shape2D {
   return {
     id: 'test-shape',
     name: 'Test',
+    placementPlane: 'XZ',
     nodes: [
       { id: 'n1', x: 0, y: 0 },
       { id: 'n2', x: 4, y: 0 },
@@ -111,6 +112,7 @@ describe('placeShape', () => {
     const shape: Shape2D = {
       id: 's',
       name: 'Simple',
+      placementPlane: 'XZ',
       nodes: [
         { id: 'a', x: 0, y: 0 },
         { id: 'b', x: 3, y: 0 },
@@ -137,7 +139,7 @@ describe('placeShape', () => {
   })
 
   it('returns empty result for empty shape', () => {
-    const shape: Shape2D = { id: 's', name: 'Empty', nodes: [], members: [] }
+    const shape: Shape2D = { id: 's', name: 'Empty', placementPlane: 'XZ', nodes: [], members: [] }
     const result = placeShape(shape, {
       start: { x: 0, y: 0, z: 0 },
       end: { x: 5, y: 0, z: 0 },
