@@ -8,18 +8,19 @@ const FOCUS_DISTANCE = 15
 
 /**
  * Controls camera position when entering/exiting 2D focus mode.
- * On focus: saves camera state, snaps to orthogonal view looking down the plane normal,
- * updates OrbitControls target, and disables rotation (pan/zoom only).
- * On unfocus: restores saved camera state and re-enables rotation.
+ * On focus: saves camera state, creates an orthographic camera snapped to
+ * the plane normal, updates OrbitControls, and disables rotation.
+ * On unfocus: restores saved perspective camera and re-enables rotation.
  */
 export default function FocusCameraController() {
-  const { camera, controls } = useThree()
+  const { camera, controls, set, size } = useThree()
   const isFocused = usePlaneStore((s) => s.isFocused)
   const activePlane = usePlaneStore((s) => s.activePlane)
   const savedCameraState = usePlaneStore((s) => s.savedCameraState)
   const saveCameraState = usePlaneStore((s) => s.saveCameraState)
   const prevFocused = useRef(false)
   const savedTarget = useRef(new THREE.Vector3())
+  const savedCamera = useRef<THREE.Camera | null>(null)
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,64 +35,89 @@ export default function FocusCameraController() {
         zoom: camera.zoom,
       }
       saveCameraState(state)
+      savedCamera.current = camera
 
       // Save OrbitControls target
       if (orbitControls?.target) {
         savedTarget.current.copy(orbitControls.target)
       }
 
+      // Compute orthographic frustum to match perspective view size at the plane
+      const aspect = size.width / size.height
+      const perspCamera = camera as THREE.PerspectiveCamera
+      const fov = perspCamera.fov ?? 50
+      const halfHeight = FOCUS_DISTANCE * Math.tan(THREE.MathUtils.degToRad(fov / 2))
+      const halfWidth = halfHeight * aspect
+
+      // Create orthographic camera (no vanishing point)
+      const orthoCamera = new THREE.OrthographicCamera(
+        -halfWidth, halfWidth,
+        halfHeight, -halfHeight,
+        0.1, 1000,
+      )
+
       // Position camera above the plane looking down the normal
       const n = activePlane.normal
       const pt = activePlane.point
-      camera.position.set(
+      orthoCamera.position.set(
         pt.x + n.x * FOCUS_DISTANCE,
         pt.y + n.y * FOCUS_DISTANCE,
         pt.z + n.z * FOCUS_DISTANCE,
       )
 
       // Set up vector to tangentV for correct orientation
-      camera.up.set(activePlane.tangentV.x, activePlane.tangentV.y, activePlane.tangentV.z)
-      camera.lookAt(pt.x, pt.y, pt.z)
-      camera.updateProjectionMatrix()
+      orthoCamera.up.set(activePlane.tangentV.x, activePlane.tangentV.y, activePlane.tangentV.z)
+      orthoCamera.lookAt(pt.x, pt.y, pt.z)
+      orthoCamera.updateProjectionMatrix()
 
-      // Update OrbitControls target and disable rotation
+      // Swap camera in R3F
+      set({ camera: orthoCamera })
+
+      // Update OrbitControls to use new camera, disable rotation
       if (orbitControls) {
+        orbitControls.object = orthoCamera
         orbitControls.target.set(pt.x, pt.y, pt.z)
         orbitControls.enableRotate = false
         orbitControls.update()
       }
 
-      console.log(`[focus] ON — camera at (${camera.position.x.toFixed(1)}, ${camera.position.y.toFixed(1)}, ${camera.position.z.toFixed(1)}), looking at (${pt.x}, ${pt.y}, ${pt.z})`)
+      console.log(`[focus] ON — ortho camera, frustum ±${halfWidth.toFixed(1)}×±${halfHeight.toFixed(1)}`)
     }
 
-    if (!isFocused && prevFocused.current && savedCameraState) {
-      // Exiting focus: restore saved camera state
-      camera.position.set(
+    if (!isFocused && prevFocused.current && savedCameraState && savedCamera.current) {
+      // Exiting focus: restore saved perspective camera
+      const perspCamera = savedCamera.current
+      perspCamera.position.set(
         savedCameraState.position.x,
         savedCameraState.position.y,
         savedCameraState.position.z,
       )
-      camera.quaternion.set(
+      perspCamera.quaternion.set(
         savedCameraState.quaternion.x,
         savedCameraState.quaternion.y,
         savedCameraState.quaternion.z,
         savedCameraState.quaternion.w,
       )
-      camera.up.set(0, 0, 1) // Restore default up (Z-up)
-      camera.updateProjectionMatrix()
+      perspCamera.up.set(0, 0, 1) // Restore default up (Z-up)
+      perspCamera.updateProjectionMatrix()
 
-      // Restore OrbitControls target and re-enable rotation
+      // Swap camera back in R3F
+      set({ camera: perspCamera })
+
+      // Restore OrbitControls and re-enable rotation
       if (orbitControls) {
+        orbitControls.object = perspCamera
         orbitControls.target.copy(savedTarget.current)
         orbitControls.enableRotate = true
         orbitControls.update()
       }
 
-      console.log(`[focus] OFF — camera restored`)
+      savedCamera.current = null
+      console.log(`[focus] OFF — perspective camera restored`)
     }
 
     prevFocused.current = isFocused
-  }, [isFocused, activePlane, savedCameraState, camera, saveCameraState, controls])
+  }, [isFocused, activePlane, savedCameraState, camera, saveCameraState, controls, set, size])
 
   return null
 }

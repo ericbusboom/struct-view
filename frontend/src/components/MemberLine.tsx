@@ -2,11 +2,15 @@ import { useMemo } from 'react'
 import * as THREE from 'three'
 import type { ThreeEvent } from '@react-three/fiber'
 import type { Member, Node } from '../model'
+import { isOnPlane } from '../model/WorkingPlane'
 import { useEditorStore } from '../store/useEditorStore'
+import { usePlaneStore } from '../store/usePlaneStore'
 
 const MEMBER_COLOR = '#cccccc'
 const SELECTED_COLOR = '#ffff00'
 const TRUSS_HIGHLIGHT_COLOR = '#00e5ff'
+const GHOST_COLOR = '#888888'
+const GHOST_OPACITY = 0.15
 const TUBE_RADIUS = 0.025
 const TUBE_SEGMENTS = 8
 
@@ -25,7 +29,18 @@ export default function MemberLine({ member, nodes }: Props) {
   const toggleSelect = useEditorStore((s) => s.toggleSelect)
   const selectGroup = useEditorStore((s) => s.selectGroup)
 
+  const isFocused = usePlaneStore((s) => s.isFocused)
+  const activePlane = usePlaneStore((s) => s.activePlane)
+
   const isTrussHighlighted = !!(member.groupId && selectedGroupId && member.groupId === selectedGroupId)
+
+  // Ghost rendering: members with either endpoint off-plane are ghosted
+  const ghosted = useMemo(() => {
+    if (!isFocused || !activePlane || !startNode || !endNode) return false
+    const startOnPlane = isOnPlane(startNode.position, activePlane)
+    const endOnPlane = isOnPlane(endNode.position, activePlane)
+    return !(startOnPlane && endOnPlane)
+  }, [isFocused, activePlane, startNode, endNode])
 
   const geometry = useMemo(() => {
     if (!startNode || !endNode) return null
@@ -52,15 +67,22 @@ export default function MemberLine({ member, nodes }: Props) {
   if (!geometry) return null
 
   let color = MEMBER_COLOR
-  if (isSelected) {
+  if (ghosted) {
+    color = GHOST_COLOR
+  } else if (isSelected) {
     color = SELECTED_COLOR
   } else if (isTrussHighlighted) {
     color = TRUSS_HIGHLIGHT_COLOR
   }
 
   return (
-    <mesh geometry={geometry} onClick={handleClick}>
-      <meshStandardMaterial color={color} />
+    <mesh geometry={geometry} onClick={handleClick} renderOrder={ghosted ? 0 : 10}>
+      <meshStandardMaterial
+        color={color}
+        transparent={ghosted}
+        opacity={ghosted ? GHOST_OPACITY : 1}
+        depthWrite={!ghosted}
+      />
     </mesh>
   )
 }

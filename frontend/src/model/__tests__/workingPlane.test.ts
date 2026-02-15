@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createPlaneFromPoints, getPlaneColor, _resetPlaneIdCounter } from '../WorkingPlane'
+import { createPlaneFromPoints, getPlaneColor, isOnPlane, _resetPlaneIdCounter } from '../WorkingPlane'
 import type { Vec3 } from '../schemas'
 
 function dot(a: Vec3, b: Vec3): number {
@@ -176,5 +176,41 @@ describe('getPlaneColor', () => {
 
   it('returns yellow for non-axis-aligned planes', () => {
     expect(getPlaneColor({ x: 0.577, y: 0.577, z: 0.577 })).toBe('#ffcc00')
+  })
+})
+
+describe('isOnPlane', () => {
+  beforeEach(() => _resetPlaneIdCounter())
+
+  it('returns true for a point exactly on the plane', () => {
+    const plane = createPlaneFromPoints([])
+    expect(isOnPlane({ x: 5, y: 3, z: 0 }, plane)).toBe(true)
+  })
+
+  it('returns true for a point within threshold', () => {
+    const plane = createPlaneFromPoints([])
+    expect(isOnPlane({ x: 5, y: 3, z: 0.005 }, plane)).toBe(true)
+  })
+
+  it('returns false for a point beyond threshold', () => {
+    const plane = createPlaneFromPoints([])
+    expect(isOnPlane({ x: 5, y: 3, z: 1 }, plane)).toBe(false)
+  })
+
+  it('works with tilted planes', () => {
+    const plane = createPlaneFromPoints([
+      { x: 0, y: 0, z: 0 },
+      { x: 5, y: 0, z: 0 },
+      { x: 0, y: 0, z: 5 },
+    ])
+    // Normal is along Y for this XZ plane — point at y=0 is on it
+    expect(isOnPlane({ x: 2, y: 0, z: 3 }, plane)).toBe(true)
+    expect(isOnPlane({ x: 2, y: 5, z: 3 }, plane)).toBe(false)
+  })
+
+  it('respects custom threshold', () => {
+    const plane = createPlaneFromPoints([])
+    expect(isOnPlane({ x: 0, y: 0, z: 0.5 }, plane, 1.0)).toBe(true)
+    expect(isOnPlane({ x: 0, y: 0, z: 0.5 }, plane, 0.1)).toBe(false)
   })
 })

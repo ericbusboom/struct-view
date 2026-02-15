@@ -213,6 +213,15 @@ export function getPlaneColor(normal: Vec3): string {
   return '#ffcc00' // Yellow — general
 }
 
+/** Check if a point lies on (or very near) a working plane. */
+export function isOnPlane(position: Vec3, plane: WorkingPlane, threshold = 0.01): boolean {
+  const dx = position.x - plane.point.x
+  const dy = position.y - plane.point.y
+  const dz = position.z - plane.point.z
+  const dist = Math.abs(dx * plane.normal.x + dy * plane.normal.y + dz * plane.normal.z)
+  return dist < threshold
+}
+
 /** Reset the ID counter (for tests). */
 export function _resetPlaneIdCounter() {
   nextId = 1

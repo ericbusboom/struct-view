@@ -1,8 +1,10 @@
 import type { ThreeEvent } from '@react-three/fiber'
 import type { Node } from '../model'
+import { isOnPlane } from '../model/WorkingPlane'
 import { createMember } from '../model'
 import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
+import { usePlaneStore } from '../store/usePlaneStore'
 
 const NODE_RADIUS = 0.08
 const NODE_RADIUS_SELECTED = 0.1
@@ -12,6 +14,8 @@ const TRUSS_HIGHLIGHT_COLOR = '#00e5ff'
 const PIVOT_COLOR = '#ff00ff'
 const SUPPORT_FIXED_COLOR = '#ff6b4a'
 const SUPPORT_PINNED_COLOR = '#ffb84a'
+const GHOST_COLOR = '#888888'
+const GHOST_OPACITY = 0.15
 
 function nodeColor(node: Node, isHighlighted: boolean, isTrussHighlighted: boolean, isPivot: boolean): string {
   if (isPivot) return PIVOT_COLOR
@@ -42,10 +46,17 @@ export default function NodeMesh({ node }: Props) {
   const setRotatePivotNodeId = useEditorStore((s) => s.setRotatePivotNodeId)
   const addMember = useModelStore((s) => s.addMember)
 
+  const isFocused = usePlaneStore((s) => s.isFocused)
+  const activePlane = usePlaneStore((s) => s.activePlane)
+
   const isMemberStart = memberStartNode === node.id
   const isTrussHighlighted = !!(node.groupId && selectedGroupId && node.groupId === selectedGroupId)
   const isPivot = rotatePivotNodeId === node.id
   const highlighted = isSelected || isMemberStart
+
+  // Ghost rendering: off-plane nodes are transparent gray when focused
+  const onPlane = isFocused && activePlane ? isOnPlane(node.position, activePlane) : true
+  const ghosted = isFocused && !onPlane
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
@@ -83,9 +94,19 @@ export default function NodeMesh({ node }: Props) {
   }
 
   return (
-    <mesh position={[x, y, z]} onClick={handleClick} onPointerDown={handlePointerDown}>
+    <mesh
+      position={[x, y, z]}
+      onClick={handleClick}
+      onPointerDown={handlePointerDown}
+      renderOrder={ghosted ? 0 : 10}
+    >
       <sphereGeometry args={[(highlighted || isTrussHighlighted || isPivot) ? NODE_RADIUS_SELECTED : NODE_RADIUS, 16, 16]} />
-      <meshStandardMaterial color={nodeColor(node, highlighted, isTrussHighlighted, isPivot)} />
+      <meshStandardMaterial
+        color={ghosted ? GHOST_COLOR : nodeColor(node, highlighted, isTrussHighlighted, isPivot)}
+        transparent={ghosted}
+        opacity={ghosted ? GHOST_OPACITY : 1}
+        depthWrite={!ghosted}
+      />
     </mesh>
   )
 }
