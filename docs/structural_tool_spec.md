@@ -48,77 +48,170 @@ Run FEA solver (PyNite backend). View results: deflections, bending moment diagr
 
 The editor supports several complementary ways to create the wireframe model. All methods produce the same underlying data: a set of nodes (3D coordinates) and members (pairs of nodes).
 
-### 3.1 2D Drawing Mode (Trusses and Frames)
+There is exactly one node per point in space. Nodes are shared across all beams
+and planes that reference them. Connection/attachment information (pinned,
+fixed, semi-rigid) is stored on the beam ends, not on the node itself.
 
-A 2D canvas where the user draws line segments that represent beams. This is the primary way to create trusses and frame cross-sections.
+Drawing is primarily on 2D slices of the 3D space. The user selects a plane from
+the 3D space, focuses on the plane, and can add nodes and beams. The user
+selects a combination of points and/or beams and then hits the `p` key to create
+a plane through the selected objects.
 
-**Behavior:**
-- Draw lines by clicking start and end points
-- Aggressive snapping: endpoints snap to existing nodes, to grid intersections, to midpoints of existing beams, and to perpendicular/parallel alignments
-- When a new line endpoint is near an existing node, it connects to that node automatically
-- Standard truss templates available (Pratt, Howe, Warren, scissors, etc.) as starting points
-- The 2D drawing lives in its own coordinate space and can be named (e.g., "Roof Truss A")
+After selecting a plane, the user can place nodes and beams on that plane. Nodes
+are points in space, and beams are lines that connect nodes. The user can place
+nodes with the mouse, or can select nodes in 2D or 3D to directly edit their
+coordinates.
 
-**Output:** A named 2D shape consisting of nodes and members, with one or more members optionally tagged as "snap edges" (see Section 3.3).
+The `f` key toggles between focusing on the 2D plane (if one has been created)
+and the 3D space. When focusing on the 2D plane, the camera snaps to a straight
+top-down orthogonal view of the plane. All nodes within snap distance of the
+plane are visible and editable in this view, including nodes created from other
+planes, as long as the plane passes through them. Only the plane's constraint
+points are guaranteed to be in the plane; other nodes appear if they fall within
+snap distance.
 
-### 3.2 3D Reference Shape (STL Import)
+### Selecting Planes
 
-The user imports an STL file representing the outer envelope of the structure. This shape is not part of the structural model — it is a reference surface that beams snap to.
+#### Selecting No Points
 
-**Behavior:**
-- Import STL from file upload (exported from Tinkercad, Fusion 360, FreeCAD, etc.)
-- The STL renders as a semi-transparent shell in the 3D viewport
-- When the user is placing or moving beams in 3D mode, the cursor and beam endpoints snap to:
-  - Vertices of the STL mesh
-  - Edges of the STL mesh
-  - The surface of STL faces
-  - Other beams that are already placed
-- The STL shape can also be used to auto-generate beam layouts (see Section 5)
+Pressing `p` with nothing selected creates a plane through the origin. The
+initial plane is the XY plane with a point constraint at the origin.
 
-**Example:** User creates a rectangular box in Tinkercad (the walls of a garage), exports STL, imports into StructView. The box edges become snap targets for placing wall studs and top/bottom plates.
+#### Selecting One Point
 
-### 3.3 2D-to-3D Placement
+If the user selects a single point, that point will be included in the selected
+plane instead of the origin. The initial plane is the XY plane, with a point
+constraint at the selected point.
 
-The user takes a 2D shape (from Section 3.1) and places it into the 3D scene, constrained to snap to existing geometry.
+#### Selecting Two Points
 
-**Workflow:**
-1. User selects a 2D shape (e.g., "Roof Truss A")
-2. User clicks on one member of that shape to designate it as the **snap edge** — the edge that will align with existing 3D geometry
-3. User drags the shape into the 3D viewport
-4. The snap edge locks onto compatible geometry: top edges of the STL reference shape, existing beams, or defined snap lines
-5. The shape orients perpendicular to the surface it snaps to
-6. The user can slide the shape along the snap line to position it, with snapping to grid intervals or to other placed shapes
+Selecting two points sets a line constraint. The initial plane will be created
+in an orientation that minimizes the angle between the plane normal and one of
+the three world axes.
 
-**Constraints on placement:**
-- The 2D shape is placed as a rigid unit (internal geometry does not deform)
-- The snap edge must align with an existing edge or beam
-- Placement can be constrained to equal spacing (e.g., "place trusses every 24 inches along this edge")
-- Once placed, the shape's nodes merge with any coincident existing nodes
+#### Selecting Three Points
 
-### 3.4 Direct 3D Beam Drawing
+Selecting three points sets a plane constraint. The initial plane will be
+oriented to include all three points.
 
-For adding individual beams that don't belong to a pre-drawn 2D shape.
+#### Selecting a Beam
 
-**Behavior:**
-- Click two points in the 3D viewport to create a beam between them
-- Endpoints snap to: existing nodes, STL vertices/edges/surfaces, grid intersections, other beam midpoints
-- Useful for adding bracing, purlins, connecting members between trusses, etc.
+Selecting a beam creates a line constraint. It is equivalent to selecting the
+two endpoint nodes of the beam.
 
-### 3.5 Auto-Layout on Reference Shape
+#### Selecting a Beam and One Point
 
-The user selects a face or set of edges on the STL reference shape and requests an automatic beam layout.
+Selecting a beam and one point is equivalent to selecting three points: the one
+solitary point and the two ends of the beam.
 
-**Examples:**
-- "Put studs on 16-inch centers along this wall face" → generates vertical beams at 16" spacing between the top and bottom edges of the selected face, plus top plate and bottom plate beams along the edges
-- "Add joists at 12-inch spacing across this floor" → generates parallel beams spanning the selected rectangular region
+### Modifying a Plane
 
-This can be triggered via the UI (select face → choose layout pattern → set spacing) or via the AI/MCP interface (see Section 5).
+The selections above may be constrained by a point, a line, or a plane, and the
+user can adjust the plane through unconstrained dimensions.
 
----
+For point constraints, the plane can be rotated freely around the constrained
+point using the arrow keys (see Plane Rotation Controls below).
+
+For line constraints, the plane can only be rotated around the constraining
+line. The up/down arrow keys rotate the plane around the line.
+
+No rotation controls operate when the plane has a full plane constraint (three points).
+
+#### Plane Rotation Controls
+
+When a plane has a point constraint, the arrow keys rotate the plane around two
+tangent vectors that lie within the plane itself. These tangent vectors are
+orthogonal to each other and to the plane's normal. On initial placement, the
+tangent vectors are seeded from the world axes most perpendicular to the normal.
+As the user rotates the plane, the tangent vectors are updated incrementally to
+remain consistent with the new orientation, avoiding discontinuous jumps.
+Because the rotation axes are always derived from the plane's current
+orientation rather than fixed world axes, gimbal lock cannot occur.
+
+Arrow key rotation uses acceleration: a single tap rotates a fraction of a
+degree (~0.1°). Holding the key down accelerates up to approximately 5° per
+second. Rotation snaps to 15° increments when near a snap angle.
+
+#### Axis Alignment Keys
+
+The <kbd>x</kbd>, <kbd>y</kbd>, and <kbd>z</kbd> keys rotate the plane so that a
+line parallel to the corresponding world axis passes through the constrained
+point and lies within the plane. In other words, pressing <kbd>x</kbd> orients
+the plane so that the plane's normal is perpendicular to the X axis, meaning you
+can draw lines parallel to X on the plane. The plane still passes through the
+constrained point.
+
+When there is a line constraint, the plane can only be aligned with an axis if the axis direction is perpendicular to the constraining line.
+
+### Editing in 3D
+
+Users cannot place points in 3D space with the mouse, but they can select points, edit them, and create points through direct data entry.
+
+The sidebar has a coordinate entry box where the user can enter x, y, and z
+coordinates. Hitting Return after entering the coordinates clears the entry box
+and adds the point to the space. There is also a menu option for loading a data
+file of x, y, and z points. 
+
+The data file can be either:
+- A text file with x, y, z values on each line, separated by spaces or commas
+- A CSV file with an x, y, z header row (or headerless, with columns assumed to
+  be x, y, z)
+
+If the user selects a point, the coordinate entry box shows that point's x, y,
+and z values. Deselecting the point or hitting Escape clears the values. Users
+can edit the values directly, or apply relative adjustments by typing `+` or `-`
+followed by a number to shift the coordinate along that axis. After the
+adjustment, the resulting value replaces the expression in the entry box.
+
+### Editing in 2D
+
+In 2D, the user can place points on the grid with the mouse. By default, the
+grid snaps to one-inch increments when working in imperial units, or one
+centimeter increments when working in metric. The user can change the snap
+distance and grid increment
+
+The `n` key activates node placement mode. The `b` key activates beam placement
+mode. In beam mode, the first click sets the start node and the second click
+sets the end node. If the cursor is over an existing node, that node highlights
+and is reused as the beam endpoint (the node is shared, not duplicated). To
+place a beam, the user can either place the nodes first and then connect them
+with `b`, or create nodes on the fly as part of beam placement.
+
+When a point is selected in 2D, the sidebar shows the full 3D world coordinates
+of the node (not just the 2D plane coordinates). As in 3D, the user can edit
+coordinates directly or apply +/- adjustments.
+
+### Node Visibility Across Planes
+
+If a plane passes through an existing node (i.e., the node is within snap
+distance of the plane), that node is visible and editable in the 2D view. This
+means beams from different planes can share the same node by connecting to it
+from their respective 2D views. Nodes that are constraint points for the plane
+are always included; other nodes are included if they fall within snap distance
+of the plane surface.
+
+### Grouping
+
+When placing a truss from the library (see Section 3.1), the placed nodes and beams form a group. Groups can also be created manually: drag a rectangular selection box to select nodes, shift-click to add or remove individual nodes from the selection, then click a Group button to create a group from the selection. Grouped elements can be moved together as a unit.
+
+### 3.1 Truss Library
+
+The truss library provides reusable 2D shapes (Pratt, Howe, Warren, Scissors,
+and user-created shapes). All shapes are stored in 2D regardless of the
+orientation of the plane they were originally drawn on.
+
+To save to the library, the user draws a truss on any 2D plane view and saves
+the current drawing as a named library entry.
+
+To place from the library, the user selects a shape from the library panel while
+in a 2D plane view. The shape is placed into the current plane and its nodes and
+beams become a group that can be selected and moved as a unit.
 
 ## 4. Panels
 
-Panels represent sheet materials (plywood, sheet metal, drywall, etc.) that span between beams. They contribute to structural behavior (shear walls, diaphragms, load distribution).
+Panels represent sheet materials (plywood, sheet metal, drywall, etc.) that span
+between beams. They contribute to structural behavior (shear walls, diaphragms,
+load distribution).
 
 ### Creating Panels
 
