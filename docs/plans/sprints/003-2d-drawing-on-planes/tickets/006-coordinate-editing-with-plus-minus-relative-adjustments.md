@@ -1,11 +1,11 @@
 ---
-id: "006"
+id: '006'
 title: Coordinate editing with plus/minus relative adjustments
-status: todo
+status: done
 use-cases:
-  - SUC-003-04
+- SUC-003-04
 depends-on:
-  - "005"
+- '005'
 ---
 
 # Coordinate editing with plus/minus relative adjustments

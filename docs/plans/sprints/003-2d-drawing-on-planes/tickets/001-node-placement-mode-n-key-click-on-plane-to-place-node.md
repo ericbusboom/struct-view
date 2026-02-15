@@ -1,11 +1,11 @@
 ---
-id: "001"
-title: Node placement mode (n key) — click on plane to place node
-status: todo
+id: '001'
+title: "Node placement mode (n key) \u2014 click on plane to place node"
+status: done
 use-cases:
-  - SUC-003-01
+- SUC-003-01
 depends-on:
-  - "003"
+- '003'
 ---
 
 # Node placement mode (n key) — click on plane to place node

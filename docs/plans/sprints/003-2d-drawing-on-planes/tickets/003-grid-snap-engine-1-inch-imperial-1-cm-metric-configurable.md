@@ -1,10 +1,10 @@
 ---
-id: "003"
+id: '003'
 title: Grid snap engine (1 inch imperial / 1 cm metric, configurable)
-status: todo
+status: done
 use-cases:
-  - SUC-003-01
-  - SUC-003-02
+- SUC-003-01
+- SUC-003-02
 depends-on: []
 ---
 

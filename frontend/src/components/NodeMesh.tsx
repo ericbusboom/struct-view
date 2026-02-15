@@ -14,6 +14,7 @@ const TRUSS_HIGHLIGHT_COLOR = '#00e5ff'
 const PIVOT_COLOR = '#ff00ff'
 const SUPPORT_FIXED_COLOR = '#ff6b4a'
 const SUPPORT_PINNED_COLOR = '#ffb84a'
+const HOVER_COLOR = '#00e5ff'
 const GHOST_COLOR = '#888888'
 const GHOST_OPACITY = 0.15
 
@@ -48,6 +49,7 @@ export default function NodeMesh({ node }: Props) {
 
   const isFocused = usePlaneStore((s) => s.isFocused)
   const activePlane = usePlaneStore((s) => s.activePlane)
+  const isHovered = useEditorStore((s) => s.hoverNodeId === node.id)
 
   const isMemberStart = memberStartNode === node.id
   const isTrussHighlighted = !!(node.groupId && selectedGroupId && node.groupId === selectedGroupId)
@@ -100,9 +102,9 @@ export default function NodeMesh({ node }: Props) {
       onPointerDown={handlePointerDown}
       renderOrder={ghosted ? 0 : 10}
     >
-      <sphereGeometry args={[(highlighted || isTrussHighlighted || isPivot) ? NODE_RADIUS_SELECTED : NODE_RADIUS, 16, 16]} />
+      <sphereGeometry args={[(highlighted || isTrussHighlighted || isPivot || isHovered) ? NODE_RADIUS_SELECTED : NODE_RADIUS, 16, 16]} />
       <meshStandardMaterial
-        color={ghosted ? GHOST_COLOR : nodeColor(node, highlighted, isTrussHighlighted, isPivot)}
+        color={ghosted ? GHOST_COLOR : isHovered ? HOVER_COLOR : nodeColor(node, highlighted, isTrussHighlighted, isPivot)}
         transparent={ghosted}
         opacity={ghosted ? GHOST_OPACITY : 1}
         depthWrite={!ghosted}

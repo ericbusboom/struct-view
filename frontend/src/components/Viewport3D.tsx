@@ -7,6 +7,7 @@ import TrussDragger from './TrussDragger'
 import RotateArc from './RotateArc'
 import SnapIndicators from './SnapIndicators'
 import PlaneGrid from './PlaneGrid'
+import PlanePlacer from './PlanePlacer'
 import FocusCameraController from './FocusCameraController'
 
 export default function Viewport3D() {
@@ -41,6 +42,7 @@ export default function Viewport3D() {
       <RotateArc />
       <SnapIndicators />
       <PlaneGrid />
+      <PlanePlacer />
       <FocusCameraController />
 
       <OrbitControls makeDefault zoomToCursor />

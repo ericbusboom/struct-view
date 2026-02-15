@@ -1,18 +1,18 @@
 ---
-id: "008"
+id: 008
 title: Integration tests for 2D drawing workflow
-status: todo
+status: done
 use-cases:
-  - SUC-003-01
-  - SUC-003-02
-  - SUC-003-03
-  - SUC-003-04
+- SUC-003-01
+- SUC-003-02
+- SUC-003-03
+- SUC-003-04
 depends-on:
-  - "001"
-  - "002"
-  - "003"
-  - "004"
-  - "006"
+- '001'
+- '002'
+- '003'
+- '004'
+- '006'
 ---
 
 # Integration tests for 2D drawing workflow

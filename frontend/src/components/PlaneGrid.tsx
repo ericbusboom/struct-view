@@ -4,7 +4,7 @@ import { usePlaneStore } from '../store/usePlaneStore'
 import { getPlaneColor } from '../model'
 
 const GRID_SIZE = 20
-const GRID_DIVISIONS = 40
+const GRID_DIVISIONS = 20 // 20/20 = 1.0 unit per cell, matching snap grid
 const GRID_OPACITY = 0.25
 
 /**

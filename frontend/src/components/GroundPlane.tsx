@@ -2,6 +2,7 @@ import type { ThreeEvent } from '@react-three/fiber'
 import { createNode } from '../model'
 import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
+import { usePlaneStore } from '../store/usePlaneStore'
 import { snapPoint3D } from '../editor3d/snap3d'
 
 export default function GroundPlane() {
@@ -10,9 +11,13 @@ export default function GroundPlane() {
   const addNode = useModelStore((s) => s.addNode)
   const nodes = useModelStore((s) => s.nodes)
   const members = useModelStore((s) => s.members)
+  const isFocused = usePlaneStore((s) => s.isFocused)
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
+
+    // In focus mode, PlanePlacer handles placement
+    if (isFocused) return
 
     if (mode === 'add-node') {
       const cursor = { x: e.point.x, y: e.point.y, z: 0 }

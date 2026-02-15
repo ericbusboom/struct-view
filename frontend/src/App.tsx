@@ -4,6 +4,7 @@ import EditorToolbar from './components/EditorToolbar'
 import FileToolbar from './components/FileToolbar'
 import KeyboardHandler from './components/KeyboardHandler'
 import TrussLibraryPanel from './components/TrussLibraryPanel'
+import PropertiesPanel from './components/PropertiesPanel'
 import FocusOverlay from './components/FocusOverlay'
 
 function App() {
@@ -21,7 +22,10 @@ function App() {
           <Viewport3D />
           <FocusOverlay />
         </div>
-        <TrussLibraryPanel />
+        <div className="sidebar">
+          <PropertiesPanel />
+          <TrussLibraryPanel />
+        </div>
       </main>
     </div>
   )

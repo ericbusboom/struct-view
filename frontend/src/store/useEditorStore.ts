@@ -17,6 +17,8 @@ export interface EditorState {
   activePlane: PlacementPlane
   /** Node used as rotation pivot (null = use centroid) */
   rotatePivotNodeId: string | null
+  /** Node the cursor is hovering near (for snap highlight) */
+  hoverNodeId: string | null
 
   setMode: (mode: EditorMode) => void
   /** Select a single entity (replaces current selection). */
@@ -32,6 +34,7 @@ export interface EditorState {
   setDragNodeId: (id: string | null) => void
   setActivePlane: (plane: PlacementPlane) => void
   setRotatePivotNodeId: (id: string | null) => void
+  setHoverNodeId: (id: string | null) => void
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
@@ -43,9 +46,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   dragNodeId: null,
   activePlane: 'XZ' as PlacementPlane,
   rotatePivotNodeId: null,
+  hoverNodeId: null,
 
   setMode: (mode) =>
-    set({ mode, memberStartNode: null, dragNodeId: null }),
+    set({ mode, memberStartNode: null, dragNodeId: null, hoverNodeId: null }),
 
   select: (id, type) =>
     set({
@@ -89,6 +93,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   setRotatePivotNodeId: (id) =>
     set({ rotatePivotNodeId: id }),
+
+  setHoverNodeId: (id) =>
+    set({ hoverNodeId: id }),
 }))
 
 // Convenience helpers for components

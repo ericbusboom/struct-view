@@ -1,12 +1,12 @@
 ---
-id: "004"
+id: '004'
 title: Existing node highlight + reuse when cursor near node
-status: todo
+status: done
 use-cases:
-  - SUC-003-03
+- SUC-003-03
 depends-on:
-  - "001"
-  - "003"
+- '001'
+- '003'
 ---
 
 # Existing node highlight + reuse when cursor near node

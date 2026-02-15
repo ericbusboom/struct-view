@@ -1,10 +1,10 @@
 ---
-id: "007"
+id: '007'
 title: Node and beam rendering in 2D focus view (project 3D model onto plane)
-status: todo
+status: done
 use-cases:
-  - SUC-003-01
-  - SUC-003-02
+- SUC-003-01
+- SUC-003-02
 depends-on: []
 ---
 

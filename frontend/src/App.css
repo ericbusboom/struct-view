@@ -265,12 +265,21 @@
   gap: 3px;
 }
 
-/* Truss Library Panel (right side) */
-.truss-library-panel {
+/* Right sidebar */
+.sidebar {
   width: 240px;
   flex-shrink: 0;
   background: #1a1a2e;
   border-left: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  color: #e0e0e0;
+}
+
+/* Truss Library Panel (right side) */
+.truss-library-panel {
+  flex: 1;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -344,4 +353,62 @@
 .plane-selector {
   display: flex;
   gap: 2px;
+}
+
+/* Properties Panel */
+.properties-panel {
+  background: #1a1a2e;
+  border-bottom: 1px solid #333;
+  padding: 8px 12px;
+}
+
+.properties-header {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #e0e0e0;
+  margin-bottom: 6px;
+}
+
+.coord-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.coord-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.coord-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #888;
+  min-width: 14px;
+}
+
+.coord-value {
+  font-size: 0.8rem;
+  color: #e0e0e0;
+  font-family: monospace;
+}
+
+.coord-input {
+  flex: 1;
+  padding: 2px 4px;
+  border: 1px solid #4a9eff;
+  border-radius: 3px;
+  background: #2a2a3e;
+  color: #e0e0e0;
+  font-size: 0.8rem;
+  font-family: monospace;
+  outline: none;
+  width: 80px;
+}
+
+.properties-multi {
+  font-size: 0.75rem;
+  color: #888;
 }

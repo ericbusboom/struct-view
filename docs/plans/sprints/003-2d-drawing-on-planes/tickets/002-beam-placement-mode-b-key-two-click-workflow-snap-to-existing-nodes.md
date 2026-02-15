@@ -1,13 +1,13 @@
 ---
-id: "002"
-title: Beam placement mode (m key) — two-click workflow, snap to existing nodes
-status: todo
+id: '002'
+title: "Beam placement mode (m key) \u2014 two-click workflow, snap to existing nodes"
+status: done
 use-cases:
-  - SUC-003-02
-  - SUC-003-03
+- SUC-003-02
+- SUC-003-03
 depends-on:
-  - "001"
-  - "003"
+- '001'
+- '003'
 ---
 
 # Beam placement mode (m key) — two-click workflow, snap to existing nodes

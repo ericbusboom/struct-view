@@ -1,9 +1,9 @@
 ---
-id: "005"
+id: '005'
 title: Sidebar 3D coordinate display for selected node
-status: todo
+status: done
 use-cases:
-  - SUC-003-04
+- SUC-003-04
 depends-on: []
 ---
 
