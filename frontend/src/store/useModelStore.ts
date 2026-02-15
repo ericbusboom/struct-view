@@ -51,21 +51,45 @@ export interface ModelState {
   }) => void
 }
 
-// Sample portal frame for visual verification
+// Sample 3D shed frame for visual verification and plane testing.
+// Front frame (z=0), back frame (z=4), ridge, and connecting beams
+// give nodes in all three principal planes plus oblique selections.
 function createSampleModel() {
+  // Front frame (z = 0)
   const n1 = createNode({ id: 'n1', position: { x: 0, y: 0, z: 0 }, support: { type: 'fixed' } })
   const n2 = createNode({ id: 'n2', position: { x: 0, y: 3, z: 0 } })
-  const n3 = createNode({ id: 'n3', position: { x: 5, y: 3, z: 0 } })
-  const n4 = createNode({ id: 'n4', position: { x: 5, y: 0, z: 0 }, support: { type: 'fixed' } })
+  const n3 = createNode({ id: 'n3', position: { x: 2.5, y: 4.5, z: 0 } }) // ridge
+  const n4 = createNode({ id: 'n4', position: { x: 5, y: 3, z: 0 } })
+  const n5 = createNode({ id: 'n5', position: { x: 5, y: 0, z: 0 }, support: { type: 'fixed' } })
 
+  // Back frame (z = 4)
+  const n6 = createNode({ id: 'n6', position: { x: 0, y: 0, z: 4 }, support: { type: 'fixed' } })
+  const n7 = createNode({ id: 'n7', position: { x: 0, y: 3, z: 4 } })
+  const n8 = createNode({ id: 'n8', position: { x: 2.5, y: 4.5, z: 4 } }) // ridge
+  const n9 = createNode({ id: 'n9', position: { x: 5, y: 3, z: 4 } })
+  const n10 = createNode({ id: 'n10', position: { x: 5, y: 0, z: 4 }, support: { type: 'fixed' } })
+
+  // Front frame members
   const m1 = createMember('n1', 'n2', { id: 'm1' })
   const m2 = createMember('n2', 'n3', { id: 'm2' })
   const m3 = createMember('n3', 'n4', { id: 'm3' })
+  const m4 = createMember('n4', 'n5', { id: 'm4' })
+
+  // Back frame members
+  const m5 = createMember('n6', 'n7', { id: 'm5' })
+  const m6 = createMember('n7', 'n8', { id: 'm6' })
+  const m7 = createMember('n8', 'n9', { id: 'm7' })
+  const m8 = createMember('n9', 'n10', { id: 'm8' })
+
+  // Connecting beams (along Z axis)
+  const m9 = createMember('n2', 'n7', { id: 'm9' })
+  const m10 = createMember('n3', 'n8', { id: 'm10' }) // ridge beam
+  const m11 = createMember('n4', 'n9', { id: 'm11' })
 
   return {
-    name: 'Sample Portal Frame',
-    nodes: [n1, n2, n3, n4],
-    members: [m1, m2, m3],
+    name: 'Sample Shed Frame',
+    nodes: [n1, n2, n3, n4, n5, n6, n7, n8, n9, n10],
+    members: [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11],
     groups: [] as Group[],
     panels: [] as Panel[],
     loads: [] as Load[],
