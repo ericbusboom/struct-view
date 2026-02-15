@@ -2,12 +2,15 @@ import { useEffect } from 'react'
 import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
 import type { EditorMode } from '../store/useEditorStore'
+import { computeNudgeDelta, computeTrussCentroid } from '../editor3d/trussMove'
+import { rotatePositionsAroundPivot } from '../editor3d/planeRotate'
 
 const MODE_KEYS: Record<string, EditorMode> = {
   v: 'select',
   n: 'add-node',
   m: 'add-member',
   g: 'move',
+  r: 'rotate',
 }
 
 export default function KeyboardHandler() {
@@ -35,6 +38,48 @@ export default function KeyboardHandler() {
           useModelStore.getState().removeNode(id)
         }
         clearSelection()
+      }
+
+      // Arrow keys — nudge (move mode) or rotate (rotate mode) selected truss
+      const ARROW_DIRS: Record<string, 'left' | 'right' | 'up' | 'down'> = {
+        ArrowLeft: 'left',
+        ArrowRight: 'right',
+        ArrowUp: 'up',
+        ArrowDown: 'down',
+      }
+      const arrowDir = ARROW_DIRS[e.key]
+      if (arrowDir) {
+        const { selectedTrussId, activePlane, mode: currentMode } = useEditorStore.getState()
+        if (selectedTrussId) {
+          e.preventDefault()
+          const trussNodes = useModelStore.getState().getNodesByTrussId(selectedTrussId)
+
+          if (currentMode === 'rotate') {
+            // Arrow left/right rotate by +/-15 degrees
+            const angleDeg = (arrowDir === 'right' || arrowDir === 'up') ? 15 : -15
+            const { rotatePivotNodeId } = useEditorStore.getState()
+            const pivotNode = rotatePivotNodeId ? useModelStore.getState().nodes.find((n) => n.id === rotatePivotNodeId) : null
+            const pivot = pivotNode ? { ...pivotNode.position } : computeTrussCentroid(trussNodes)
+            const positions = trussNodes.map((n) => n.position)
+            const rotated = rotatePositionsAroundPivot(positions, pivot, angleDeg, activePlane)
+            for (let i = 0; i < trussNodes.length; i++) {
+              useModelStore.getState().updateNode(trussNodes[i].id, { position: rotated[i] })
+            }
+          } else {
+            // Move mode: nudge by step size
+            const stepSize = e.shiftKey ? 0.1 : 0.5
+            const delta = computeNudgeDelta(arrowDir, activePlane, stepSize)
+            for (const node of trussNodes) {
+              useModelStore.getState().updateNode(node.id, {
+                position: {
+                  x: node.position.x + delta.x,
+                  y: node.position.y + delta.y,
+                  z: node.position.z + delta.z,
+                },
+              })
+            }
+          }
+        }
       }
 
       // Escape — clear selection and reset to select mode

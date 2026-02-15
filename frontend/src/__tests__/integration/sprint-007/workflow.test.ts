@@ -5,7 +5,7 @@
  * 1. Full placement workflow: draw shape → save → place → verify in model
  * 2. 3D snap engine integration with placement and move
  * 3. Multi-shape management: create, save, load, edit, save-as
- * 4. Equal spacing with node merging
+ * 4. Equal spacing placement with trussId stamping
  */
 import { describe, it, expect, beforeEach } from 'vitest'
 import { useModelStore } from '../../../store/useModelStore'
@@ -82,7 +82,7 @@ describe('Workflow 1: Draw shape → save → place into 3D', () => {
     expect(positions.some((p) => Math.abs(p.x) < 0.01 && Math.abs(p.y) < 0.01 && Math.abs(p.z) < 0.01)).toBe(true)
   })
 
-  it('second placement merges coincident nodes', () => {
+  it('second placement does not merge coincident nodes', () => {
     // Create and save a simple two-node shape
     const n1 = useEditor2DStore.getState().addNode(0, 0)
     const n2 = useEditor2DStore.getState().addNode(5, 0)
@@ -107,8 +107,8 @@ describe('Workflow 1: Draw shape → save → place into 3D', () => {
     })
     commitPlacement()
 
-    // One node should merge at (5, 0, 0)
-    expect(useModelStore.getState().nodes).toHaveLength(3) // not 4
+    // No merge: 2 existing + 2 placed = 4 nodes (coincident at (5,0,0))
+    expect(useModelStore.getState().nodes).toHaveLength(4)
     expect(useModelStore.getState().members).toHaveLength(2)
   })
 })
@@ -209,7 +209,7 @@ describe('Workflow 3: Multi-shape management', () => {
 })
 
 describe('Workflow 4: Equal spacing placement', () => {
-  it('places 3 copies with node merging', () => {
+  it('places 3 copies with separate trussIds', () => {
     // Create a simple beam shape (2 nodes, 1 member)
     const n1 = useEditor2DStore.getState().addNode(0, 0)
     const n2 = useEditor2DStore.getState().addNode(5, 0)
@@ -229,10 +229,14 @@ describe('Workflow 4: Equal spacing placement', () => {
     commitPlacement()
 
     const { nodes, members } = useModelStore.getState()
-    // 3 copies of beams along the edge; some nodes merge at shared points
-    expect(members.length).toBeGreaterThanOrEqual(3)
-    expect(nodes.length).toBeGreaterThanOrEqual(3)
+    // 3 copies × 2 nodes = 6 nodes, 3 copies × 1 member = 3 members (no merge)
+    expect(nodes).toHaveLength(6)
+    expect(members).toHaveLength(3)
     expect(usePlacementStore.getState().phase).toBe('idle')
+
+    // Each copy should have a distinct trussId
+    const trussIds = new Set(nodes.map((n) => n.trussId).filter(Boolean))
+    expect(trussIds.size).toBe(3)
   })
 })
 

@@ -62,21 +62,19 @@ describe('placeEqualSpacing', () => {
     ],
   }
 
-  it('places 3 copies with correct node count', () => {
+  it('places 3 copies without merging nodes', () => {
     const result = placeEqualSpacing(
       simpleShape,
       { start: { x: 0, y: 0, z: 0 }, end: { x: 10, y: 0, z: 0 } },
       3,
       [],
     )
-    // 3 copies with 2 nodes each, but copies share the same target edge direction
-    // so node at (10,0,0) from copy 1 merges with copy 3's start -> 5 unique nodes
-    expect(result.nodes).toHaveLength(5)
+    // 3 copies × 2 nodes = 6 nodes, no merging
+    expect(result.nodes).toHaveLength(6)
     expect(result.members).toHaveLength(3)
   })
 
-  it('places 2 copies with existing nodes for merge', () => {
-    // If we already have a node at (0,0,0), the first copy's start node should merge
+  it('places 2 copies without merging against existing nodes', () => {
     const existing = [createNode({ id: 'e1', position: { x: 0, y: 0, z: 0 } })]
     const result = placeEqualSpacing(
       simpleShape,
@@ -84,10 +82,8 @@ describe('placeEqualSpacing', () => {
       2,
       existing,
     )
-    // First copy: node at (0,0,0) merges with e1, node at (10,0,0) stays -> 1 new
-    // Second copy: node at (10,0,0) merges with first copy's second node, and (20,0,0) stays -> 1 new
-    // Total new: might be fewer due to merging
-    expect(result.nodes.length).toBeLessThanOrEqual(4)
+    // 2 copies × 2 nodes = 4 new nodes, no merging with existing
+    expect(result.nodes).toHaveLength(4)
     expect(result.members).toHaveLength(2)
   })
 })

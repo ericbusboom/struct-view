@@ -53,7 +53,22 @@ export const useCanvas2DStore = create<Canvas2DState>((set) => ({
       }
     }),
 
-  open: () => set({ isOpen: true }),
+  open: () => {
+    // Position origin in the lower-left region of the canvas.
+    // The pop-up is 80vw x 85vh; canvas area is modal minus header (40px).
+    // We want origin at ~10% from left, ~90% from top (10% from bottom)
+    // so +X goes right, +Y goes up (screen Y is inverted).
+    const canvasW = window.innerWidth * 0.8
+    const canvasH = window.innerHeight * 0.85 - 40
+    set({
+      isOpen: true,
+      camera: {
+        offsetX: canvasW * 0.1,
+        offsetY: canvasH * 0.9,
+        zoom: 40,
+      },
+    })
+  },
   close: () => set({ isOpen: false }),
   toggle: () => set((state) => ({ isOpen: !state.isOpen })),
 }))

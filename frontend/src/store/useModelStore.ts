@@ -27,6 +27,10 @@ export interface ModelState {
   updateShape: (id: string, updates: Partial<Shape2D>) => void
   removeShape: (id: string) => void
 
+  // Truss queries
+  getNodesByTrussId: (trussId: string) => Node[]
+  getMembersByTrussId: (trussId: string) => Member[]
+
   // Bulk replace (for import)
   loadProject: (project: {
     name: string
@@ -103,6 +107,9 @@ export const useModelStore = create<ModelState>((set) => ({
 
   removeShape: (id) =>
     set((state) => ({ shapes: state.shapes.filter((s) => s.id !== id) })),
+
+  getNodesByTrussId: (trussId) => useModelStore.getState().nodes.filter((n) => n.trussId === trussId),
+  getMembersByTrussId: (trussId) => useModelStore.getState().members.filter((m) => m.trussId === trussId),
 
   loadProject: (project) => set({ ...project, shapes: project.shapes ?? [] }),
 }))

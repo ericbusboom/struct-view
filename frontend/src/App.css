@@ -58,23 +58,45 @@
   gap: 4px;
 }
 
+.viewport-main {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
 .viewport-container {
   flex: 1;
   position: relative;
   background: #2a2a2a;
 }
 
-/* 2D Canvas Editor overlay */
-.canvas2d-overlay {
+/* 2D Canvas Editor backdrop */
+.canvas2d-backdrop {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 100;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 2D Canvas Editor pop-up */
+.canvas2d-overlay {
+  width: 80vw;
+  height: 85vh;
+  z-index: 101;
   display: flex;
   flex-direction: column;
   background: #1e1e2e;
+  border: 1px solid #555;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
 .canvas2d-header {
@@ -241,4 +263,85 @@
 .shape-library-item-actions {
   display: flex;
   gap: 3px;
+}
+
+/* Truss Library Panel (right side) */
+.truss-library-panel {
+  width: 240px;
+  flex-shrink: 0;
+  background: #1a1a2e;
+  border-left: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  color: #e0e0e0;
+}
+
+.truss-library-header {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 10px 12px;
+  border-bottom: 1px solid #333;
+}
+
+.truss-library-empty {
+  font-size: 0.75rem;
+  color: #777;
+  text-align: center;
+  padding: 24px 12px;
+}
+
+.truss-library-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px;
+}
+
+/* Truss Card */
+.truss-card {
+  background: #22223a;
+  border: 1px solid #3a3a4e;
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.truss-card:hover {
+  border-color: #4a9eff;
+}
+
+.truss-card-thumbnail {
+  border-radius: 4px;
+  width: 100%;
+  height: auto;
+}
+
+.truss-card-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.truss-card-meta {
+  font-size: 0.65rem;
+  color: #888;
+}
+
+.truss-card-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.truss-card-actions .tool-btn {
+  flex: 1;
+  font-size: 0.7rem;
+  padding: 3px 8px;
+}
+
+/* Plane Selector */
+.plane-selector {
+  display: flex;
+  gap: 2px;
 }

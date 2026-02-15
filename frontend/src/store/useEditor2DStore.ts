@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { nanoid } from 'nanoid'
-import type { Shape2D, Shape2DNode, Shape2DMember } from '../model'
+import type { Shape2D, Shape2DNode, Shape2DMember, PlacementPlane } from '../model'
 import { createShape2D } from '../model'
 
 export type Tool2D = 'draw-node' | 'draw-segment' | 'select' | 'delete' | 'snap-edge'
@@ -21,6 +21,7 @@ export interface Editor2DState {
   selectEntity: (id: string | null) => void
   setPendingSegmentStart: (nodeId: string | null) => void
   toggleSnapEdge: (memberId: string) => void
+  setPlacementPlane: (plane: PlacementPlane) => void
   loadShape: (shape: Shape2D, shapeId?: string) => void
   resetShape: (name?: string) => void
   markClean: () => void
@@ -124,6 +125,12 @@ export const useEditor2DStore = create<Editor2DState>((set) => ({
           m.id === memberId ? { ...m, isSnapEdge: !m.isSnapEdge } : m,
         ),
       },
+      isDirty: true,
+    })),
+
+  setPlacementPlane: (plane) =>
+    set((state) => ({
+      shape: { ...state.shape, placementPlane: plane },
       isDirty: true,
     })),
 

@@ -17,6 +17,7 @@ function resetStores() {
     mode: 'select',
     selectedNodeIds: new Set(),
     selectedMemberIds: new Set(),
+    selectedTrussId: null,
     memberStartNode: null,
   })
 }
@@ -145,5 +146,62 @@ describe('selection system', () => {
     useEditorStore.getState().select('m1', 'member')
     expect(useEditorStore.getState().isMemberSelected('m1')).toBe(true)
     expect(useEditorStore.getState().isMemberSelected('m2')).toBe(false)
+  })
+})
+
+describe('truss selection', () => {
+  beforeEach(resetStores)
+
+  it('selectTruss sets selectedTrussId and clears node/member selection', () => {
+    useEditorStore.getState().select('n1', 'node')
+    useEditorStore.getState().selectTruss('truss-1')
+    expect(useEditorStore.getState().selectedTrussId).toBe('truss-1')
+    expect(useEditorStore.getState().selectedNodeIds.size).toBe(0)
+    expect(useEditorStore.getState().selectedMemberIds.size).toBe(0)
+  })
+
+  it('clearSelection clears selectedTrussId', () => {
+    useEditorStore.getState().selectTruss('truss-1')
+    useEditorStore.getState().clearSelection()
+    expect(useEditorStore.getState().selectedTrussId).toBeNull()
+  })
+
+  it('selecting a node clears truss selection', () => {
+    useEditorStore.getState().selectTruss('truss-1')
+    useEditorStore.getState().select('n1', 'node')
+    expect(useEditorStore.getState().selectedTrussId).toBeNull()
+  })
+
+  it('selecting a member clears truss selection', () => {
+    useEditorStore.getState().selectTruss('truss-1')
+    useEditorStore.getState().select('m1', 'member')
+    expect(useEditorStore.getState().selectedTrussId).toBeNull()
+  })
+})
+
+describe('rotate pivot', () => {
+  beforeEach(resetStores)
+
+  it('setRotatePivotNodeId sets the pivot', () => {
+    useEditorStore.getState().setRotatePivotNodeId('n1')
+    expect(useEditorStore.getState().rotatePivotNodeId).toBe('n1')
+  })
+
+  it('clearSelection clears pivot', () => {
+    useEditorStore.getState().setRotatePivotNodeId('n1')
+    useEditorStore.getState().clearSelection()
+    expect(useEditorStore.getState().rotatePivotNodeId).toBeNull()
+  })
+
+  it('selectTruss clears pivot', () => {
+    useEditorStore.getState().setRotatePivotNodeId('n1')
+    useEditorStore.getState().selectTruss('truss-2')
+    expect(useEditorStore.getState().rotatePivotNodeId).toBeNull()
+  })
+
+  it('setting pivot to null resets to centroid mode', () => {
+    useEditorStore.getState().setRotatePivotNodeId('n1')
+    useEditorStore.getState().setRotatePivotNodeId(null)
+    expect(useEditorStore.getState().rotatePivotNodeId).toBeNull()
   })
 })

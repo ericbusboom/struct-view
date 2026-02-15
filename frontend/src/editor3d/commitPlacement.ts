@@ -1,12 +1,13 @@
+import { nanoid } from 'nanoid'
 import { usePlacementStore } from '../store/usePlacementStore'
 import { useModelStore } from '../store/useModelStore'
 import { placeShape } from '../editor2d/placeShape'
 import { placeEqualSpacing } from '../editor2d/equalSpacing'
-import { mergeCoincidentNodes, applyNodeRemap } from '../editor2d/mergeNodes'
 
 /**
  * Commit the current placement to the model store.
- * Computes placement, merges coincident nodes with existing model, and adds results.
+ * Stamps every placed node and member with a trussId for group selection.
+ * Nodes are never merged — co-located nodes remain separate entities.
  * Resets placement store to idle.
  */
 export function commitPlacement(): void {
@@ -30,27 +31,31 @@ export function commitPlacement(): void {
     placedMembers = result.members
   }
 
-  // For single placement, merge against existing model nodes
+  // Stamp trussId on all placed entities.
+  // For equal-spacing (count > 1), each copy gets its own trussId.
   if (count <= 1) {
-    const { mergedNodes, remapTable } = mergeCoincidentNodes(
-      existingNodes,
-      placedNodes,
-    )
-    const remappedMembers = applyNodeRemap(placedMembers, remapTable)
-
-    for (const node of mergedNodes) {
-      addNode(node)
-    }
-    for (const member of remappedMembers) {
-      addMember(member)
-    }
-  } else {
-    // placeEqualSpacing already does incremental merging internally
+    const trussId = nanoid()
     for (const node of placedNodes) {
-      addNode(node)
+      addNode({ ...node, trussId })
     }
     for (const member of placedMembers) {
-      addMember(member)
+      addMember({ ...member, trussId })
+    }
+  } else {
+    // Group nodes/members by their placement index.
+    // placeEqualSpacing returns all copies concatenated, so we chunk by shape size.
+    const nodesPerCopy = shape.nodes.length
+    const membersPerCopy = shape.members.length
+    for (let i = 0; i < count; i++) {
+      const trussId = nanoid()
+      const nodeSlice = placedNodes.slice(i * nodesPerCopy, (i + 1) * nodesPerCopy)
+      const memberSlice = placedMembers.slice(i * membersPerCopy, (i + 1) * membersPerCopy)
+      for (const node of nodeSlice) {
+        addNode({ ...node, trussId })
+      }
+      for (const member of memberSlice) {
+        addMember({ ...member, trussId })
+      }
     }
   }
 

@@ -42,7 +42,7 @@ describe('commitPlacement', () => {
     expect(usePlacementStore.getState().phase).toBe('idle')
   })
 
-  it('merges coincident nodes with existing model', () => {
+  it('does not merge coincident nodes (co-location only)', () => {
     const existingNode = createNode({ id: 'existing', position: { x: 0, y: 0, z: 0 } })
     useModelStore.setState({ nodes: [existingNode], members: [] })
 
@@ -56,9 +56,30 @@ describe('commitPlacement', () => {
     commitPlacement()
 
     const { nodes, members } = useModelStore.getState()
-    // One node should merge with existing, so 1 existing + 2 new = 3
-    expect(nodes).toHaveLength(3)
+    // No merge: 1 existing + 3 placed = 4 nodes
+    expect(nodes).toHaveLength(4)
     expect(members).toHaveLength(3)
+  })
+
+  it('stamps trussId on all placed nodes and members', () => {
+    const shape = makeTriangleShape()
+    usePlacementStore.getState().startPlacement(shape)
+    usePlacementStore.getState().setTargetEdge({
+      start: { x: 0, y: 0, z: 0 },
+      end: { x: 10, y: 0, z: 0 },
+    })
+
+    commitPlacement()
+
+    const { nodes, members } = useModelStore.getState()
+    // All placed nodes and members should have the same trussId
+    const trussIds = new Set(nodes.map((n) => n.trussId).filter(Boolean))
+    expect(trussIds.size).toBe(1)
+    const trussId = [...trussIds][0]
+    expect(trussId).toBeTruthy()
+    for (const m of members) {
+      expect(m.trussId).toBe(trussId)
+    }
   })
 
   it('does nothing when shape or targetEdge is missing', () => {
@@ -80,7 +101,7 @@ describe('commitPlacement', () => {
     commitPlacement()
 
     const { nodes, members } = useModelStore.getState()
-    // 2 copies of 3 nodes with some merging at shared positions
+    // 2 copies of 3 nodes = 6 nodes, 2 copies of 3 members = 6 members (no merge)
     expect(nodes.length).toBeGreaterThan(3)
     expect(members.length).toBeGreaterThan(3)
     expect(usePlacementStore.getState().phase).toBe('idle')

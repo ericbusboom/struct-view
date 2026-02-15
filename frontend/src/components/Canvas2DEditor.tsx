@@ -8,6 +8,7 @@ import type { SnapResult } from '../editor2d/snap'
 import type { Shape2D } from '../model'
 import TemplatePicker from './TemplatePicker'
 import ShapeLibrary from './ShapeLibrary'
+import PlaneSelector from './PlaneSelector'
 
 const ZOOM_SENSITIVITY = 0.001
 const SNAP_RADIUS_PX = 10
@@ -194,6 +195,7 @@ export default function Canvas2DEditor() {
   const selectEntity = useEditor2DStore((s) => s.selectEntity)
   const setPendingSegmentStart = useEditor2DStore((s) => s.setPendingSegmentStart)
   const toggleSnapEdge = useEditor2DStore((s) => s.toggleSnapEdge)
+  const setPlacementPlane = useEditor2DStore((s) => s.setPlacementPlane)
 
   const render = useCallback(() => {
     const canvas = canvasRef.current
@@ -431,7 +433,15 @@ export default function Canvas2DEditor() {
         ? 'pointer'
         : 'crosshair'
 
+  const handleBackdropClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) close()
+    },
+    [close],
+  )
+
   return (
+    <div className="canvas2d-backdrop" onClick={handleBackdropClick}>
     <div className="canvas2d-overlay">
       <div className="canvas2d-header">
         <div className="canvas2d-tools">
@@ -447,7 +457,8 @@ export default function Canvas2DEditor() {
         </div>
         <button className="tool-btn" onClick={() => setShowTemplatePicker(true)}>Template</button>
         <button className="tool-btn" onClick={() => setShowShapeLibrary(true)}>Library</button>
-        <span className="canvas2d-title">2D Shape Editor</span>
+        <PlaneSelector value={shape.placementPlane} onChange={setPlacementPlane} />
+        <span className="canvas2d-title">2D Truss Editor</span>
         <div className="canvas2d-info">
           {cursorWorld.x.toFixed(2)}, {cursorWorld.y.toFixed(2)}
           {cursorSnap && cursorSnap.type !== 'none' && ` [${cursorSnap.type}]`}
@@ -473,6 +484,7 @@ export default function Canvas2DEditor() {
           <ShapeLibrary onClose={() => setShowShapeLibrary(false)} />
         )}
       </div>
+    </div>
     </div>
   )
 }

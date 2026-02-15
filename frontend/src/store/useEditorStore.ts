@@ -1,15 +1,22 @@
 import { create } from 'zustand'
+import type { PlacementPlane } from '../model'
 
-export type EditorMode = 'select' | 'add-node' | 'add-member' | 'move'
+export type EditorMode = 'select' | 'add-node' | 'add-member' | 'move' | 'rotate'
 
 export interface EditorState {
   mode: EditorMode
   selectedNodeIds: Set<string>
   selectedMemberIds: Set<string>
+  /** Currently selected truss (by trussId) */
+  selectedTrussId: string | null
   /** First node picked in add-member mode */
   memberStartNode: string | null
   /** Node currently being dragged in move mode */
   dragNodeId: string | null
+  /** Active constraint plane for 3D movement/rotation */
+  activePlane: PlacementPlane
+  /** Node used as rotation pivot (null = use centroid) */
+  rotatePivotNodeId: string | null
 
   setMode: (mode: EditorMode) => void
   /** Select a single entity (replaces current selection). */
@@ -17,18 +24,25 @@ export interface EditorState {
   /** Toggle entity in multi-select (shift+click). */
   toggleSelect: (id: string, type: 'node' | 'member') => void
   clearSelection: () => void
+  /** Select an entire truss by its trussId. */
+  selectTruss: (trussId: string) => void
   isNodeSelected: (id: string) => boolean
   isMemberSelected: (id: string) => boolean
   setMemberStartNode: (id: string | null) => void
   setDragNodeId: (id: string | null) => void
+  setActivePlane: (plane: PlacementPlane) => void
+  setRotatePivotNodeId: (id: string | null) => void
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
   mode: 'select',
   selectedNodeIds: new Set(),
   selectedMemberIds: new Set(),
+  selectedTrussId: null,
   memberStartNode: null,
   dragNodeId: null,
+  activePlane: 'XZ' as PlacementPlane,
+  rotatePivotNodeId: null,
 
   setMode: (mode) =>
     set({ mode, memberStartNode: null, dragNodeId: null }),
@@ -37,6 +51,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set({
       selectedNodeIds: type === 'node' ? new Set([id]) : new Set(),
       selectedMemberIds: type === 'member' ? new Set([id]) : new Set(),
+      selectedTrussId: null,
     }),
 
   toggleSelect: (id, type) =>
@@ -55,7 +70,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     }),
 
   clearSelection: () =>
-    set({ selectedNodeIds: new Set(), selectedMemberIds: new Set() }),
+    set({ selectedNodeIds: new Set(), selectedMemberIds: new Set(), selectedTrussId: null, rotatePivotNodeId: null }),
+
+  selectTruss: (trussId) =>
+    set({ selectedNodeIds: new Set(), selectedMemberIds: new Set(), selectedTrussId: trussId, rotatePivotNodeId: null }),
 
   isNodeSelected: (id) => get().selectedNodeIds.has(id),
   isMemberSelected: (id) => get().selectedMemberIds.has(id),
@@ -65,6 +83,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   setDragNodeId: (id) =>
     set({ dragNodeId: id }),
+
+  setActivePlane: (plane) =>
+    set({ activePlane: plane }),
+
+  setRotatePivotNodeId: (id) =>
+    set({ rotatePivotNodeId: id }),
 }))
 
 // Convenience helpers for components

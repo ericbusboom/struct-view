@@ -3,6 +3,9 @@ import { OrbitControls, GizmoHelper, GizmoViewport, Grid } from '@react-three/dr
 import SceneModel from './SceneModel'
 import GroundPlane from './GroundPlane'
 import NodeDragger from './NodeDragger'
+import TrussDragger from './TrussDragger'
+import RotateArc from './RotateArc'
+import SnapIndicators from './SnapIndicators'
 import TargetEdgePicker from './TargetEdgePicker'
 import PlacementPreview from './PlacementPreview'
 
@@ -32,6 +35,9 @@ export default function Viewport3D() {
       <GroundPlane />
       <SceneModel />
       <NodeDragger />
+      <TrussDragger />
+      <RotateArc />
+      <SnapIndicators />
       <TargetEdgePicker />
       <PlacementPreview />
 

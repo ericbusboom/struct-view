@@ -115,6 +115,7 @@ export function createShape2D(name: string = 'Untitled Shape'): Shape2D {
     name,
     nodes: [],
     members: [],
+    placementPlane: 'XZ',
   }
 }
 

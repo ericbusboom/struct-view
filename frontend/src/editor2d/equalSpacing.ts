@@ -1,7 +1,6 @@
 import type { Vec3, Shape2D, Node, Member } from '../model'
 import { placeShape } from './placeShape'
 import type { TargetEdge } from './placeShape'
-import { mergeCoincidentNodes, applyNodeRemap, MERGE_TOLERANCE } from './mergeNodes'
 
 /**
  * Compute N evenly-spaced positions along a target edge.
@@ -34,32 +33,28 @@ export function computeEqualSpacingPositions(
 }
 
 /**
- * Place N copies of a shape at equal spacing along a target edge,
- * with incremental node merging between copies and against existing nodes.
+ * Place N copies of a shape at equal spacing along a target edge.
+ * Nodes are never merged — co-located nodes remain separate entities.
+ * Returns all copies concatenated (each copy has shape.nodes.length nodes).
  */
 export function placeEqualSpacing(
   shape: Shape2D,
   targetEdge: TargetEdge,
   count: number,
-  existingNodes: Node[],
+  _existingNodes: Node[],
 ): { nodes: Node[]; members: Member[] } {
   const positions = computeEqualSpacingPositions(targetEdge.start, targetEdge.end, count)
 
-  let accumulatedNodes = [...existingNodes]
   const allNewNodes: Node[] = []
   const allNewMembers: Member[] = []
 
   for (const pos of positions) {
-    // Create a sub-edge for this copy: snap edge aligned at this position
-    // The target edge for each copy has the same direction as the original
     const dx = targetEdge.end.x - targetEdge.start.x
     const dy = targetEdge.end.y - targetEdge.start.y
     const dz = targetEdge.end.z - targetEdge.start.z
     const len = Math.sqrt(dx * dx + dy * dy + dz * dz)
     if (len === 0) continue
 
-    // Compute a sub-target edge of the same length as the original
-    // but starting at the computed position
     const copyEdge: TargetEdge = {
       start: pos,
       end: {
@@ -70,18 +65,8 @@ export function placeEqualSpacing(
     }
 
     const placed = placeShape(shape, copyEdge, 0)
-
-    // Merge against accumulated nodes
-    const { mergedNodes, remapTable } = mergeCoincidentNodes(
-      accumulatedNodes,
-      placed.nodes,
-      MERGE_TOLERANCE,
-    )
-    const remappedMembers = applyNodeRemap(placed.members, remapTable)
-
-    allNewNodes.push(...mergedNodes)
-    allNewMembers.push(...remappedMembers)
-    accumulatedNodes = [...accumulatedNodes, ...mergedNodes]
+    allNewNodes.push(...placed.nodes)
+    allNewMembers.push(...placed.members)
   }
 
   return { nodes: allNewNodes, members: allNewMembers }

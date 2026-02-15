@@ -47,6 +47,7 @@ export const NodeSchema = z.object({
   support: SupportSchema,
   connection_type: ConnectionTypeSchema,
   connection_method: ConnectionMethodSchema.optional(),
+  trussId: z.string().min(1).optional(),
   tags: z.array(z.string()),
 })
 
@@ -91,6 +92,7 @@ export const MemberSchema = z.object({
   material: MaterialSchema,
   section: SectionSchema,
   end_releases: EndReleasesSchema,
+  trussId: z.string().min(1).optional(),
   tags: z.array(z.string()),
 })
 
@@ -151,6 +153,10 @@ export const LoadCombinationSchema = z.object({
   factors: z.array(CombinationFactorSchema).min(1),
 })
 
+// --- Placement Plane ---
+
+export const PlacementPlaneSchema = z.enum(['XZ', 'XY', 'YZ'])
+
 // --- Shape2D ---
 
 export const Shape2DNodeSchema = z.object({
@@ -171,6 +177,7 @@ export const Shape2DSchema = z.object({
   name: z.string().min(1),
   nodes: z.array(Shape2DNodeSchema),
   members: z.array(Shape2DMemberSchema),
+  placementPlane: PlacementPlaneSchema.default('XZ'),
 })
 
 // --- Project ---
@@ -208,6 +215,7 @@ export type LoadCaseType = z.infer<typeof LoadCaseTypeSchema>
 export type LoadCase = z.infer<typeof LoadCaseSchema>
 export type CombinationFactor = z.infer<typeof CombinationFactorSchema>
 export type LoadCombination = z.infer<typeof LoadCombinationSchema>
+export type PlacementPlane = z.infer<typeof PlacementPlaneSchema>
 export type Shape2DNode = z.infer<typeof Shape2DNodeSchema>
 export type Shape2DMember = z.infer<typeof Shape2DMemberSchema>
 export type Shape2D = z.infer<typeof Shape2DSchema>
