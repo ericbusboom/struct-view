@@ -8,6 +8,7 @@ export default function FileToolbar() {
       name: state.name,
       nodes: state.nodes,
       members: state.members,
+      groups: state.groups,
       panels: state.panels,
       loads: state.loads,
       load_cases: state.load_cases,
