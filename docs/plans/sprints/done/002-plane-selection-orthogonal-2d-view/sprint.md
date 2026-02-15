@@ -1,7 +1,7 @@
 ---
-id: "002"
+id: '002'
 title: Plane Selection + Orthogonal 2D View
-status: planning
+status: done
 branch: sprint/002-plane-selection-orthogonal-2d-view
 use-cases: []
 ---
