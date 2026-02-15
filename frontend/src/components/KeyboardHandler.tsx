@@ -108,6 +108,7 @@ export default function KeyboardHandler() {
           }
         }
 
+        // setActivePlane resets focus and savedCameraState automatically
         const plane = createPlaneFromPoints(points.slice(0, 3))
         usePlaneStore.getState().setActivePlane(plane)
       }
@@ -120,10 +121,11 @@ export default function KeyboardHandler() {
         }
       }
 
-      // Escape — clear selection and reset to select mode
+      // Escape — clear selection, clear active plane, and reset to select mode
       if (e.key === 'Escape') {
         useEditorStore.getState().clearSelection()
         useEditorStore.getState().setMemberStartNode(null)
+        usePlaneStore.getState().clearActivePlane()
         setMode('select')
       }
     }

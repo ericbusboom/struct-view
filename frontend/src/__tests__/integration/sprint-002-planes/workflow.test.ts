@@ -84,16 +84,16 @@ function simulatePKey() {
 describe('Plane creation from selection', () => {
   beforeEach(resetAll)
 
-  it('press p with no selection → XY plane at origin', () => {
+  it('press p with no selection → horizontal XZ plane at origin', () => {
     simulatePKey()
     const plane = usePlaneStore.getState().activePlane
     expect(plane).not.toBeNull()
     expect(plane!.constraintType).toBe('point')
     expect(plane!.point).toEqual({ x: 0, y: 0, z: 0 })
-    expect(Math.abs(plane!.normal.z)).toBeCloseTo(1)
+    expect(Math.abs(plane!.normal.y)).toBeCloseTo(1)
   })
 
-  it('select 1 node, press p → XY plane at that node', () => {
+  it('select 1 node, press p → horizontal XZ plane at that node', () => {
     const n = createNode({ id: 'n1', position: { x: 5, y: 3, z: 7 } })
     useModelStore.setState({ nodes: [n] })
     useEditorStore.getState().select('n1', 'node')

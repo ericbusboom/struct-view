@@ -41,7 +41,7 @@ export default function Viewport3D() {
       <PlaneGrid />
       <FocusCameraController />
 
-      <OrbitControls makeDefault />
+      <OrbitControls makeDefault zoomToCursor />
 
       <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
         <GizmoViewport />

@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { usePlaneStore } from '../store/usePlaneStore'
 import { getPlaneColor } from '../model'
@@ -10,9 +10,18 @@ const GRID_OPACITY = 0.25
 /**
  * Renders a translucent colored grid on the active working plane.
  * Color indicates axis alignment: red=XY, blue=YZ, green=XZ, yellow=general.
+ * Raycasting is disabled so the grid never intercepts mouse events.
  */
 export default function PlaneGrid() {
   const activePlane = usePlaneStore((s) => s.activePlane)
+  const meshRef = useRef<THREE.Mesh>(null)
+
+  // Disable raycasting on the translucent overlay mesh so it never blocks clicks
+  useEffect(() => {
+    if (meshRef.current) {
+      meshRef.current.raycast = () => {}
+    }
+  }, [])
 
   const { position, quaternion, color } = useMemo(() => {
     if (!activePlane) return { position: [0, 0, 0] as const, quaternion: new THREE.Quaternion(), color: '#ffcc00' }
@@ -36,7 +45,7 @@ export default function PlaneGrid() {
       <gridHelper
         args={[GRID_SIZE, GRID_DIVISIONS, color, color]}
       />
-      <mesh rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[GRID_SIZE, GRID_SIZE]} />
         <meshBasicMaterial
           color={color}

@@ -13,12 +13,12 @@ function length(v: Vec3): number {
 describe('createPlaneFromPoints', () => {
   beforeEach(() => _resetPlaneIdCounter())
 
-  describe('0 points — XY plane at origin', () => {
-    it('creates an XY plane with normal along Z', () => {
+  describe('0 points — horizontal XZ plane at origin', () => {
+    it('creates an XZ plane with normal along Y', () => {
       const plane = createPlaneFromPoints([])
-      expect(plane.normal.z).toBeCloseTo(1)
+      expect(plane.normal.y).toBeCloseTo(1)
       expect(plane.normal.x).toBeCloseTo(0)
-      expect(plane.normal.y).toBeCloseTo(0)
+      expect(plane.normal.z).toBeCloseTo(0)
     })
 
     it('has anchor at origin', () => {
@@ -45,10 +45,10 @@ describe('createPlaneFromPoints', () => {
     })
   })
 
-  describe('1 point — XY plane through that point', () => {
-    it('creates an XY plane with normal along Z', () => {
+  describe('1 point — horizontal XZ plane through that point', () => {
+    it('creates an XZ plane with normal along Y', () => {
       const plane = createPlaneFromPoints([{ x: 5, y: 3, z: 7 }])
-      expect(plane.normal.z).toBeCloseTo(1)
+      expect(plane.normal.y).toBeCloseTo(1)
       expect(plane.constraintType).toBe('point')
     })
 
