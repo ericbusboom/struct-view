@@ -8,6 +8,7 @@ import { usePlaneStore } from '../store/usePlaneStore'
 
 const NODE_RADIUS = 0.08
 const NODE_RADIUS_SELECTED = 0.1
+const NODE_HITBOX_RADIUS = 0.14  // larger than beam hitbox (0.08) so nodes win near endpoints
 const NODE_COLOR = '#4a9eff'
 const SELECTED_COLOR = '#ffff00'
 const TRUSS_HIGHLIGHT_COLOR = '#00e5ff'
@@ -113,19 +114,25 @@ export default function NodeMesh({ node }: Props) {
   const opacity = ghosted ? GHOST_OPACITY : nearPlane ? NEAR_PLANE_OPACITY : 1
 
   return (
-    <mesh
-      position={[x, y, z]}
-      onClick={handleClick}
-      onPointerDown={handlePointerDown}
-      renderOrder={renderOrder}
-    >
-      <sphereGeometry args={[radius, 16, 16]} />
-      <meshStandardMaterial
-        color={color}
-        transparent={ghosted || nearPlane}
-        opacity={opacity}
-        depthWrite={!ghosted && !nearPlane}
-      />
-    </mesh>
+    <group position={[x, y, z]}>
+      {/* Invisible hitbox sphere — larger than beam hitbox so nodes win near endpoints */}
+      <mesh
+        onClick={handleClick}
+        onPointerDown={handlePointerDown}
+      >
+        <sphereGeometry args={[NODE_HITBOX_RADIUS, 8, 8]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} colorWrite={false} />
+      </mesh>
+      {/* Visual sphere */}
+      <mesh renderOrder={renderOrder}>
+        <sphereGeometry args={[radius, 16, 16]} />
+        <meshStandardMaterial
+          color={color}
+          transparent={ghosted || nearPlane}
+          opacity={opacity}
+          depthWrite={!ghosted && !nearPlane}
+        />
+      </mesh>
+    </group>
   )
 }
