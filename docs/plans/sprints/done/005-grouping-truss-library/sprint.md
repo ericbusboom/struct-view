@@ -1,7 +1,7 @@
 ---
-id: "005"
+id: '005'
 title: Grouping + Truss Library
-status: planning
+status: done
 branch: sprint/005-grouping-truss-library
 use-cases: []
 ---
