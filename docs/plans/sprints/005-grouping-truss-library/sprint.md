@@ -77,7 +77,6 @@ library integration.
 
 - Direct 3D coordinate entry (Sprint 006)
 - CSV/text import (Sprint 006)
-- Undo/redo (future sprint)
 - Copy/paste groups (future sprint)
 
 ## Test Strategy
@@ -124,3 +123,4 @@ Before tickets can be created, all of the following must be true:
 7. Place from library into current plane view as group
 8. Adapt truss templates (Pratt, Howe, Warren, Scissors) for new workflow
 9. Integration tests for grouping + library workflow
+10. 2D editor undo/redo (command stack for draw/move/delete operations)

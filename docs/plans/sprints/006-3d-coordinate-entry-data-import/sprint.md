@@ -71,7 +71,7 @@ file import.
 
 - Beam creation from coordinate entry (user creates nodes, then connects
   with `b` key in a plane view or via MCP tools)
-- Coordinate units conversion (imperial/metric switching is a future sprint)
+- Coordinate units conversion (imperial/metric switching — Sprint 007)
 - Batch node editing (select multiple nodes and shift all by same amount)
 
 ## Test Strategy
@@ -114,3 +114,4 @@ Before tickets can be created, all of the following must be true:
 5. CSV file import (with or without header)
 6. Text file import (space/comma separated x y z per line)
 7. Integration tests for coordinate entry + import
+8. Sidebar property editor with beam length setting

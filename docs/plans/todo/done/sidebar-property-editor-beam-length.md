@@ -1,5 +1,6 @@
 ---
-status: pending
+status: done
+sprint: '006'
 ---
 
 # Sidebar Property Editor with Beam Length Setting
