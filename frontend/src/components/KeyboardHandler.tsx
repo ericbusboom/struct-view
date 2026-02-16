@@ -5,8 +5,8 @@ import { usePlaneStore } from '../store/usePlaneStore'
 import type { EditorMode } from '../store/useEditorStore'
 import { computeNudgeDelta, computeGroupCentroid } from '../editor3d/groupMove'
 import { rotatePositionsAroundPivot } from '../editor3d/planeRotate'
+import { getPlaneFromSelection } from '../editor3d/planeFromSelection'
 import { createPlaneFromPoints } from '../model'
-import type { Vec3 } from '../model'
 
 const MODE_KEYS: Record<string, EditorMode> = {
   v: 'select',
@@ -93,26 +93,8 @@ export default function KeyboardHandler() {
 
       // P key — create working plane from selection
       if (key === 'p') {
-        const { selectedNodeIds, selectedMemberIds } = useEditorStore.getState()
-        const { nodes, members } = useModelStore.getState()
-
-        const points: Vec3[] = []
-        for (const id of selectedNodeIds) {
-          const node = nodes.find((n) => n.id === id)
-          if (node) points.push({ ...node.position })
-        }
-        for (const id of selectedMemberIds) {
-          const member = members.find((m) => m.id === id)
-          if (member) {
-            const startNode = nodes.find((n) => n.id === member.start_node)
-            const endNode = nodes.find((n) => n.id === member.end_node)
-            if (startNode) points.push({ ...startNode.position })
-            if (endNode) points.push({ ...endNode.position })
-          }
-        }
-
-        const plane = createPlaneFromPoints(points.slice(0, 3))
-        console.log(`[key] p → plane from ${points.length} points, normal=(${plane.normal.x.toFixed(2)}, ${plane.normal.y.toFixed(2)}, ${plane.normal.z.toFixed(2)}), type=${plane.constraintType}`)
+        const plane = getPlaneFromSelection() ?? createPlaneFromPoints([])
+        console.log(`[key] p → plane normal=(${plane.normal.x.toFixed(2)}, ${plane.normal.y.toFixed(2)}, ${plane.normal.z.toFixed(2)}), type=${plane.constraintType}`)
         usePlaneStore.getState().setActivePlane(plane)
         return
       }

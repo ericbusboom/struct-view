@@ -1,5 +1,5 @@
 ---
-status: pending
+status: done
 ---
 
 # View cube for setting specific camera views

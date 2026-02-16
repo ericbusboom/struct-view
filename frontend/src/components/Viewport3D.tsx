@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, GizmoHelper, GizmoViewport, Grid } from '@react-three/drei'
+import { OrbitControls, GizmoHelper, GizmoViewcube, Grid } from '@react-three/drei'
 import SceneModel from './SceneModel'
 import GroundPlane from './GroundPlane'
 import NodeDragger from './NodeDragger'
@@ -9,6 +9,7 @@ import SnapIndicators from './SnapIndicators'
 import PlaneGrid from './PlaneGrid'
 import PlanePlacer from './PlanePlacer'
 import FocusCameraController from './FocusCameraController'
+import CameraActionExecutor from './CameraActionExecutor'
 
 export default function Viewport3D() {
   return (
@@ -33,8 +34,6 @@ export default function Viewport3D() {
         rotation={[Math.PI / 2, 0, 0]}
       />
 
-      <axesHelper args={[5]} />
-
       <GroundPlane />
       <SceneModel />
       <NodeDragger />
@@ -44,11 +43,14 @@ export default function Viewport3D() {
       <PlaneGrid />
       <PlanePlacer />
       <FocusCameraController />
+      <CameraActionExecutor />
 
       <OrbitControls makeDefault zoomToCursor />
 
       <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
-        <GizmoViewport />
+        <GizmoViewcube
+          faces={['Right', 'Left', 'Front', 'Back', 'Top', 'Bottom']}
+        />
       </GizmoHelper>
     </Canvas>
   )

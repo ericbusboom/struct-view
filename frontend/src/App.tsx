@@ -6,6 +6,7 @@ import KeyboardHandler from './components/KeyboardHandler'
 import TrussLibraryPanel from './components/TrussLibraryPanel'
 import PropertiesPanel from './components/PropertiesPanel'
 import FocusOverlay from './components/FocusOverlay'
+import ViewportOverlayButtons from './components/ViewportOverlayButtons'
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <div className="viewport-container" style={{ position: 'relative' }}>
           <Viewport3D />
           <FocusOverlay />
+          <ViewportOverlayButtons />
         </div>
         <div className="sidebar">
           <PropertiesPanel />
