@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
 import { usePlaneStore } from '../store/usePlaneStore'
@@ -7,6 +7,13 @@ import { computeNudgeDelta, computeGroupCentroid } from '../editor3d/groupMove'
 import { rotatePositionsAroundPivot } from '../editor3d/planeRotate'
 import { getPlaneFromSelection } from '../editor3d/planeFromSelection'
 import { createPlaneFromPoints } from '../model'
+import {
+  rotatePlane,
+  getRotationAxes,
+  snapPlaneAngle,
+  computeRotationSpeed,
+  TAP_ANGLE,
+} from '../editor3d/planeRotation'
 
 const MODE_KEYS: Record<string, EditorMode> = {
   v: 'select',
@@ -16,15 +23,84 @@ const MODE_KEYS: Record<string, EditorMode> = {
   r: 'rotate',
 }
 
+type ArrowDir = 'left' | 'right' | 'up' | 'down'
+const ARROW_DIRS: Record<string, ArrowDir> = {
+  ArrowLeft: 'left',
+  ArrowRight: 'right',
+  ArrowUp: 'up',
+  ArrowDown: 'down',
+}
+
 export default function KeyboardHandler() {
   const setMode = useEditorStore((s) => s.setMode)
 
+  // Plane rotation state (refs to avoid re-render churn)
+  const heldArrows = useRef(new Set<string>())
+  const holdStart = useRef(new Map<string, number>()) // key → timestamp of first hold
+  const rafId = useRef<number>(0)
+  const lastTick = useRef(0)
+  const isFirstFrame = useRef(new Map<string, boolean>()) // key → whether this is the first frame
+
   useEffect(() => {
+    // --- Plane rotation animation loop ---
+    const tick = (time: number) => {
+      const dt = lastTick.current ? (time - lastTick.current) / 1000 : 0
+      lastTick.current = time
+
+      if (heldArrows.current.size > 0) {
+        const plane = usePlaneStore.getState().activePlane
+        const { selectedGroupId } = useEditorStore.getState()
+        const { isFocused } = usePlaneStore.getState()
+
+        // Only rotate the plane if: active plane, no group selected, not focused
+        if (plane && !selectedGroupId && !isFocused) {
+          const axes = getRotationAxes(plane)
+          let updated = plane
+
+          for (const key of heldArrows.current) {
+            const dir = ARROW_DIRS[key]
+            if (!dir) continue
+
+            // Determine rotation axis and sign
+            let axis = (dir === 'up' || dir === 'down') ? axes.horizontal : axes.vertical
+            if (!axis) continue
+            const sign = (dir === 'right' || dir === 'up') ? 1 : -1
+
+            // Compute angle for this frame
+            let angle: number
+            if (isFirstFrame.current.get(key)) {
+              // First frame of a key press: apply tap angle
+              angle = TAP_ANGLE * sign
+              isFirstFrame.current.set(key, false)
+            } else {
+              const holdDuration = (time - (holdStart.current.get(key) ?? time)) / 1000
+              const speed = computeRotationSpeed(holdDuration)
+              angle = speed * dt * sign
+            }
+
+            updated = rotatePlane(updated, axis, angle)
+
+            // Apply 15-degree snap
+            const snapAxis = (dir === 'up' || dir === 'down') ? axes.horizontal! : axes.vertical!
+            updated = snapPlaneAngle(updated, snapAxis)
+          }
+
+          if (updated !== plane) {
+            usePlaneStore.getState().updatePlane(updated)
+          }
+        }
+      }
+
+      rafId.current = requestAnimationFrame(tick)
+    }
+
+    rafId.current = requestAnimationFrame(tick)
+
+    // --- Keyboard event handlers ---
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement).tagName === 'INPUT') return
 
       const key = e.key.toLowerCase()
-      console.log(`[key] '${e.key}' (lower: '${key}')`)
 
       // Mode keys
       const newMode = MODE_KEYS[key]
@@ -50,16 +126,12 @@ export default function KeyboardHandler() {
         return
       }
 
-      // Arrow keys — nudge (move mode) or rotate (rotate mode) selected truss
-      const ARROW_DIRS: Record<string, 'left' | 'right' | 'up' | 'down'> = {
-        ArrowLeft: 'left',
-        ArrowRight: 'right',
-        ArrowUp: 'up',
-        ArrowDown: 'down',
-      }
+      // Arrow keys
       const arrowDir = ARROW_DIRS[e.key]
       if (arrowDir) {
         const { selectedGroupId, activePlane, mode: currentMode } = useEditorStore.getState()
+
+        // Group selected → existing nudge/rotate behavior
         if (selectedGroupId) {
           e.preventDefault()
           const trussNodes = useModelStore.getState().getNodesByGroupId(selectedGroupId)
@@ -86,6 +158,18 @@ export default function KeyboardHandler() {
                 },
               })
             }
+          }
+          return
+        }
+
+        // No group selected → plane rotation (handled by rAF loop)
+        const workingPlane = usePlaneStore.getState().activePlane
+        if (workingPlane && !e.repeat) {
+          e.preventDefault()
+          heldArrows.current.add(e.key)
+          if (!holdStart.current.has(e.key)) {
+            holdStart.current.set(e.key, performance.now())
+            isFirstFrame.current.set(e.key, true)
           }
         }
         return
@@ -122,8 +206,21 @@ export default function KeyboardHandler() {
       }
     }
 
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (ARROW_DIRS[e.key]) {
+        heldArrows.current.delete(e.key)
+        holdStart.current.delete(e.key)
+        isFirstFrame.current.delete(e.key)
+      }
+    }
+
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+      cancelAnimationFrame(rafId.current)
+    }
   }, [setMode])
 
   return null
