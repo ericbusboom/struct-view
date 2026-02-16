@@ -220,5 +220,48 @@ describe('planeSnap', () => {
       )
       expect(result).toBe('n2')
     })
+
+    it('finds near-plane nodes within NEAR_PLANE_THRESHOLD', () => {
+      const plane = createPlaneFromPoints([])
+      const nodes = [
+        { id: 'n1', position: { x: 1, y: 0, z: 0.3 } }, // near-plane (0.3 < 0.5)
+      ]
+      const result = findNearestOnPlaneNode(
+        { x: 1, y: 0, z: 0 },
+        nodes,
+        plane,
+        0.5,
+      )
+      expect(result).toBe('n1')
+    })
+
+    it('prefers on-plane nodes over near-plane nodes', () => {
+      const plane = createPlaneFromPoints([])
+      const nodes = [
+        { id: 'near', position: { x: 0.05, y: 0, z: 0.3 } }, // near-plane, closer in XY
+        { id: 'on', position: { x: 0.2, y: 0, z: 0 } },      // on-plane, farther in XY
+      ]
+      const result = findNearestOnPlaneNode(
+        { x: 0, y: 0, z: 0 },
+        nodes,
+        plane,
+        0.5,
+      )
+      expect(result).toBe('on')
+    })
+
+    it('ignores nodes beyond NEAR_PLANE_THRESHOLD', () => {
+      const plane = createPlaneFromPoints([])
+      const nodes = [
+        { id: 'n1', position: { x: 0, y: 0, z: 1.0 } }, // beyond 0.5 threshold
+      ]
+      const result = findNearestOnPlaneNode(
+        { x: 0, y: 0, z: 0 },
+        nodes,
+        plane,
+        0.5,
+      )
+      expect(result).toBeNull()
+    })
   })
 })

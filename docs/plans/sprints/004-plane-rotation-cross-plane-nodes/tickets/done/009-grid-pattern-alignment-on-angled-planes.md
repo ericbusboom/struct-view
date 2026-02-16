@@ -1,12 +1,12 @@
 ---
-id: "003"
-title: Tangent vector tracking (gimbal-lock-free incremental updates)
-status: todo
+id: "009"
+title: Grid pattern alignment on angled planes
+status: done
 use-cases: []
 depends-on: []
 ---
 
-# Tangent vector tracking (gimbal-lock-free incremental updates)
+# Grid pattern alignment on angled planes
 
 ## Description
 

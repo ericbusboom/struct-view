@@ -125,3 +125,5 @@ Before tickets can be created, all of the following must be true:
 6. Node visibility across planes (nodes within snap distance appear in 2D view)
 7. Cross-plane node sharing (connect beams to nodes from other planes)
 8. Integration tests for rotation + cross-plane connections
+9. Grid pattern alignment on angled planes (align grid to constraint points/lines)
+10. Wider beam/member selection hitbox (at least 2x raycaster threshold)

@@ -100,6 +100,26 @@ describe('createPlaneFromPoints', () => {
       expect(dot(plane.tangentU, plane.tangentV)).toBeCloseTo(0)
       expect(dot(plane.tangentU, plane.normal)).toBeCloseTo(0)
     })
+
+    it('tangentU aligns with constraint line direction', () => {
+      // Line along X axis
+      const planeX = createPlaneFromPoints([
+        { x: 0, y: 0, z: 0 },
+        { x: 5, y: 0, z: 0 },
+      ])
+      expect(Math.abs(planeX.tangentU.x)).toBeCloseTo(1)
+      expect(planeX.tangentU.y).toBeCloseTo(0)
+      expect(planeX.tangentU.z).toBeCloseTo(0)
+
+      // Line along diagonal
+      const planeDiag = createPlaneFromPoints([
+        { x: 0, y: 0, z: 0 },
+        { x: 1, y: 1, z: 0 },
+      ])
+      const s = 1 / Math.sqrt(2)
+      expect(planeDiag.tangentU.x).toBeCloseTo(s)
+      expect(planeDiag.tangentU.y).toBeCloseTo(s)
+    })
   })
 
   describe('3 points — fully constrained plane', () => {
@@ -148,6 +168,18 @@ describe('createPlaneFromPoints', () => {
         { x: 10, y: 0, z: 0 },
       ])
       expect(plane.constraintType).toBe('line')
+    })
+
+    it('tangentU aligns with first edge direction', () => {
+      const plane = createPlaneFromPoints([
+        { x: 0, y: 0, z: 0 },
+        { x: 5, y: 0, z: 0 },
+        { x: 0, y: 5, z: 0 },
+      ])
+      // First edge is along X
+      expect(Math.abs(plane.tangentU.x)).toBeCloseTo(1)
+      expect(plane.tangentU.y).toBeCloseTo(0)
+      expect(plane.tangentU.z).toBeCloseTo(0)
     })
   })
 

@@ -1,12 +1,12 @@
 ---
-id: "004"
-title: x/y/z axis alignment keys for plane orientation
-status: todo
+id: '010'
+title: Wider beam/member selection hitbox
+status: done
 use-cases: []
 depends-on: []
 ---
 
-# x/y/z axis alignment keys for plane orientation
+# Wider beam/member selection hitbox
 
 ## Description
 

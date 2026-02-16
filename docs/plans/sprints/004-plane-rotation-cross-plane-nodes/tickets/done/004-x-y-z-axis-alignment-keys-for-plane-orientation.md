@@ -1,12 +1,12 @@
 ---
-id: "006"
-title: Node visibility across planes (nodes within snap distance appear in 2D view)
-status: todo
+id: "004"
+title: x/y/z axis alignment keys for plane orientation
+status: done
 use-cases: []
 depends-on: []
 ---
 
-# Node visibility across planes (nodes within snap distance appear in 2D view)
+# x/y/z axis alignment keys for plane orientation
 
 ## Description
 

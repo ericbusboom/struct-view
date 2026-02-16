@@ -1,12 +1,12 @@
 ---
-id: "002"
-title: 15-degree snap angle behavior
-status: todo
+id: '006'
+title: Node visibility across planes (nodes within snap distance appear in 2D view)
+status: done
 use-cases: []
 depends-on: []
 ---
 
-# 15-degree snap angle behavior
+# Node visibility across planes (nodes within snap distance appear in 2D view)
 
 ## Description
 

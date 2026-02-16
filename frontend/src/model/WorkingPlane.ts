@@ -155,7 +155,9 @@ export function createPlaneFromPoints(points: Vec3[]): WorkingPlane {
     const lineDir = normalize(sub(points[1], points[0]))
     const normal = bestNormalForLine(lineDir)
     const point = { ...points[0] }
-    const { tangentU, tangentV } = computeTangents(normal)
+    // Align tangentU to constraint line for predictable grid orientation
+    const tangentU = lineDir
+    const tangentV = normalize(cross(normal, tangentU))
     return {
       id,
       normal,
@@ -180,7 +182,8 @@ export function createPlaneFromPoints(points: Vec3[]): WorkingPlane {
     const lineDir = normalize(v1)
     const normal = bestNormalForLine(lineDir)
     const point = { ...p0 }
-    const { tangentU, tangentV } = computeTangents(normal)
+    const tangentU = lineDir
+    const tangentV = normalize(cross(normal, tangentU))
     return {
       id,
       normal,
@@ -196,7 +199,10 @@ export function createPlaneFromPoints(points: Vec3[]): WorkingPlane {
   // Ensure normal points "upward" (positive Z component) for consistency (Z-up)
   const finalNormal = normal.z < 0 ? negate(normal) : normal
   const point = { ...p0 }
-  const { tangentU, tangentV } = computeTangents(finalNormal)
+  // Align tangentU to first edge (p0→p1) for predictable grid orientation
+  const edgeDir = normalize(v1)
+  const tangentU = edgeDir
+  const tangentV = normalize(cross(finalNormal, tangentU))
   return {
     id,
     normal: finalNormal,
@@ -226,6 +232,9 @@ export function getPlaneColor(normal: Vec3): string {
   if (ay > THRESHOLD) return '#44cc44' // Green — XZ plane
   return '#ffcc00' // Yellow — general
 }
+
+/** Distance threshold for cross-plane node visibility in focus mode. */
+export const NEAR_PLANE_THRESHOLD = 0.5
 
 /** Check if a point lies on (or very near) a working plane. */
 export function isOnPlane(position: Vec3, plane: WorkingPlane, threshold = 0.01): boolean {

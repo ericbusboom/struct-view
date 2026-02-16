@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import * as THREE from 'three'
 import type { ThreeEvent } from '@react-three/fiber'
 import type { Member, Node } from '../model'
-import { isOnPlane } from '../model/WorkingPlane'
+import { isOnPlane, NEAR_PLANE_THRESHOLD } from '../model/WorkingPlane'
 import { useEditorStore } from '../store/useEditorStore'
 import { usePlaneStore } from '../store/usePlaneStore'
 
@@ -11,7 +11,9 @@ const SELECTED_COLOR = '#ffff00'
 const TRUSS_HIGHLIGHT_COLOR = '#00e5ff'
 const GHOST_COLOR = '#888888'
 const GHOST_OPACITY = 0.15
+const NEAR_PLANE_OPACITY = 0.4
 const TUBE_RADIUS = 0.025
+const HITBOX_RADIUS = 0.08  // 3x visual radius for easier selection
 const TUBE_SEGMENTS = 8
 
 interface Props {
@@ -34,20 +36,30 @@ export default function MemberLine({ member, nodes }: Props) {
 
   const isTrussHighlighted = !!(member.groupId && selectedGroupId && member.groupId === selectedGroupId)
 
-  // Ghost rendering: members with either endpoint off-plane are ghosted
-  const ghosted = useMemo(() => {
-    if (!isFocused || !activePlane || !startNode || !endNode) return false
-    const startOnPlane = isOnPlane(startNode.position, activePlane)
-    const endOnPlane = isOnPlane(endNode.position, activePlane)
-    return !(startOnPlane && endOnPlane)
+  // Visibility tiers: on-plane (full), near-plane (semi), ghosted
+  const { ghosted, nearPlane } = useMemo(() => {
+    if (!isFocused || !activePlane || !startNode || !endNode)
+      return { ghosted: false, nearPlane: false }
+    const startOn = isOnPlane(startNode.position, activePlane)
+    const endOn = isOnPlane(endNode.position, activePlane)
+    if (startOn && endOn) return { ghosted: false, nearPlane: false }
+    // At least one endpoint near the plane → show as near-plane
+    const startNear = isOnPlane(startNode.position, activePlane, NEAR_PLANE_THRESHOLD)
+    const endNear = isOnPlane(endNode.position, activePlane, NEAR_PLANE_THRESHOLD)
+    if ((startOn || startNear) && (endOn || endNear))
+      return { ghosted: false, nearPlane: true }
+    return { ghosted: true, nearPlane: false }
   }, [isFocused, activePlane, startNode, endNode])
 
-  const geometry = useMemo(() => {
-    if (!startNode || !endNode) return null
+  const { geometry, hitboxGeometry } = useMemo(() => {
+    if (!startNode || !endNode) return { geometry: null, hitboxGeometry: null }
     const start = new THREE.Vector3(startNode.position.x, startNode.position.y, startNode.position.z)
     const end = new THREE.Vector3(endNode.position.x, endNode.position.y, endNode.position.z)
     const path = new THREE.LineCurve3(start, end)
-    return new THREE.TubeGeometry(path, 1, TUBE_RADIUS, TUBE_SEGMENTS, false)
+    return {
+      geometry: new THREE.TubeGeometry(path, 1, TUBE_RADIUS, TUBE_SEGMENTS, false),
+      hitboxGeometry: new THREE.TubeGeometry(path, 1, HITBOX_RADIUS, TUBE_SEGMENTS, false),
+    }
   }, [startNode, endNode])
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
@@ -75,14 +87,24 @@ export default function MemberLine({ member, nodes }: Props) {
     color = TRUSS_HIGHLIGHT_COLOR
   }
 
+  const opacity = ghosted ? GHOST_OPACITY : nearPlane ? NEAR_PLANE_OPACITY : 1
+  const renderOrder = ghosted ? 0 : nearPlane ? 5 : 10
+
   return (
-    <mesh geometry={geometry} onClick={handleClick} renderOrder={ghosted ? 0 : 10}>
-      <meshStandardMaterial
-        color={color}
-        transparent={ghosted}
-        opacity={ghosted ? GHOST_OPACITY : 1}
-        depthWrite={!ghosted}
-      />
-    </mesh>
+    <group>
+      {/* Invisible wider hitbox for easier click selection */}
+      <mesh geometry={hitboxGeometry} onClick={handleClick}>
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} colorWrite={false} />
+      </mesh>
+      {/* Visual tube */}
+      <mesh geometry={geometry} renderOrder={renderOrder}>
+        <meshStandardMaterial
+          color={color}
+          transparent={ghosted || nearPlane}
+          opacity={opacity}
+          depthWrite={!ghosted && !nearPlane}
+        />
+      </mesh>
+    </group>
   )
 }

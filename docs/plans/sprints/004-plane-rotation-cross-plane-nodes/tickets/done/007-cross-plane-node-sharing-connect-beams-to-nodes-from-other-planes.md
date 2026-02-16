@@ -1,12 +1,12 @@
 ---
-id: "005"
-title: Line constraint rotation (up/down arrow only, around constraining line)
-status: todo
+id: "007"
+title: Cross-plane node sharing (connect beams to nodes from other planes)
+status: done
 use-cases: []
 depends-on: []
 ---
 
-# Line constraint rotation (up/down arrow only, around constraining line)
+# Cross-plane node sharing (connect beams to nodes from other planes)
 
 ## Description
 

@@ -1,12 +1,12 @@
 ---
-id: "001"
-title: Arrow key rotation with acceleration (0.1 deg tap to 5 deg/sec hold)
-status: todo
+id: 008
+title: Integration tests for rotation + cross-plane connections
+status: done
 use-cases: []
 depends-on: []
 ---
 
-# Arrow key rotation with acceleration (0.1 deg tap to 5 deg/sec hold)
+# Integration tests for rotation + cross-plane connections
 
 ## Description
 
