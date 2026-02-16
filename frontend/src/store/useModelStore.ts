@@ -34,6 +34,7 @@ export interface ModelState {
   updateGroup: (id: string, updates: Partial<Group>) => void
 
   // Group queries
+  getGroup: (id: string) => Group | undefined
   getNodesByGroupId: (groupId: string) => Node[]
   getMembersByGroupId: (groupId: string) => Member[]
 
@@ -155,6 +156,7 @@ export const useModelStore = create<ModelState>((set) => ({
       groups: state.groups.map((g) => (g.id === id ? { ...g, ...updates } : g)),
     })),
 
+  getGroup: (id): Group | undefined => useModelStore.getState().groups.find((g: Group) => g.id === id),
   getNodesByGroupId: (groupId): Node[] => useModelStore.getState().nodes.filter((n: Node) => n.groupId === groupId),
   getMembersByGroupId: (groupId): Member[] => useModelStore.getState().members.filter((m: Member) => m.groupId === groupId),
 

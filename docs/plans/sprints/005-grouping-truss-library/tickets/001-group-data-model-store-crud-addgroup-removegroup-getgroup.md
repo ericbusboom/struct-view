@@ -1,8 +1,8 @@
 ---
 id: "001"
 title: Group data model + store CRUD (addGroup, removeGroup, getGroup)
-status: todo
-use-cases: []
+status: in-progress
+use-cases: [SUC-005-03]
 depends-on: []
 ---
 
@@ -10,14 +10,21 @@ depends-on: []
 
 ## Description
 
-(What needs to be done and why.)
+The Group data model and basic store CRUD (addGroup, removeGroup, updateGroup,
+getNodesByGroupId, getMembersByGroupId) were added in Sprint 001. This ticket
+adds the missing `getGroup(id)` convenience getter and writes comprehensive
+tests for all group CRUD operations, which currently have zero test coverage.
 
 ## Acceptance Criteria
 
-- [ ] (Criterion)
+- [ ] `getGroup(id)` method exists on useModelStore and returns the Group or undefined
+- [ ] Unit tests cover addGroup, removeGroup, updateGroup, getGroup
+- [ ] Unit tests verify removeGroup clears groupId from associated nodes and members
+- [ ] Unit tests verify getNodesByGroupId and getMembersByGroupId
+- [ ] All existing tests still pass (no regressions)
 
 ## Testing
 
-- **Existing tests to run**: (list test files/commands to verify no regressions)
-- **New tests to write**: (describe tests that validate this ticket's changes)
-- **Verification command**: `uv run pytest`
+- **Existing tests to run**: `cd frontend && npx vitest run`
+- **New tests to write**: Add group CRUD tests to `frontend/src/store/__tests__/useModelStore.test.ts`
+- **Verification command**: `cd frontend && npx vitest run`
