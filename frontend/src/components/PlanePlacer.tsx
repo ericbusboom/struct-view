@@ -1,41 +1,24 @@
 import { useCallback, useRef } from 'react'
 import * as THREE from 'three'
-import { useThree } from '@react-three/fiber'
 import type { ThreeEvent } from '@react-three/fiber'
 import { createNode, createMember } from '../model'
 import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
 import { usePlaneStore } from '../store/usePlaneStore'
-import { raycastOntoPlane, snapToPlaneGrid, findNearestOnPlaneNode } from '../editor3d/planeSnap'
+import { snapToPlaneGrid, findNearestOnPlaneNode } from '../editor3d/planeSnap'
 
 const GRID_SIZE = 1.0
 const SNAP_RADIUS = 0.5
 
-/** Helper: build raycaster from a ThreeEvent's native mouse coords. */
-function raycasterFromEvent(
-  e: ThreeEvent<MouseEvent | PointerEvent>,
-  camera: THREE.Camera,
-): { origin: { x: number; y: number; z: number }; dir: { x: number; y: number; z: number } } {
-  const target = e.nativeEvent.target as HTMLElement
-  const raycaster = new THREE.Raycaster()
-  const mouse = new THREE.Vector2(
-    (e.nativeEvent.offsetX / target.clientWidth) * 2 - 1,
-    -(e.nativeEvent.offsetY / target.clientHeight) * 2 + 1,
-  )
-  raycaster.setFromCamera(mouse, camera)
-  return {
-    origin: { x: raycaster.ray.origin.x, y: raycaster.ray.origin.y, z: raycaster.ray.origin.z },
-    dir: { x: raycaster.ray.direction.x, y: raycaster.ray.direction.y, z: raycaster.ray.direction.z },
-  }
-}
-
 /**
  * Handles node/beam placement and hover highlighting in focus mode.
- * Renders an invisible plane mesh to catch click/pointer events, then
- * raycasts onto the active WorkingPlane and snaps to grid.
+ * Renders an invisible double-sided plane mesh to catch click/pointer
+ * events, then snaps the intersection point to the grid.
+ *
+ * Uses e.point from R3F's raycaster directly (already correct for the
+ * current camera) instead of building a second raycaster manually.
  */
 export default function PlanePlacer() {
-  const { camera } = useThree()
   const mode = useEditorStore((s) => s.mode)
   const isFocused = usePlaneStore((s) => s.isFocused)
   const activePlane = usePlaneStore((s) => s.activePlane)
@@ -55,11 +38,12 @@ export default function PlanePlacer() {
 
       e.stopPropagation()
 
-      const { origin, dir } = raycasterFromEvent(e, camera)
-      const intersection = raycastOntoPlane(origin, dir, activePlane)
-      if (!intersection) return
-
-      const snapped = snapToPlaneGrid(intersection, activePlane, GRID_SIZE)
+      // e.point is the world-space intersection from R3F's raycaster
+      const snapped = snapToPlaneGrid(
+        { x: e.point.x, y: e.point.y, z: e.point.z },
+        activePlane,
+        GRID_SIZE,
+      )
 
       const nearNodeId = findNearestOnPlaneNode(
         snapped,
@@ -103,7 +87,7 @@ export default function PlanePlacer() {
         }
       }
     },
-    [isFocused, activePlane, mode, camera, nodes, addNode, addMember, memberStartNode, setMemberStartNode],
+    [isFocused, activePlane, mode, nodes, addNode, addMember, memberStartNode, setMemberStartNode],
   )
 
   const handlePointerMove = useCallback(
@@ -111,17 +95,11 @@ export default function PlanePlacer() {
       if (!isFocused || !activePlane) return
       if (mode !== 'add-node' && mode !== 'add-member') return
 
-      const { origin, dir } = raycasterFromEvent(e, camera)
-      const intersection = raycastOntoPlane(origin, dir, activePlane)
-      if (!intersection) {
-        if (lastHoverRef.current) {
-          lastHoverRef.current = null
-          setHoverNodeId(null)
-        }
-        return
-      }
-
-      const snapped = snapToPlaneGrid(intersection, activePlane, GRID_SIZE)
+      const snapped = snapToPlaneGrid(
+        { x: e.point.x, y: e.point.y, z: e.point.z },
+        activePlane,
+        GRID_SIZE,
+      )
       const nearNodeId = findNearestOnPlaneNode(
         snapped,
         nodes.map((n) => ({ id: n.id, position: n.position })),
@@ -135,7 +113,7 @@ export default function PlanePlacer() {
         setHoverNodeId(nearNodeId)
       }
     },
-    [isFocused, activePlane, mode, camera, nodes, setHoverNodeId],
+    [isFocused, activePlane, mode, nodes, setHoverNodeId],
   )
 
   if (!isFocused || !activePlane) return null
