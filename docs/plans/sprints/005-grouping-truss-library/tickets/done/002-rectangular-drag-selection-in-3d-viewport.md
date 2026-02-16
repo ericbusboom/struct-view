@@ -1,8 +1,9 @@
 ---
-id: "002"
+id: '002'
 title: Rectangular drag selection in 3D viewport
-status: in-progress
-use-cases: [SUC-005-01]
+status: done
+use-cases:
+- SUC-005-01
 depends-on: []
 ---
 
