@@ -155,7 +155,9 @@ export function createPlaneFromPoints(points: Vec3[]): WorkingPlane {
     const lineDir = normalize(sub(points[1], points[0]))
     const normal = bestNormalForLine(lineDir)
     const point = { ...points[0] }
-    const { tangentU, tangentV } = computeTangents(normal)
+    // Align tangentU to constraint line for predictable grid orientation
+    const tangentU = lineDir
+    const tangentV = normalize(cross(normal, tangentU))
     return {
       id,
       normal,
@@ -180,7 +182,8 @@ export function createPlaneFromPoints(points: Vec3[]): WorkingPlane {
     const lineDir = normalize(v1)
     const normal = bestNormalForLine(lineDir)
     const point = { ...p0 }
-    const { tangentU, tangentV } = computeTangents(normal)
+    const tangentU = lineDir
+    const tangentV = normalize(cross(normal, tangentU))
     return {
       id,
       normal,
@@ -196,7 +199,10 @@ export function createPlaneFromPoints(points: Vec3[]): WorkingPlane {
   // Ensure normal points "upward" (positive Z component) for consistency (Z-up)
   const finalNormal = normal.z < 0 ? negate(normal) : normal
   const point = { ...p0 }
-  const { tangentU, tangentV } = computeTangents(finalNormal)
+  // Align tangentU to first edge (p0→p1) for predictable grid orientation
+  const edgeDir = normalize(v1)
+  const tangentU = edgeDir
+  const tangentV = normalize(cross(finalNormal, tangentU))
   return {
     id,
     normal: finalNormal,
