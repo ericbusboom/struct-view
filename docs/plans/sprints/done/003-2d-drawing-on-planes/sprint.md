@@ -1,7 +1,7 @@
 ---
-id: "003"
+id: '003'
 title: 2D Drawing on Planes
-status: planning
+status: done
 branch: sprint/003-2d-drawing-on-planes
 use-cases: []
 ---
