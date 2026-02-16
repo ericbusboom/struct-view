@@ -25,6 +25,8 @@ export interface EditorState {
   select: (id: string, type: 'node' | 'member') => void
   /** Toggle entity in multi-select (shift+click). */
   toggleSelect: (id: string, type: 'node' | 'member') => void
+  /** Replace selection with a set of node IDs (for drag-select). */
+  setSelectedNodeIds: (ids: Set<string>, additive?: boolean) => void
   clearSelection: () => void
   /** Select an entire group by its groupId. */
   selectGroup: (trussId: string) => void
@@ -72,6 +74,13 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         return { selectedMemberIds: next }
       }
     }),
+
+  setSelectedNodeIds: (ids, additive) =>
+    set((state) => ({
+      selectedNodeIds: additive ? new Set([...state.selectedNodeIds, ...ids]) : ids,
+      selectedMemberIds: new Set(),
+      selectedGroupId: null,
+    })),
 
   clearSelection: () =>
     set({ selectedNodeIds: new Set(), selectedMemberIds: new Set(), selectedGroupId: null, rotatePivotNodeId: null }),
