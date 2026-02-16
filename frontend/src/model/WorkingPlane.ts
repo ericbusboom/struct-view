@@ -51,37 +51,59 @@ const WORLD_AXES: Vec3[] = [WORLD_X, WORLD_Y, WORLD_Z]
 
 /**
  * Compute tangent vectors from a normal.
- * tangentV is always the projection of world-Z onto the plane ("up" in the
- * plane), so the 2D focus view shows Z-up on screen.  For horizontal planes
- * where Z is the normal, we fall back to projecting world-Y as screen-up.
- * tangentU completes the right-handed frame (U × V = N).
+ *
+ * tangentV ("up on screen"):
+ *   - If Z is in the plane, Z-projected is up.
+ *   - If only X and Y are in the plane (horizontal), Y is up.
+ *   - For tilted planes, compare Z and Y projections onto the plane;
+ *     pick the one more aligned (larger projection = smaller angle to plane).
+ *
+ * tangentU ("right on screen"):
+ *   - X should go left-to-right whenever X is in the plane.
  */
 function computeTangents(normal: Vec3): { tangentU: Vec3; tangentV: Vec3 } {
-  // Project world-Z onto the plane: projZ = Z - dot(Z, N) * N
+  // Project world-Z and world-Y onto the plane
   const dotZN = dot(WORLD_Z, normal)
   const projZ: Vec3 = {
     x: WORLD_Z.x - dotZN * normal.x,
     y: WORLD_Z.y - dotZN * normal.y,
     z: WORLD_Z.z - dotZN * normal.z,
   }
+  const projZLen = length(projZ)
 
+  const dotYN = dot(WORLD_Y, normal)
+  const projY: Vec3 = {
+    x: WORLD_Y.x - dotYN * normal.x,
+    y: WORLD_Y.y - dotYN * normal.y,
+    z: WORLD_Y.z - dotYN * normal.z,
+  }
+  const projYLen = length(projY)
+
+  // Pick the axis more aligned with the plane (larger projection).
+  // Prefer Z when equal (Z-up convention).
   let tangentV: Vec3
-  if (length(projZ) > 1e-6) {
-    // Non-horizontal plane: Z projected onto plane is "up"
+  if (projZLen >= projYLen && projZLen > 1e-6) {
     tangentV = normalize(projZ)
-  } else {
-    // Horizontal plane (normal ≈ ±Z): use world-Y as "up" on screen
-    const dotYN = dot(WORLD_Y, normal)
-    const projY: Vec3 = {
-      x: WORLD_Y.x - dotYN * normal.x,
-      y: WORLD_Y.y - dotYN * normal.y,
-      z: WORLD_Y.z - dotYN * normal.z,
-    }
+  } else if (projYLen > 1e-6) {
     tangentV = normalize(projY)
+  } else {
+    tangentV = { ...WORLD_Y }
   }
 
-  // tangentU = "right" in the plane, completing right-handed frame (U × V = N)
-  const tangentU = normalize(cross(tangentV, normal))
+  let tangentU = normalize(cross(tangentV, normal))
+
+  // Ensure X goes left-to-right: if X is in the plane, tangentU should
+  // have a positive dot product with the X projection.
+  const dotXN = dot(WORLD_X, normal)
+  const projX: Vec3 = {
+    x: WORLD_X.x - dotXN * normal.x,
+    y: WORLD_X.y - dotXN * normal.y,
+    z: WORLD_X.z - dotXN * normal.z,
+  }
+  if (length(projX) > 1e-6 && dot(tangentU, projX) < 0) {
+    tangentU = negate(tangentU)
+  }
+
   return { tangentU, tangentV }
 }
 

@@ -61,26 +61,55 @@ export default function FocusCameraController() {
         0.1, 1000,
       )
 
-      // Determine which side of the plane the current camera is on
+      // Compute camera up and side from the plane normal.
+      // Rules: Z-up preferred, Y-up fallback, X left-to-right.
       const n = activePlane.normal
       const pt = activePlane.point
-      const camDx = camera.position.x - pt.x
-      const camDy = camera.position.y - pt.y
-      const camDz = camera.position.z - pt.z
-      const cameraSide = camDx * n.x + camDy * n.y + camDz * n.z
 
-      // Position camera on the SAME side as the current 3D camera
-      // so the transition doesn't flip the view
-      const sign = cameraSide >= 0 ? 1 : -1
+      // Project Z and Y onto the plane; pick the one more aligned
+      const dotZN = n.z // dot(WORLD_Z, n)
+      const projZ = new THREE.Vector3(-dotZN * n.x, -dotZN * n.y, 1 - dotZN * n.z)
+      const projZLen = projZ.length()
+
+      const dotYN = n.y // dot(WORLD_Y, n)
+      const projY = new THREE.Vector3(-dotYN * n.x, 1 - dotYN * n.y, -dotYN * n.z)
+      const projYLen = projY.length()
+
+      let cameraUp: THREE.Vector3
+      if (projZLen >= projYLen && projZLen > 1e-6) {
+        cameraUp = projZ.normalize()
+      } else if (projYLen > 1e-6) {
+        cameraUp = projY.normalize()
+      } else {
+        cameraUp = new THREE.Vector3(0, 0, 1)
+      }
+
+      // Choose camera side so X goes left-to-right.
+      // From -N side: screenRight = cross(N, up).
+      // From +N side: screenRight = -cross(N, up).
+      const normalVec = new THREE.Vector3(n.x, n.y, n.z)
+      const crossNU = new THREE.Vector3().crossVectors(normalVec, cameraUp)
+
+      // Project X onto plane to determine desired horizontal direction
+      const dotXN = n.x // dot(WORLD_X, n)
+      const projX = new THREE.Vector3(1 - dotXN * n.x, -dotXN * n.y, -dotXN * n.z)
+      const projXLen = projX.length()
+
+      let sign: number
+      if (projXLen > 1e-6) {
+        // X is in the plane — pick side so screenRight aligns with +X
+        sign = crossNU.dot(projX.normalize()) >= 0 ? -1 : 1
+      } else {
+        // X not in plane (e.g. YZ) — default to positive normal side
+        sign = 1
+      }
+
       orthoCamera.position.set(
         pt.x + n.x * FOCUS_DISTANCE * sign,
         pt.y + n.y * FOCUS_DISTANCE * sign,
         pt.z + n.z * FOCUS_DISTANCE * sign,
       )
-
-      // Use tangentV as up (projection of world-Z onto plane),
-      // which preserves the sense of "Z is up on screen"
-      orthoCamera.up.set(activePlane.tangentV.x, activePlane.tangentV.y, activePlane.tangentV.z)
+      orthoCamera.up.copy(cameraUp)
       orthoCamera.lookAt(pt.x, pt.y, pt.z)
       orthoCamera.updateProjectionMatrix()
 
