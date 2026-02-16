@@ -1,7 +1,7 @@
 ---
-id: "006"
+id: '006'
 title: Node visibility across planes (nodes within snap distance appear in 2D view)
-status: todo
+status: in-progress
 use-cases: []
 depends-on: []
 ---

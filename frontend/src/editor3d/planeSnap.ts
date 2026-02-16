@@ -1,5 +1,6 @@
 import type { Vec3 } from '../model'
 import type { WorkingPlane } from '../model/WorkingPlane'
+import { NEAR_PLANE_THRESHOLD } from '../model/WorkingPlane'
 
 /**
  * Project a 3D world point onto plane-local (u, v) coordinates.
@@ -86,7 +87,8 @@ export function raycastOntoPlane(
 }
 
 /**
- * Find the nearest on-plane node within snapRadius.
+ * Find the nearest on-plane or near-plane node within snapRadius.
+ * Prefers on-plane nodes over near-plane nodes at the same distance.
  * Returns the node ID if found, null otherwise.
  */
 export function findNearestOnPlaneNode(
@@ -94,13 +96,13 @@ export function findNearestOnPlaneNode(
   nodes: { id: string; position: Vec3 }[],
   plane: WorkingPlane,
   snapRadius: number,
-  planeTolerance = 0.01,
+  planeTolerance = NEAR_PLANE_THRESHOLD,
 ): string | null {
   let closestId: string | null = null
   let closestDist = Infinity
+  let closestIsOnPlane = false
 
   for (const node of nodes) {
-    // Check if node is on the plane
     const dx = node.position.x - plane.point.x
     const dy = node.position.y - plane.point.y
     const dz = node.position.z - plane.point.z
@@ -109,14 +111,24 @@ export function findNearestOnPlaneNode(
     )
     if (planeDist > planeTolerance) continue
 
-    // Check distance to cursor
+    const nodeIsOnPlane = planeDist <= 0.01
+
+    // Check distance to cursor (projected onto plane)
     const ex = node.position.x - point.x
     const ey = node.position.y - point.y
     const ez = node.position.z - point.z
     const d = Math.sqrt(ex * ex + ey * ey + ez * ez)
-    if (d < snapRadius && d < closestDist) {
-      closestDist = d
-      closestId = node.id
+    if (d < snapRadius) {
+      // Prefer on-plane nodes: only replace with near-plane if no on-plane found
+      if (nodeIsOnPlane && !closestIsOnPlane) {
+        closestDist = d
+        closestId = node.id
+        closestIsOnPlane = true
+      } else if (nodeIsOnPlane === closestIsOnPlane && d < closestDist) {
+        closestDist = d
+        closestId = node.id
+        closestIsOnPlane = nodeIsOnPlane
+      }
     }
   }
 

@@ -1,6 +1,6 @@
 import type { ThreeEvent } from '@react-three/fiber'
 import type { Node } from '../model'
-import { isOnPlane } from '../model/WorkingPlane'
+import { isOnPlane, NEAR_PLANE_THRESHOLD } from '../model/WorkingPlane'
 import { createMember } from '../model'
 import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
@@ -17,6 +17,9 @@ const SUPPORT_PINNED_COLOR = '#ffb84a'
 const HOVER_COLOR = '#00e5ff'
 const GHOST_COLOR = '#888888'
 const GHOST_OPACITY = 0.15
+const NEAR_PLANE_COLOR = '#7ab8ff'
+const NEAR_PLANE_OPACITY = 0.5
+const NEAR_PLANE_RADIUS = 0.06
 
 function nodeColor(node: Node, isHighlighted: boolean, isTrussHighlighted: boolean, isPivot: boolean): string {
   if (isPivot) return PIVOT_COLOR
@@ -56,9 +59,12 @@ export default function NodeMesh({ node }: Props) {
   const isPivot = rotatePivotNodeId === node.id
   const highlighted = isSelected || isMemberStart
 
-  // Ghost rendering: off-plane nodes are transparent gray when focused
+  // Visibility tiers in focus mode: on-plane (full), near-plane (semi), ghosted
   const onPlane = isFocused && activePlane ? isOnPlane(node.position, activePlane) : true
-  const ghosted = isFocused && !onPlane
+  const nearPlane = isFocused && activePlane && !onPlane
+    ? isOnPlane(node.position, activePlane, NEAR_PLANE_THRESHOLD)
+    : false
+  const ghosted = isFocused && !onPlane && !nearPlane
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation()
@@ -95,19 +101,30 @@ export default function NodeMesh({ node }: Props) {
     }
   }
 
+  const radius = nearPlane
+    ? NEAR_PLANE_RADIUS
+    : (highlighted || isTrussHighlighted || isPivot || isHovered) ? NODE_RADIUS_SELECTED : NODE_RADIUS
+  const renderOrder = ghosted ? 0 : nearPlane ? 5 : 10
+  const color = ghosted
+    ? GHOST_COLOR
+    : nearPlane
+      ? NEAR_PLANE_COLOR
+      : isHovered ? HOVER_COLOR : nodeColor(node, highlighted, isTrussHighlighted, isPivot)
+  const opacity = ghosted ? GHOST_OPACITY : nearPlane ? NEAR_PLANE_OPACITY : 1
+
   return (
     <mesh
       position={[x, y, z]}
       onClick={handleClick}
       onPointerDown={handlePointerDown}
-      renderOrder={ghosted ? 0 : 10}
+      renderOrder={renderOrder}
     >
-      <sphereGeometry args={[(highlighted || isTrussHighlighted || isPivot || isHovered) ? NODE_RADIUS_SELECTED : NODE_RADIUS, 16, 16]} />
+      <sphereGeometry args={[radius, 16, 16]} />
       <meshStandardMaterial
-        color={ghosted ? GHOST_COLOR : isHovered ? HOVER_COLOR : nodeColor(node, highlighted, isTrussHighlighted, isPivot)}
-        transparent={ghosted}
-        opacity={ghosted ? GHOST_OPACITY : 1}
-        depthWrite={!ghosted}
+        color={color}
+        transparent={ghosted || nearPlane}
+        opacity={opacity}
+        depthWrite={!ghosted && !nearPlane}
       />
     </mesh>
   )

@@ -227,6 +227,9 @@ export function getPlaneColor(normal: Vec3): string {
   return '#ffcc00' // Yellow — general
 }
 
+/** Distance threshold for cross-plane node visibility in focus mode. */
+export const NEAR_PLANE_THRESHOLD = 0.5
+
 /** Check if a point lies on (or very near) a working plane. */
 export function isOnPlane(position: Vec3, plane: WorkingPlane, threshold = 0.01): boolean {
   const dx = position.x - plane.point.x
