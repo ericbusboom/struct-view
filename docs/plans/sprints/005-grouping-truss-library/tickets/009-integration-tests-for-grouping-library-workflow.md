@@ -1,23 +1,29 @@
 ---
-id: "009"
+id: '009'
 title: Integration tests for grouping + library workflow
-status: todo
+status: done
 use-cases: []
-depends-on: []
+depends-on: ["006", "007", "008"]
 ---
 
 # Integration tests for grouping + library workflow
 
 ## Description
 
-(What needs to be done and why.)
+End-to-end integration tests covering the full Sprint 005 workflow:
+group creation, save to library, place from library as group,
+template generation, and the complete draw-save-place pipeline.
 
 ## Acceptance Criteria
 
-- [ ] (Criterion)
+- [x] Group creation workflow tested (create group, set groupId, remove group)
+- [x] Save to library workflow tested (plane filtering, Shape2D creation)
+- [x] Place from library workflow tested (plane placement, unique IDs, offset)
+- [x] End-to-end draw-save-place test across two planes
+- [x] Template generation to library tested
+- [x] All 317 tests pass (307 existing + 10 new)
 
 ## Testing
 
-- **Existing tests to run**: (list test files/commands to verify no regressions)
-- **New tests to write**: (describe tests that validate this ticket's changes)
-- **Verification command**: `uv run pytest`
+- **New tests**: `sprint-005-grouping/workflow.test.ts` (10 tests)
+- **Verification command**: `cd frontend && npx vitest run`
