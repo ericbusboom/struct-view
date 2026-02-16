@@ -1,7 +1,7 @@
 ---
 id: '006'
 title: Save current 2D plane drawing to truss library
-status: in-progress
+status: done
 use-cases: []
 depends-on: []
 ---

@@ -1,9 +1,10 @@
 ---
 id: '007'
 title: Place from library into current plane view as group
-status: in-progress
+status: done
 use-cases: []
-depends-on: ["006"]
+depends-on:
+- '006'
 ---
 
 # Place from library into current plane view as group
