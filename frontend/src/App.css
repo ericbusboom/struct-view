@@ -145,7 +145,7 @@
   left: 0;
 }
 
-/* Template picker */
+/* Template picker (floating overlay) */
 .template-picker {
   position: absolute;
   top: 20px;
@@ -159,27 +159,38 @@
   color: #e0e0e0;
 }
 
+/* Template picker (inline in sidebar) */
+.template-picker-inline {
+  padding: 8px 12px;
+  border-bottom: 1px solid #333;
+  color: #e0e0e0;
+}
+
 .template-picker-title {
   font-size: 0.85rem;
   font-weight: 600;
   margin-bottom: 8px;
 }
 
-.template-picker-row {
+.template-picker-row,
+.template-picker-inline .template-picker-row {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 6px;
 }
 
-.template-picker-row label {
+.template-picker-row label,
+.template-picker-inline .template-picker-row label {
   font-size: 0.75rem;
   min-width: 50px;
   color: #aaa;
 }
 
 .template-picker-row input,
-.template-picker-row select {
+.template-picker-row select,
+.template-picker-inline input,
+.template-picker-inline select {
   flex: 1;
   padding: 3px 6px;
   border: 1px solid #555;
@@ -362,10 +373,18 @@
 }
 
 .truss-library-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 0.85rem;
   font-weight: 600;
   padding: 10px 12px;
   border-bottom: 1px solid #333;
+}
+
+.truss-library-header .tool-btn {
+  font-size: 0.7rem;
+  padding: 2px 8px;
 }
 
 .truss-library-empty {

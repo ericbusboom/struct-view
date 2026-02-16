@@ -38,7 +38,7 @@ export default function TemplatePicker({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="template-picker">
+    <div className="template-picker-inline">
       <div className="template-picker-title">Truss Template</div>
       <div className="template-picker-row">
         <label>Type</label>

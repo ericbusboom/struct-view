@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useModelStore } from '../store/useModelStore'
 import { usePlaneStore } from '../store/usePlaneStore'
 import { useEditorStore } from '../store/useEditorStore'
@@ -5,14 +6,14 @@ import { placeShapeOnPlane } from '../editor2d/shapeToPlane'
 import { createGroup } from '../model'
 import type { Shape2D } from '../model'
 import TrussCard from './TrussCard'
+import TemplatePicker from './TemplatePicker'
 
 export default function TrussLibraryPanel() {
+  const [showPicker, setShowPicker] = useState(false)
   const shapes = useModelStore((s) => s.shapes)
   const addNode = useModelStore((s) => s.addNode)
   const addMember = useModelStore((s) => s.addMember)
   const addGroup = useModelStore((s) => s.addGroup)
-  const updateNode = useModelStore((s) => s.updateNode)
-  const updateMember = useModelStore((s) => s.updateMember)
   const activePlane = usePlaneStore((s) => s.activePlane)
   const selectGroup = useEditorStore((s) => s.selectGroup)
 
@@ -38,8 +39,14 @@ export default function TrussLibraryPanel() {
 
   return (
     <div className="truss-library-panel">
-      <div className="truss-library-header">Trusses</div>
-      {shapes.length === 0 ? (
+      <div className="truss-library-header">
+        Trusses
+        <button className="tool-btn" onClick={() => setShowPicker(!showPicker)}>
+          + Template
+        </button>
+      </div>
+      {showPicker && <TemplatePicker onClose={() => setShowPicker(false)} />}
+      {shapes.length === 0 && !showPicker ? (
         <div className="truss-library-empty">
           No trusses yet.
         </div>
