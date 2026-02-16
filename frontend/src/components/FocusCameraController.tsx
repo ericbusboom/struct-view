@@ -9,8 +9,12 @@ const FOCUS_DISTANCE = 15
 /**
  * Controls camera position when entering/exiting 2D focus mode.
  * On focus: saves camera state, creates an orthographic camera snapped to
- * the plane normal, updates OrbitControls, and disables rotation.
- * On unfocus: restores saved perspective camera and re-enables rotation.
+ * the plane normal, and swaps it into R3F.
+ * On unfocus: restores saved perspective camera.
+ *
+ * OrbitControls settings (rotation lock, target) are managed by a separate
+ * effect that re-applies whenever the controls instance changes (drei
+ * recreates OrbitControls when the R3F camera changes).
  */
 export default function FocusCameraController() {
   const { camera, controls, set, size } = useThree()
@@ -21,11 +25,10 @@ export default function FocusCameraController() {
   const prevFocused = useRef(false)
   const savedTarget = useRef(new THREE.Vector3())
   const savedCamera = useRef<THREE.Camera | null>(null)
+  const focusTarget = useRef(new THREE.Vector3())
 
+  // Primary effect: create/destroy orthographic camera on focus toggle
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const orbitControls = controls as any
-
     if (isFocused && activePlane && !prevFocused.current) {
       // Entering focus: save current camera state
       const state: CameraState = {
@@ -37,7 +40,9 @@ export default function FocusCameraController() {
       saveCameraState(state)
       savedCamera.current = camera
 
-      // Save OrbitControls target
+      // Save OrbitControls target for later restoration
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const orbitControls = controls as any
       if (orbitControls?.target) {
         savedTarget.current.copy(orbitControls.target)
       }
@@ -70,16 +75,12 @@ export default function FocusCameraController() {
       orthoCamera.lookAt(pt.x, pt.y, pt.z)
       orthoCamera.updateProjectionMatrix()
 
-      // Swap camera in R3F
-      set({ camera: orthoCamera })
+      // Store focus target for the controls effect
+      focusTarget.current.set(pt.x, pt.y, pt.z)
 
-      // Update OrbitControls to use new camera, disable rotation
-      if (orbitControls) {
-        orbitControls.object = orthoCamera
-        orbitControls.target.set(pt.x, pt.y, pt.z)
-        orbitControls.enableRotate = false
-        orbitControls.update()
-      }
+      // Swap camera in R3F — this triggers drei's OrbitControls recreation,
+      // which is handled by the secondary effect below.
+      set({ camera: orthoCamera })
 
       console.log(`[focus] ON — ortho camera, frustum ±${halfWidth.toFixed(1)}×±${halfHeight.toFixed(1)}`)
     }
@@ -104,20 +105,32 @@ export default function FocusCameraController() {
       // Swap camera back in R3F
       set({ camera: perspCamera })
 
-      // Restore OrbitControls and re-enable rotation
-      if (orbitControls) {
-        orbitControls.object = perspCamera
-        orbitControls.target.copy(savedTarget.current)
-        orbitControls.enableRotate = true
-        orbitControls.update()
-      }
-
       savedCamera.current = null
       console.log(`[focus] OFF — perspective camera restored`)
     }
 
     prevFocused.current = isFocused
   }, [isFocused, activePlane, savedCameraState, camera, saveCameraState, controls, set, size])
+
+  // Secondary effect: manage OrbitControls settings.
+  // drei recreates OrbitControls whenever the R3F camera changes (via useMemo
+  // on the camera ref). The new instance has default settings (rotation enabled,
+  // target at origin). This effect re-applies the correct settings.
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const orbitControls = controls as any
+    if (!orbitControls) return
+
+    if (isFocused) {
+      orbitControls.target.copy(focusTarget.current)
+      orbitControls.enableRotate = false
+      orbitControls.update()
+    } else {
+      orbitControls.target.copy(savedTarget.current)
+      orbitControls.enableRotate = true
+      orbitControls.update()
+    }
+  }, [controls, isFocused])
 
   return null
 }
