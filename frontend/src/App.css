@@ -145,7 +145,7 @@
   left: 0;
 }
 
-/* Template picker */
+/* Template picker (floating overlay) */
 .template-picker {
   position: absolute;
   top: 20px;
@@ -159,27 +159,38 @@
   color: #e0e0e0;
 }
 
+/* Template picker (inline in sidebar) */
+.template-picker-inline {
+  padding: 8px 12px;
+  border-bottom: 1px solid #333;
+  color: #e0e0e0;
+}
+
 .template-picker-title {
   font-size: 0.85rem;
   font-weight: 600;
   margin-bottom: 8px;
 }
 
-.template-picker-row {
+.template-picker-row,
+.template-picker-inline .template-picker-row {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 6px;
 }
 
-.template-picker-row label {
+.template-picker-row label,
+.template-picker-inline .template-picker-row label {
   font-size: 0.75rem;
   min-width: 50px;
   color: #aaa;
 }
 
 .template-picker-row input,
-.template-picker-row select {
+.template-picker-row select,
+.template-picker-inline input,
+.template-picker-inline select {
   flex: 1;
   padding: 3px 6px;
   border: 1px solid #555;
@@ -277,6 +288,81 @@
   color: #e0e0e0;
 }
 
+/* Group Panel */
+.group-panel {
+  border-bottom: 1px solid #333;
+}
+
+.group-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 10px 12px;
+  border-bottom: 1px solid #333;
+}
+
+.group-panel-header .tool-btn {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+}
+
+.group-panel-empty {
+  font-size: 0.75rem;
+  color: #777;
+  text-align: center;
+  padding: 12px;
+}
+
+.group-panel-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.group-panel-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #2a2a3e;
+}
+
+.group-panel-item:hover {
+  background: #22223a;
+}
+
+.group-panel-item.selected {
+  background: rgba(74, 158, 255, 0.15);
+  border-left: 2px solid #4a9eff;
+}
+
+.group-panel-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.group-panel-item-name {
+  font-size: 0.8rem;
+}
+
+.group-panel-item-count {
+  font-size: 0.65rem;
+  color: #888;
+}
+
+.group-panel-delete {
+  font-size: 0.8rem;
+  padding: 1px 6px;
+  color: #888;
+}
+
+.group-panel-delete:hover {
+  color: #ff6b6b;
+}
+
 /* Truss Library Panel (right side) */
 .truss-library-panel {
   flex: 1;
@@ -287,10 +373,18 @@
 }
 
 .truss-library-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 0.85rem;
   font-weight: 600;
   padding: 10px 12px;
   border-bottom: 1px solid #333;
+}
+
+.truss-library-header .tool-btn {
+  font-size: 0.7rem;
+  padding: 2px 8px;
 }
 
 .truss-library-empty {

@@ -11,6 +11,7 @@ import PlaneGrid from './PlaneGrid'
 import PlanePlacer from './PlanePlacer'
 import FocusCameraController from './FocusCameraController'
 import CameraActionExecutor from './CameraActionExecutor'
+import DragSelect from './DragSelect'
 
 export default function Viewport3D() {
   return (
@@ -45,6 +46,7 @@ export default function Viewport3D() {
       <PlanePlacer />
       <FocusCameraController />
       <CameraActionExecutor />
+      <DragSelect />
 
       <OrbitControls makeDefault zoomToCursor />
 

@@ -1,5 +1,7 @@
 import { usePlaneStore } from '../store/usePlaneStore'
-import { getPlaneColor } from '../model'
+import { useModelStore } from '../store/useModelStore'
+import { getPlaneColor, isOnPlane } from '../model'
+import { saveToShape2D } from '../editor2d/shapeToPlane'
 import type { Vec3 } from '../model'
 
 /**
@@ -23,12 +25,27 @@ function axisLabel(tangent: Vec3): string {
 export default function FocusOverlay() {
   const isFocused = usePlaneStore((s) => s.isFocused)
   const activePlane = usePlaneStore((s) => s.activePlane)
+  const nodes = useModelStore((s) => s.nodes)
+  const members = useModelStore((s) => s.members)
+  const addShape = useModelStore((s) => s.addShape)
 
   if (!isFocused || !activePlane) return null
 
   const color = getPlaneColor(activePlane.normal)
   const uLabel = axisLabel(activePlane.tangentU)
   const vLabel = axisLabel(activePlane.tangentV)
+
+  const handleSaveToLibrary = () => {
+    const planeNodes = nodes.filter((n) => isOnPlane(n.position, activePlane))
+    if (planeNodes.length === 0) return
+    const nodeIdSet = new Set(planeNodes.map((n) => n.id))
+    const planeMembers = members.filter(
+      (m) => nodeIdSet.has(m.start_node) && nodeIdSet.has(m.end_node),
+    )
+    const name = window.prompt('Shape name:', 'My Truss') ?? 'My Truss'
+    const shape = saveToShape2D(planeNodes, planeMembers, activePlane, name)
+    addShape(shape)
+  }
 
   return (
     <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
@@ -48,6 +65,20 @@ export default function FocusOverlay() {
       >
         2D
       </div>
+
+      {/* Save to Library button */}
+      <button
+        className="tool-btn"
+        style={{
+          position: 'absolute',
+          top: 12,
+          left: 60,
+          pointerEvents: 'auto',
+        }}
+        onClick={handleSaveToLibrary}
+      >
+        Save to Library
+      </button>
 
       {/* Horizontal axis label (tangentU) — bottom center */}
       {uLabel && (

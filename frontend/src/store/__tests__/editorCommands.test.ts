@@ -150,6 +150,37 @@ describe('selection system', () => {
   })
 })
 
+describe('setSelectedNodeIds (drag select)', () => {
+  beforeEach(resetStores)
+
+  it('replaces selection when additive is false', () => {
+    useEditorStore.getState().select('n1', 'node')
+    useEditorStore.getState().setSelectedNodeIds(new Set(['n2', 'n3']), false)
+    expect(useEditorStore.getState().selectedNodeIds).toEqual(new Set(['n2', 'n3']))
+    expect(useEditorStore.getState().selectedGroupId).toBeNull()
+  })
+
+  it('adds to existing selection when additive is true', () => {
+    useEditorStore.getState().select('n1', 'node')
+    useEditorStore.getState().setSelectedNodeIds(new Set(['n2', 'n3']), true)
+    expect(useEditorStore.getState().selectedNodeIds).toEqual(new Set(['n1', 'n2', 'n3']))
+  })
+
+  it('clears member selection and group selection', () => {
+    useEditorStore.getState().select('m1', 'member')
+    useEditorStore.getState().selectGroup('g1')
+    useEditorStore.getState().setSelectedNodeIds(new Set(['n1']), false)
+    expect(useEditorStore.getState().selectedMemberIds.size).toBe(0)
+    expect(useEditorStore.getState().selectedGroupId).toBeNull()
+  })
+
+  it('empty set with additive=false clears node selection', () => {
+    useEditorStore.getState().select('n1', 'node')
+    useEditorStore.getState().setSelectedNodeIds(new Set(), false)
+    expect(useEditorStore.getState().selectedNodeIds.size).toBe(0)
+  })
+})
+
 describe('group selection', () => {
   beforeEach(resetStores)
 

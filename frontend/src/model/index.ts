@@ -63,4 +63,4 @@ export {
 } from './defaults'
 
 export type { WorkingPlane, ConstraintType } from './WorkingPlane'
-export { createPlaneFromPoints, getPlaneColor, isOnPlane, _resetPlaneIdCounter } from './WorkingPlane'
+export { createPlaneFromPoints, getPlaneColor, isOnPlane, workingPlaneFromPlacementPlane, _resetPlaneIdCounter } from './WorkingPlane'

@@ -13,7 +13,7 @@
  */
 import * as React from 'react'
 import { useThree } from '@react-three/fiber'
-import { Vector3, CanvasTexture } from 'three'
+import { Vector3, CanvasTexture, BufferGeometry, Float32BufferAttribute } from 'three'
 import { useCameraActionStore } from '../store/useCameraActionStore'
 
 const FACE_LABELS = ['Right', 'Left', 'Front', 'Back', 'Top', 'Bottom']
@@ -162,6 +162,82 @@ function EdgeCube({ position, dimensions }: { position: Vector3; dimensions: num
   )
 }
 
+// --- Axis indicators ---
+
+const AXIS_ORIGIN: [number, number, number] = [-0.55, -0.55, -0.55]
+const AXIS_LENGTH = 1.1
+
+const AXES_CONFIG = [
+  { dir: [1, 0, 0] as [number, number, number], color: '#ff4444', label: 'X', coneRot: [0, 0, -Math.PI / 2] as [number, number, number] },
+  { dir: [0, 1, 0] as [number, number, number], color: '#44cc44', label: 'Y', coneRot: [0, 0, 0] as [number, number, number] },
+  { dir: [0, 0, 1] as [number, number, number], color: '#4488ff', label: 'Z', coneRot: [Math.PI / 2, 0, 0] as [number, number, number] },
+]
+
+function createLabelTexture(label: string, color: string): CanvasTexture {
+  const canvas = document.createElement('canvas')
+  canvas.width = 64
+  canvas.height = 64
+  const ctx = canvas.getContext('2d')!
+  ctx.clearRect(0, 0, 64, 64)
+  ctx.font = 'bold 48px Inter var, Arial, sans-serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillStyle = color
+  ctx.fillText(label, 32, 32)
+  return new CanvasTexture(canvas)
+}
+
+function AxisArrow({ dir, color, label, coneRot }: typeof AXES_CONFIG[number]) {
+  const end: [number, number, number] = [
+    AXIS_ORIGIN[0] + dir[0] * AXIS_LENGTH,
+    AXIS_ORIGIN[1] + dir[1] * AXIS_LENGTH,
+    AXIS_ORIGIN[2] + dir[2] * AXIS_LENGTH,
+  ]
+
+  const lineGeo = React.useMemo(() => {
+    const geo = new BufferGeometry()
+    geo.setAttribute('position', new Float32BufferAttribute(
+      new Float32Array([...AXIS_ORIGIN, ...end]),
+      3,
+    ))
+    return geo
+  }, [end])
+
+  const labelTexture = React.useMemo(() => createLabelTexture(label, color), [label, color])
+
+  const labelPos: [number, number, number] = [
+    AXIS_ORIGIN[0] + dir[0] * (AXIS_LENGTH + 0.18),
+    AXIS_ORIGIN[1] + dir[1] * (AXIS_LENGTH + 0.18),
+    AXIS_ORIGIN[2] + dir[2] * (AXIS_LENGTH + 0.18),
+  ]
+
+  return (
+    <group>
+      {/* eslint-disable-next-line react/no-unknown-property */}
+      <line geometry={lineGeo}>
+        <lineBasicMaterial color={color} />
+      </line>
+      <mesh position={end} rotation={coneRot}>
+        <coneGeometry args={[0.04, 0.12, 8]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+      <sprite position={labelPos} scale={[0.25, 0.25, 1]}>
+        <spriteMaterial map={labelTexture} transparent />
+      </sprite>
+    </group>
+  )
+}
+
+function AxisIndicators() {
+  return (
+    <group>
+      {AXES_CONFIG.map((axis) => (
+        <AxisArrow key={axis.label} {...axis} />
+      ))}
+    </group>
+  )
+}
+
 export default function ViewCube() {
   return (
     <group scale={[60, 60, 60]}>
@@ -172,6 +248,7 @@ export default function ViewCube() {
       {corners.map((corner, i) => (
         <EdgeCube key={`c${i}`} position={corner} dimensions={[0.25, 0.25, 0.25]} />
       ))}
+      <AxisIndicators />
     </group>
   )
 }
