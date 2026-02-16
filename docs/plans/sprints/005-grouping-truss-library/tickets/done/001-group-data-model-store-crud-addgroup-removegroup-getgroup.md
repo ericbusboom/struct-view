@@ -1,8 +1,9 @@
 ---
-id: "001"
+id: '001'
 title: Group data model + store CRUD (addGroup, removeGroup, getGroup)
-status: in-progress
-use-cases: [SUC-005-03]
+status: done
+use-cases:
+- SUC-005-03
 depends-on: []
 ---
 
