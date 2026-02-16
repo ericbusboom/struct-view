@@ -1,6 +1,7 @@
 ---
-id: "001"
-title: Group data model + store CRUD — Plan
+id: '001'
+title: "Group data model + store CRUD \u2014 Plan"
+status: done
 ---
 
 # Ticket 001 Plan: Group data model + store CRUD
