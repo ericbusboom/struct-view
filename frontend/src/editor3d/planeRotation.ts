@@ -1,5 +1,11 @@
 import type { Vec3, WorkingPlane } from '../model'
 
+export const AXIS_NORMALS: Record<string, Vec3> = {
+  x: { x: 1, y: 0, z: 0 },
+  y: { x: 0, y: 1, z: 0 },
+  z: { x: 0, y: 0, z: 1 },
+}
+
 /**
  * Rodrigues' rotation formula: rotate vector v around unit axis by angleDeg degrees.
  */
@@ -140,6 +146,74 @@ const RAMP_DURATION = 2 // seconds to reach max
 export function computeRotationSpeed(holdDuration: number): number {
   const t = Math.min(1, holdDuration / RAMP_DURATION)
   return MIN_SPEED + t * (MAX_SPEED - MIN_SPEED)
+}
+
+/**
+ * Align a plane's normal to a target world axis. Sets the normal exactly
+ * and projects the tangent vectors to maintain the closest orientation.
+ * Returns the plane unchanged if already aligned or fully constrained.
+ *
+ * For line-constrained planes, the target normal must be perpendicular
+ * to the constraint line — otherwise the request is ignored.
+ */
+export function alignPlaneToAxis(plane: WorkingPlane, targetNormal: Vec3): WorkingPlane {
+  if (plane.constraintType === 'plane') return plane
+
+  // For line constraints, verify target is perpendicular to the line
+  if (plane.constraintType === 'line') {
+    const p0 = plane.constraintPoints[0]
+    const p1 = plane.constraintPoints[1]
+    const lineDir = normalize({
+      x: p1.x - p0.x,
+      y: p1.y - p0.y,
+      z: p1.z - p0.z,
+    })
+    const d = Math.abs(
+      targetNormal.x * lineDir.x + targetNormal.y * lineDir.y + targetNormal.z * lineDir.z,
+    )
+    if (d > 0.01) return plane // target not perpendicular to line
+  }
+
+  const cur = plane.normal
+  const d = cur.x * targetNormal.x + cur.y * targetNormal.y + cur.z * targetNormal.z
+  if (d > 0.9999) return plane // already aligned
+
+  // Set normal exactly to target, project tangentU onto new plane
+  const newNormal = targetNormal
+
+  // Project current tangentU perpendicular to new normal
+  const uDotN = plane.tangentU.x * newNormal.x + plane.tangentU.y * newNormal.y + plane.tangentU.z * newNormal.z
+  let projU = {
+    x: plane.tangentU.x - uDotN * newNormal.x,
+    y: plane.tangentU.y - uDotN * newNormal.y,
+    z: plane.tangentU.z - uDotN * newNormal.z,
+  }
+
+  // If tangentU was parallel to new normal, project tangentV instead
+  if (vecLength(projU) < 1e-6) {
+    const vDotN = plane.tangentV.x * newNormal.x + plane.tangentV.y * newNormal.y + plane.tangentV.z * newNormal.z
+    projU = {
+      x: plane.tangentV.x - vDotN * newNormal.x,
+      y: plane.tangentV.y - vDotN * newNormal.y,
+      z: plane.tangentV.z - vDotN * newNormal.z,
+    }
+  }
+
+  const newTangentU = normalize(projU)
+
+  // V = N × U (right-handed frame where U × V = N)
+  const newTangentV = normalize({
+    x: newNormal.y * newTangentU.z - newNormal.z * newTangentU.y,
+    y: newNormal.z * newTangentU.x - newNormal.x * newTangentU.z,
+    z: newNormal.x * newTangentU.y - newNormal.y * newTangentU.x,
+  })
+
+  return {
+    ...plane,
+    normal: newNormal,
+    tangentU: newTangentU,
+    tangentV: newTangentV,
+  }
 }
 
 /** Minimum angle for a single tap (degrees). */

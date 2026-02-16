@@ -5,6 +5,7 @@ import {
   getRotationAxes,
   snapPlaneAngle,
   computeRotationSpeed,
+  alignPlaneToAxis,
   TAP_ANGLE,
 } from '../planeRotation'
 import { createPlaneFromPoints, _resetPlaneIdCounter } from '../../model'
@@ -197,6 +198,87 @@ describe('computeRotationSpeed', () => {
     for (let i = 1; i < speeds.length; i++) {
       expect(speeds[i]).toBeGreaterThanOrEqual(speeds[i - 1])
     }
+  })
+})
+
+describe('alignPlaneToAxis', () => {
+  beforeEach(() => {
+    _resetPlaneIdCounter()
+  })
+
+  it('aligns an XY plane (normal=Z) to X axis', () => {
+    const plane = createPlaneFromPoints([])
+    const aligned = alignPlaneToAxis(plane, { x: 1, y: 0, z: 0 })
+    approxVec(aligned.normal, { x: 1, y: 0, z: 0 })
+    expect(vecLength(aligned.tangentU)).toBeCloseTo(1, 5)
+    expect(vecLength(aligned.tangentV)).toBeCloseTo(1, 5)
+    expect(dot(aligned.normal, aligned.tangentU)).toBeCloseTo(0, 5)
+    expect(dot(aligned.normal, aligned.tangentV)).toBeCloseTo(0, 5)
+  })
+
+  it('aligns an XY plane (normal=Z) to Y axis', () => {
+    const plane = createPlaneFromPoints([])
+    const aligned = alignPlaneToAxis(plane, { x: 0, y: 1, z: 0 })
+    approxVec(aligned.normal, { x: 0, y: 1, z: 0 })
+  })
+
+  it('returns same plane when already aligned', () => {
+    const plane = createPlaneFromPoints([])
+    const aligned = alignPlaneToAxis(plane, { x: 0, y: 0, z: 1 })
+    expect(aligned).toBe(plane) // reference equality — no change
+  })
+
+  it('handles 180° flip (opposite normal)', () => {
+    const plane = createPlaneFromPoints([])
+    // normal is +Z, align to -Z
+    const aligned = alignPlaneToAxis(plane, { x: 0, y: 0, z: -1 })
+    approxVec(aligned.normal, { x: 0, y: 0, z: -1 })
+    expect(vecLength(aligned.tangentU)).toBeCloseTo(1, 5)
+    expect(dot(aligned.normal, aligned.tangentU)).toBeCloseTo(0, 5)
+  })
+
+  it('preserves orthonormality after alignment', () => {
+    // Start with a rotated plane
+    const plane = rotatePlane(createPlaneFromPoints([]), { x: 1, y: 1, z: 0 }, 37)
+    const aligned = alignPlaneToAxis(plane, { x: 0, y: 1, z: 0 })
+    expect(vecLength(aligned.normal)).toBeCloseTo(1, 5)
+    expect(vecLength(aligned.tangentU)).toBeCloseTo(1, 5)
+    expect(vecLength(aligned.tangentV)).toBeCloseTo(1, 5)
+    expect(dot(aligned.normal, aligned.tangentU)).toBeCloseTo(0, 5)
+    expect(dot(aligned.normal, aligned.tangentV)).toBeCloseTo(0, 5)
+    expect(dot(aligned.tangentU, aligned.tangentV)).toBeCloseTo(0, 5)
+  })
+
+  it('ignores fully-constrained planes', () => {
+    const plane = createPlaneFromPoints([
+      { x: 0, y: 0, z: 0 },
+      { x: 1, y: 0, z: 0 },
+      { x: 0, y: 1, z: 0 },
+    ])
+    const aligned = alignPlaneToAxis(plane, { x: 1, y: 0, z: 0 })
+    expect(aligned).toBe(plane) // unchanged
+  })
+
+  it('aligns line-constrained plane when target is perpendicular to line', () => {
+    // Line along X axis: normal must be perpendicular to X
+    const plane = createPlaneFromPoints([
+      { x: 0, y: 0, z: 0 },
+      { x: 1, y: 0, z: 0 },
+    ])
+    // Align to Z (perpendicular to X line) — should work
+    const aligned = alignPlaneToAxis(plane, { x: 0, y: 0, z: 1 })
+    approxVec(aligned.normal, { x: 0, y: 0, z: 1 })
+  })
+
+  it('ignores line-constrained plane when target is not perpendicular', () => {
+    // Line along X axis
+    const plane = createPlaneFromPoints([
+      { x: 0, y: 0, z: 0 },
+      { x: 1, y: 0, z: 0 },
+    ])
+    // Align to X (parallel to line) — should be ignored
+    const aligned = alignPlaneToAxis(plane, { x: 1, y: 0, z: 0 })
+    expect(aligned).toBe(plane) // unchanged
   })
 })
 

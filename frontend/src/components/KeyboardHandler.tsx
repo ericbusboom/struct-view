@@ -12,6 +12,8 @@ import {
   getRotationAxes,
   snapPlaneAngle,
   computeRotationSpeed,
+  alignPlaneToAxis,
+  AXIS_NORMALS,
   TAP_ANGLE,
 } from '../editor3d/planeRotation'
 
@@ -170,6 +172,20 @@ export default function KeyboardHandler() {
           if (!holdStart.current.has(e.key)) {
             holdStart.current.set(e.key, performance.now())
             isFirstFrame.current.set(e.key, true)
+          }
+        }
+        return
+      }
+
+      // X/Y/Z keys — align plane normal to world axis
+      if (key === 'x' || key === 'y' || key === 'z') {
+        const plane = usePlaneStore.getState().activePlane
+        if (plane && !usePlaneStore.getState().isFocused) {
+          const target = AXIS_NORMALS[key]
+          const aligned = alignPlaneToAxis(plane, target)
+          if (aligned !== plane) {
+            usePlaneStore.getState().updatePlane(aligned)
+            console.log(`[key] ${key} → align normal to ${key.toUpperCase()} axis`)
           }
         }
         return
