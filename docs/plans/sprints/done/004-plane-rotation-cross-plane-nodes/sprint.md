@@ -1,7 +1,7 @@
 ---
-id: "004"
+id: '004'
 title: Plane Rotation + Cross-Plane Nodes
-status: planning
+status: done
 branch: sprint/004-plane-rotation-cross-plane-nodes
 use-cases: []
 ---
