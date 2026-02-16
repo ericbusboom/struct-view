@@ -14,10 +14,10 @@ export default function GroundPlane() {
   const isFocused = usePlaneStore((s) => s.isFocused)
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
-    e.stopPropagation()
-
-    // In focus mode, PlanePlacer handles placement
+    // In focus mode, let PlanePlacer handle placement
     if (isFocused) return
+
+    e.stopPropagation()
 
     if (mode === 'add-node') {
       const cursor = { x: e.point.x, y: e.point.y, z: 0 }

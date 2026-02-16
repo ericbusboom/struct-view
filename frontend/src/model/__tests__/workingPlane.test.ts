@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createPlaneFromPoints, getPlaneColor, isOnPlane, _resetPlaneIdCounter } from '../WorkingPlane'
+import { createPlaneFromPoints, getPlaneColor, isOnPlane, workingPlaneFromPlacementPlane, _resetPlaneIdCounter } from '../WorkingPlane'
 import type { Vec3 } from '../schemas'
 
 function dot(a: Vec3, b: Vec3): number {
@@ -244,5 +244,33 @@ describe('isOnPlane', () => {
     const plane = createPlaneFromPoints([])
     expect(isOnPlane({ x: 0, y: 0, z: 0.5 }, plane, 1.0)).toBe(true)
     expect(isOnPlane({ x: 0, y: 0, z: 0.5 }, plane, 0.1)).toBe(false)
+  })
+})
+
+describe('workingPlaneFromPlacementPlane', () => {
+  it('XY has normal along Z', () => {
+    const plane = workingPlaneFromPlacementPlane('XY')
+    expect(plane.normal).toEqual({ x: 0, y: 0, z: 1 })
+  })
+
+  it('XZ has normal along Y', () => {
+    const plane = workingPlaneFromPlacementPlane('XZ')
+    expect(plane.normal).toEqual({ x: 0, y: 1, z: 0 })
+  })
+
+  it('YZ has normal along X', () => {
+    const plane = workingPlaneFromPlacementPlane('YZ')
+    expect(plane.normal).toEqual({ x: 1, y: 0, z: 0 })
+  })
+
+  it('all planes have orthogonal tangent vectors', () => {
+    for (const pp of ['XY', 'XZ', 'YZ'] as const) {
+      const plane = workingPlaneFromPlacementPlane(pp)
+      expect(dot(plane.tangentU, plane.tangentV)).toBeCloseTo(0)
+      expect(dot(plane.tangentU, plane.normal)).toBeCloseTo(0)
+      expect(dot(plane.tangentV, plane.normal)).toBeCloseTo(0)
+      expect(length(plane.tangentU)).toBeCloseTo(1)
+      expect(length(plane.tangentV)).toBeCloseTo(1)
+    }
   })
 })

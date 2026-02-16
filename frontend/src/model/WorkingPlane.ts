@@ -245,6 +245,22 @@ export function isOnPlane(position: Vec3, plane: WorkingPlane, threshold = 0.01)
   return dist < threshold
 }
 
+/**
+ * Create a WorkingPlane from a PlacementPlane string ('XZ', 'XY', 'YZ').
+ * Used as a fallback when no explicit WorkingPlane is set.
+ */
+export function workingPlaneFromPlacementPlane(pp: 'XZ' | 'XY' | 'YZ'): WorkingPlane {
+  const point = { x: 0, y: 0, z: 0 }
+  switch (pp) {
+    case 'XY':
+      return { id: 'default-XY', normal: { x: 0, y: 0, z: 1 }, point, constraintType: 'plane', constraintPoints: [], tangentU: { x: 1, y: 0, z: 0 }, tangentV: { x: 0, y: 1, z: 0 } }
+    case 'XZ':
+      return { id: 'default-XZ', normal: { x: 0, y: 1, z: 0 }, point, constraintType: 'plane', constraintPoints: [], tangentU: { x: 1, y: 0, z: 0 }, tangentV: { x: 0, y: 0, z: 1 } }
+    case 'YZ':
+      return { id: 'default-YZ', normal: { x: 1, y: 0, z: 0 }, point, constraintType: 'plane', constraintPoints: [], tangentU: { x: 0, y: 1, z: 0 }, tangentV: { x: 0, y: 0, z: 1 } }
+  }
+}
+
 /** Reset the ID counter (for tests). */
 export function _resetPlaneIdCounter() {
   nextId = 1
