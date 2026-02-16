@@ -1,5 +1,6 @@
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, GizmoHelper, GizmoViewcube, Grid } from '@react-three/drei'
+import { OrbitControls, GizmoHelper, Grid } from '@react-three/drei'
+import ViewCube from './ViewCube'
 import SceneModel from './SceneModel'
 import GroundPlane from './GroundPlane'
 import NodeDragger from './NodeDragger'
@@ -48,9 +49,7 @@ export default function Viewport3D() {
       <OrbitControls makeDefault zoomToCursor />
 
       <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
-        <GizmoViewcube
-          faces={['Right', 'Left', 'Front', 'Back', 'Top', 'Bottom']}
-        />
+        <ViewCube />
       </GizmoHelper>
     </Canvas>
   )
