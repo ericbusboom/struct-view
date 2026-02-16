@@ -13,6 +13,7 @@ const GHOST_COLOR = '#888888'
 const GHOST_OPACITY = 0.15
 const NEAR_PLANE_OPACITY = 0.4
 const TUBE_RADIUS = 0.025
+const HITBOX_RADIUS = 0.08  // 3x visual radius for easier selection
 const TUBE_SEGMENTS = 8
 
 interface Props {
@@ -50,12 +51,15 @@ export default function MemberLine({ member, nodes }: Props) {
     return { ghosted: true, nearPlane: false }
   }, [isFocused, activePlane, startNode, endNode])
 
-  const geometry = useMemo(() => {
-    if (!startNode || !endNode) return null
+  const { geometry, hitboxGeometry } = useMemo(() => {
+    if (!startNode || !endNode) return { geometry: null, hitboxGeometry: null }
     const start = new THREE.Vector3(startNode.position.x, startNode.position.y, startNode.position.z)
     const end = new THREE.Vector3(endNode.position.x, endNode.position.y, endNode.position.z)
     const path = new THREE.LineCurve3(start, end)
-    return new THREE.TubeGeometry(path, 1, TUBE_RADIUS, TUBE_SEGMENTS, false)
+    return {
+      geometry: new THREE.TubeGeometry(path, 1, TUBE_RADIUS, TUBE_SEGMENTS, false),
+      hitboxGeometry: new THREE.TubeGeometry(path, 1, HITBOX_RADIUS, TUBE_SEGMENTS, false),
+    }
   }, [startNode, endNode])
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
@@ -87,13 +91,20 @@ export default function MemberLine({ member, nodes }: Props) {
   const renderOrder = ghosted ? 0 : nearPlane ? 5 : 10
 
   return (
-    <mesh geometry={geometry} onClick={handleClick} renderOrder={renderOrder}>
-      <meshStandardMaterial
-        color={color}
-        transparent={ghosted || nearPlane}
-        opacity={opacity}
-        depthWrite={!ghosted && !nearPlane}
-      />
-    </mesh>
+    <group>
+      {/* Invisible wider hitbox for easier click selection */}
+      <mesh geometry={hitboxGeometry} onClick={handleClick}>
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} colorWrite={false} />
+      </mesh>
+      {/* Visual tube */}
+      <mesh geometry={geometry} renderOrder={renderOrder}>
+        <meshStandardMaterial
+          color={color}
+          transparent={ghosted || nearPlane}
+          opacity={opacity}
+          depthWrite={!ghosted && !nearPlane}
+        />
+      </mesh>
+    </group>
   )
 }

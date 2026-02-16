@@ -1,7 +1,7 @@
 ---
-id: "010"
+id: '010'
 title: Wider beam/member selection hitbox
-status: todo
+status: in-progress
 use-cases: []
 depends-on: []
 ---
