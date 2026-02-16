@@ -1,7 +1,7 @@
 ---
-id: "006"
+id: '006'
 title: Save current 2D plane drawing to truss library
-status: todo
+status: in-progress
 use-cases: []
 depends-on: []
 ---
@@ -10,14 +10,22 @@ depends-on: []
 
 ## Description
 
-(What needs to be done and why.)
+Add coordinate conversion utilities (worldToPlane2D, plane2DToWorld,
+saveToShape2D, placeShapeOnPlane) and a "Save to Library" button in
+the 2D focus overlay that saves all nodes on the active plane as a
+Shape2D entry in the truss library.
 
 ## Acceptance Criteria
 
-- [ ] (Criterion)
+- [x] worldToPlane2D projects 3D positions to plane-local (u,v)
+- [x] plane2DToWorld converts (u,v) back to 3D
+- [x] saveToShape2D normalizes node positions and filters members
+- [x] placeShapeOnPlane creates new 3D nodes/members from a Shape2D
+- [x] "Save to Library" button appears in FocusOverlay during 2D mode
+- [x] Button collects all nodes on the active plane and saves as Shape2D
+- [x] 7 unit tests for shapeToPlane utilities pass
 
 ## Testing
 
-- **Existing tests to run**: (list test files/commands to verify no regressions)
-- **New tests to write**: (describe tests that validate this ticket's changes)
-- **Verification command**: `uv run pytest`
+- **Existing tests**: `shapeToPlane.test.ts` (7 tests)
+- **Verification command**: `cd frontend && npx vitest run`
