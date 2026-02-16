@@ -154,7 +154,7 @@ export default function PlanePlacer() {
       onPointerMove={handlePointerMove}
     >
       <planeGeometry args={[200, 200]} />
-      <meshBasicMaterial visible={false} />
+      <meshBasicMaterial visible={false} side={THREE.DoubleSide} />
     </mesh>
   )
 }
