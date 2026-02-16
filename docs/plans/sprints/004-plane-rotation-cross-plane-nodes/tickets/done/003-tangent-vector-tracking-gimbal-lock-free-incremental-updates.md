@@ -1,7 +1,7 @@
 ---
 id: '003'
 title: Tangent vector tracking (gimbal-lock-free incremental updates)
-status: in-progress
+status: done
 use-cases: []
 depends-on:
 - '001'

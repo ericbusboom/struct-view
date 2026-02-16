@@ -1,7 +1,7 @@
 ---
 id: "005"
 title: Line constraint rotation (up/down arrow only, around constraining line)
-status: todo
+status: done
 use-cases: []
 depends-on: []
 ---

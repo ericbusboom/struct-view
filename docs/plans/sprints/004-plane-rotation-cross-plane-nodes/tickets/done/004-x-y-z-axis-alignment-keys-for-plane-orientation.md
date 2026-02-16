@@ -1,7 +1,7 @@
 ---
 id: "004"
 title: x/y/z axis alignment keys for plane orientation
-status: todo
+status: done
 use-cases: []
 depends-on: []
 ---

@@ -1,7 +1,7 @@
 ---
 id: "007"
 title: Cross-plane node sharing (connect beams to nodes from other planes)
-status: todo
+status: done
 use-cases: []
 depends-on: []
 ---

@@ -1,7 +1,7 @@
 ---
 id: '002'
 title: 15-degree snap angle behavior
-status: in-progress
+status: done
 use-cases: []
 depends-on:
 - '001'

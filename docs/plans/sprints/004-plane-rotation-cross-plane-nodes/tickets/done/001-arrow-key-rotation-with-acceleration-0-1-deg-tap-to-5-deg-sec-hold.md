@@ -1,7 +1,7 @@
 ---
 id: '001'
 title: Arrow key rotation with acceleration (0.1 deg tap to 5 deg/sec hold)
-status: in-progress
+status: done
 use-cases: []
 depends-on: []
 ---

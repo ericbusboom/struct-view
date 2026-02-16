@@ -1,7 +1,7 @@
 ---
 id: 008
 title: Integration tests for rotation + cross-plane connections
-status: in-progress
+status: done
 use-cases: []
 depends-on: []
 ---
