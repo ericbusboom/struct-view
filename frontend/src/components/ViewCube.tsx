@@ -1,7 +1,7 @@
 /**
  * Custom ViewCube for Z-up coordinate system.
- * Based on drei's GizmoViewcube but with per-face text rotation
- * so labels read correctly when viewed with camera.up = [0,0,1].
+ * Clicks dispatch viewFrom actions to CameraActionExecutor (bypassing
+ * drei's tweenCamera which hardcodes Y-up during animation).
  *
  * Face index → BoxGeometry material index:
  *   0: +X (Right)   1: -X (Left)
@@ -13,10 +13,23 @@
  */
 import * as React from 'react'
 import { useThree } from '@react-three/fiber'
-import { useGizmoContext } from '@react-three/drei'
 import { Vector3, CanvasTexture } from 'three'
+import { useCameraActionStore } from '../store/useCameraActionStore'
 
 const FACE_LABELS = ['Right', 'Left', 'Front', 'Back', 'Top', 'Bottom']
+
+/**
+ * Camera position directions for each face (direction FROM target TO camera).
+ * Clicking "Right" puts the camera on the +X side looking toward -X.
+ */
+const FACE_VIEW_DIRS: Vector3[] = [
+  new Vector3(1, 0, 0),   // Right: camera at +X
+  new Vector3(-1, 0, 0),  // Left: camera at -X
+  new Vector3(0, 1, 0),   // Front: camera at +Y
+  new Vector3(0, -1, 0),  // Back: camera at -Y
+  new Vector3(0, 0, 1),   // Top: camera at +Z
+  new Vector3(0, 0, -1),  // Bottom: camera at -Z
+]
 
 /** Per-face canvas rotation (radians) to correct text for Z-up viewing. */
 const FACE_ROTATIONS = [
@@ -93,14 +106,23 @@ function FaceMaterial({ index, hover }: { index: number; hover: boolean }) {
 }
 
 function FaceCube() {
-  const { tweenCamera } = useGizmoContext()
+  const requestAction = useCameraActionStore((s) => s.requestAction)
   const [hover, setHover] = React.useState<number | null>(null)
+
+  const handleClick = React.useCallback((e: { stopPropagation: () => void; faceIndex: number }) => {
+    e.stopPropagation()
+    const faceIdx = Math.floor(e.faceIndex / 2)
+    const dir = FACE_VIEW_DIRS[faceIdx]
+    if (dir) {
+      requestAction({ viewFrom: { x: dir.x, y: dir.y, z: dir.z } })
+    }
+  }, [requestAction])
 
   return (
     <mesh
       onPointerOut={(e) => { e.stopPropagation(); setHover(null) }}
       onPointerMove={(e) => { e.stopPropagation(); setHover(Math.floor(e.faceIndex / 2)) }}
-      onClick={(e) => { e.stopPropagation(); tweenCamera(e.face!.normal) }}
+      onClick={handleClick}
     >
       {[...Array(6)].map((_, i) => (
         <FaceMaterial key={i} index={i} hover={hover === i} />
@@ -111,8 +133,15 @@ function FaceCube() {
 }
 
 function EdgeCube({ position, dimensions }: { position: Vector3; dimensions: number[] | [number, number, number] }) {
-  const { tweenCamera } = useGizmoContext()
+  const requestAction = useCameraActionStore((s) => s.requestAction)
   const [hover, setHover] = React.useState(false)
+
+  const handleClick = React.useCallback((e: { stopPropagation: () => void }) => {
+    e.stopPropagation()
+    // Edge/corner position IS the view direction (camera on that side of the target)
+    const dir = position.clone().normalize()
+    requestAction({ viewFrom: { x: dir.x, y: dir.y, z: dir.z } })
+  }, [requestAction, position])
 
   return (
     <mesh
@@ -120,7 +149,7 @@ function EdgeCube({ position, dimensions }: { position: Vector3; dimensions: num
       position={position}
       onPointerOver={(e) => { e.stopPropagation(); setHover(true) }}
       onPointerOut={(e) => { e.stopPropagation(); setHover(false) }}
-      onClick={(e) => { e.stopPropagation(); tweenCamera(position) }}
+      onClick={handleClick}
     >
       <meshBasicMaterial
         color={hover ? HOVER_COLOR : 'white'}

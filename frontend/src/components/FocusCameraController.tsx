@@ -61,16 +61,25 @@ export default function FocusCameraController() {
         0.1, 1000,
       )
 
-      // Position camera above the plane looking down the normal
+      // Determine which side of the plane the current camera is on
       const n = activePlane.normal
       const pt = activePlane.point
+      const camDx = camera.position.x - pt.x
+      const camDy = camera.position.y - pt.y
+      const camDz = camera.position.z - pt.z
+      const cameraSide = camDx * n.x + camDy * n.y + camDz * n.z
+
+      // Position camera on the SAME side as the current 3D camera
+      // so the transition doesn't flip the view
+      const sign = cameraSide >= 0 ? 1 : -1
       orthoCamera.position.set(
-        pt.x + n.x * FOCUS_DISTANCE,
-        pt.y + n.y * FOCUS_DISTANCE,
-        pt.z + n.z * FOCUS_DISTANCE,
+        pt.x + n.x * FOCUS_DISTANCE * sign,
+        pt.y + n.y * FOCUS_DISTANCE * sign,
+        pt.z + n.z * FOCUS_DISTANCE * sign,
       )
 
-      // Set up vector to tangentV for correct orientation
+      // Use tangentV as up (projection of world-Z onto plane),
+      // which preserves the sense of "Z is up on screen"
       orthoCamera.up.set(activePlane.tangentV.x, activePlane.tangentV.y, activePlane.tangentV.z)
       orthoCamera.lookAt(pt.x, pt.y, pt.z)
       orthoCamera.updateProjectionMatrix()

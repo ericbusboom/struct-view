@@ -42,18 +42,41 @@ export default function CameraActionExecutor() {
 
     // Capture start state
     startPos.current.copy(camera.position)
-    startUp.current.copy(camera.up)
+    startUp.current.set(0, 0, 1) // Always start from Z-up
     if (orbitControls?.target) {
       startTarget.current.copy(orbitControls.target)
     } else {
       startTarget.current.set(0, 0, 0)
     }
 
-    // Set end state from action
-    const { position, target, up } = pendingAction
-    endPos.current.set(position.x, position.y, position.z)
-    endTarget.current.set(target.x, target.y, target.z)
-    endUp.current.set(up.x, up.y, up.z)
+    if ('viewFrom' in pendingAction) {
+      // View-direction action: compute camera state from current orbit state
+      const dir = pendingAction.viewFrom
+      const len = Math.sqrt(dir.x * dir.x + dir.y * dir.y + dir.z * dir.z)
+      if (len < 1e-10) { clearAction(); return }
+      const nx = dir.x / len, ny = dir.y / len, nz = dir.z / len
+
+      const distance = camera.position.distanceTo(startTarget.current)
+      endPos.current.set(
+        startTarget.current.x + nx * distance,
+        startTarget.current.y + ny * distance,
+        startTarget.current.z + nz * distance,
+      )
+      endTarget.current.copy(startTarget.current) // keep same orbit target
+
+      // Z-up for side views; for top/bottom (looking along Z), use Y
+      if (Math.abs(nz) > 0.99) {
+        endUp.current.set(0, nz > 0 ? -1 : 1, 0) // top: -Y, bottom: +Y
+      } else {
+        endUp.current.set(0, 0, 1)
+      }
+    } else {
+      // Absolute camera state
+      const { position, target, up } = pendingAction
+      endPos.current.set(position.x, position.y, position.z)
+      endTarget.current.set(target.x, target.y, target.z)
+      endUp.current.set(up.x, up.y, up.z)
+    }
 
     // Disable orbit controls during animation
     if (orbitControls) {
