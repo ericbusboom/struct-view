@@ -1,9 +1,15 @@
 import type { Vec3, WorkingPlane } from '../model'
 
+/**
+ * Axis alignment: pressing a key places that axis IN the plane.
+ * x → XY plane (floor/ground, normal Z) — X runs horizontal
+ * y → YZ plane (side wall, normal X) — Y runs horizontal
+ * z → XZ plane (front wall, normal Y) — Z runs vertical
+ */
 export const AXIS_NORMALS: Record<string, Vec3> = {
-  x: { x: 1, y: 0, z: 0 },
-  y: { x: 0, y: 1, z: 0 },
-  z: { x: 0, y: 0, z: 1 },
+  x: { x: 0, y: 0, z: 1 },  // XY plane: X in plane, normal Z
+  y: { x: 1, y: 0, z: 0 },  // YZ plane: Y in plane, normal X
+  z: { x: 0, y: 1, z: 0 },  // XZ plane: Z in plane, normal Y
 }
 
 /**

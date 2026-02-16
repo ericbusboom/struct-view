@@ -126,15 +126,16 @@ describe('Sprint 004: Plane Rotation + Cross-Plane Nodes', () => {
       }
     })
 
-    it('aligns a rotated plane to Y axis', () => {
+    it('pressing y aligns to YZ plane (normal X)', () => {
       let plane = createPlaneFromPoints([])
       // Rotate arbitrarily
       plane = rotatePlane(plane, { x: 1, y: 0, z: 0 }, 37)
       plane = rotatePlane(plane, { x: 0, y: 1, z: 0 }, 22)
 
+      // AXIS_NORMALS.y = (1,0,0) — pressing y puts Y in the plane, normal along X
       const aligned = alignPlaneToAxis(plane, AXIS_NORMALS.y)
-      expect(aligned.normal.y).toBeCloseTo(1, 5)
-      expect(aligned.normal.x).toBeCloseTo(0, 5)
+      expect(aligned.normal.x).toBeCloseTo(1, 5)
+      expect(aligned.normal.y).toBeCloseTo(0, 5)
       expect(aligned.normal.z).toBeCloseTo(0, 5)
 
       // Orthonormality

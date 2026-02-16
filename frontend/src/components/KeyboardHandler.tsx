@@ -177,7 +177,7 @@ export default function KeyboardHandler() {
         return
       }
 
-      // X/Y/Z keys — align plane normal to world axis
+      // X/Y/Z keys — align plane so that axis lies IN the plane
       if (key === 'x' || key === 'y' || key === 'z') {
         const plane = usePlaneStore.getState().activePlane
         if (plane && !usePlaneStore.getState().isFocused) {
@@ -185,7 +185,7 @@ export default function KeyboardHandler() {
           const aligned = alignPlaneToAxis(plane, target)
           if (aligned !== plane) {
             usePlaneStore.getState().updatePlane(aligned)
-            console.log(`[key] ${key} → align normal to ${key.toUpperCase()} axis`)
+            console.log(`[key] ${key} → plane contains ${key.toUpperCase()} axis`)
           }
         }
         return
