@@ -11,7 +11,7 @@ import {
 import { createPlaneFromPoints, _resetPlaneIdCounter } from '../../model'
 import type { Vec3, WorkingPlane } from '../../model'
 
-function approxVec(v: Vec3, expected: Vec3, tolerance = 1e-6) {
+function approxVec(v: Vec3, expected: Vec3, _tolerance = 1e-6) {
   expect(v.x).toBeCloseTo(expected.x, 5)
   expect(v.y).toBeCloseTo(expected.y, 5)
   expect(v.z).toBeCloseTo(expected.z, 5)

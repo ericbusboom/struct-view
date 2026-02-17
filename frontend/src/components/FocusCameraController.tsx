@@ -125,7 +125,7 @@ export default function FocusCameraController() {
 
     if (!isFocused && prevFocused.current && savedCameraState && savedCamera.current) {
       // Exiting focus: restore saved perspective camera
-      const perspCamera = savedCamera.current
+      const perspCamera = savedCamera.current as THREE.PerspectiveCamera
       perspCamera.position.set(
         savedCameraState.position.x,
         savedCameraState.position.y,
@@ -141,7 +141,8 @@ export default function FocusCameraController() {
       perspCamera.updateProjectionMatrix()
 
       // Swap camera back in R3F
-      set({ camera: perspCamera })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      set({ camera: perspCamera as any })
 
       savedCamera.current = null
       console.log(`[focus] OFF — perspective camera restored`)

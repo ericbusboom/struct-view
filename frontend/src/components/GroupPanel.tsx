@@ -4,7 +4,6 @@ import { createGroup } from '../model'
 
 export default function GroupPanel() {
   const groups = useModelStore((s) => s.groups)
-  const nodes = useModelStore((s) => s.nodes)
   const members = useModelStore((s) => s.members)
   const addGroup = useModelStore((s) => s.addGroup)
   const removeGroup = useModelStore((s) => s.removeGroup)

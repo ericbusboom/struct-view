@@ -119,7 +119,7 @@ describe('Sprint 004: Plane Rotation + Cross-Plane Nodes', () => {
     it('aligns XY plane to each axis', () => {
       const plane = createPlaneFromPoints([])
 
-      for (const [key, target] of Object.entries(AXIS_NORMALS)) {
+      for (const [_key, target] of Object.entries(AXIS_NORMALS)) {
         const aligned = alignPlaneToAxis(plane, target)
         const angle = angleBetweenDeg(aligned.normal, target)
         expect(angle).toBeLessThan(0.01)

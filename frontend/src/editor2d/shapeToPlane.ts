@@ -114,11 +114,11 @@ export function placeShapeOnPlane(
     id: nanoid(),
     start_node: idMap.get(sm.startNode)!,
     end_node: idMap.get(sm.endNode)!,
-    material: { name: 'Steel', E: 200e9, fy: 250e6, density: 7850 },
-    section: { name: 'Default', A: 0.01, Ix: 1e-4, Iy: 1e-4, J: 2e-4 },
+    material: { name: 'Steel', E: 200e9, G: 77e9, density: 7850, yield_strength: 250e6 },
+    section: { name: 'Default', A: 0.01, Ix: 1e-4, Iy: 1e-4, Sx: 1e-3, Sy: 1e-3, J: 2e-4 },
     end_releases: {
-      start: { Fx: false, Fy: false, Fz: false, Mx: false, My: false, Mz: false },
-      end: { Fx: false, Fy: false, Fz: false, Mx: false, My: false, Mz: false },
+      start: { fx: false, fy: false, fz: false, mx: false, my: false, mz: false, connection_type: 'rigid' as const },
+      end: { fx: false, fy: false, fz: false, mx: false, my: false, mz: false, connection_type: 'rigid' as const },
     },
     tags: [],
   }))

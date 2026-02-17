@@ -13,7 +13,7 @@
  */
 import * as React from 'react'
 import { useThree } from '@react-three/fiber'
-import { Vector3, CanvasTexture, BufferGeometry, Float32BufferAttribute } from 'three'
+import { Vector3, CanvasTexture, BufferGeometry, Float32BufferAttribute, Line as ThreeLine, LineBasicMaterial } from 'three'
 import { useCameraActionStore } from '../store/useCameraActionStore'
 
 const FACE_LABELS = ['Right', 'Left', 'Front', 'Back', 'Top', 'Bottom']
@@ -121,7 +121,7 @@ function FaceCube() {
   return (
     <mesh
       onPointerOut={(e) => { e.stopPropagation(); setHover(null) }}
-      onPointerMove={(e) => { e.stopPropagation(); setHover(Math.floor(e.faceIndex / 2)) }}
+      onPointerMove={(e) => { e.stopPropagation(); if (e.faceIndex != null) setHover(Math.floor(e.faceIndex / 2)) }}
       onClick={handleClick}
     >
       {[...Array(6)].map((_, i) => (
@@ -194,14 +194,14 @@ function AxisArrow({ dir, color, label, coneRot }: typeof AXES_CONFIG[number]) {
     AXIS_ORIGIN[2] + dir[2] * AXIS_LENGTH,
   ]
 
-  const lineGeo = React.useMemo(() => {
+  const lineObj = React.useMemo(() => {
     const geo = new BufferGeometry()
     geo.setAttribute('position', new Float32BufferAttribute(
       new Float32Array([...AXIS_ORIGIN, ...end]),
       3,
     ))
-    return geo
-  }, [end])
+    return new ThreeLine(geo, new LineBasicMaterial({ color }))
+  }, [end, color])
 
   const labelTexture = React.useMemo(() => createLabelTexture(label, color), [label, color])
 
@@ -213,10 +213,7 @@ function AxisArrow({ dir, color, label, coneRot }: typeof AXES_CONFIG[number]) {
 
   return (
     <group>
-      {/* eslint-disable-next-line react/no-unknown-property */}
-      <line geometry={lineGeo}>
-        <lineBasicMaterial color={color} />
-      </line>
+      <primitive object={lineObj} />
       <mesh position={end} rotation={coneRot}>
         <coneGeometry args={[0.04, 0.12, 8]} />
         <meshBasicMaterial color={color} />
