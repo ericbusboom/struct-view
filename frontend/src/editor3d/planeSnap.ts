@@ -37,7 +37,8 @@ export function planeLocalToWorld(
 
 /**
  * Snap a 3D point to the nearest grid intersection on a WorkingPlane.
- * Projects onto plane-local coords, rounds to gridSize, converts back.
+ * Grid lines are aligned with the world origin so that snapped positions
+ * correspond to world-space integer coordinates on axis-aligned planes.
  */
 export function snapToPlaneGrid(
   point: Vec3,
@@ -45,8 +46,10 @@ export function snapToPlaneGrid(
   gridSize: number,
 ): Vec3 {
   const { u, v } = worldToPlaneLocal(point, plane)
-  const snappedU = Math.round(u / gridSize) * gridSize
-  const snappedV = Math.round(v / gridSize) * gridSize
+  // Offset so the grid passes through the world origin
+  const origin = worldToPlaneLocal({ x: 0, y: 0, z: 0 }, plane)
+  const snappedU = Math.round((u - origin.u) / gridSize) * gridSize + origin.u
+  const snappedV = Math.round((v - origin.v) / gridSize) * gridSize + origin.v
   return planeLocalToWorld(snappedU, snappedV, plane)
 }
 

@@ -1,3 +1,9 @@
+## Project
+
+StructView is a free, web-based structural analysis tool for building 3D wireframe models of structures, assigning material properties and loads, and running finite element analysis. It targets students, makers, and small contractors who need something simpler than professional CAD/FEA software. Users draw on 2D planes, snap beams to reference geometry, and can automate repetitive tasks via an AI/MCP interface.
+
+See [docs/structural_tool_spec.md](docs/structural_tool_spec.md) for the full software specification and [docs/plans/overview.md](docs/plans/overview.md) for the sprint roadmap.
+
 <!-- CLASI:START -->
 ## CLASI Software Engineering Process
 

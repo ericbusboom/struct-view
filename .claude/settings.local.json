@@ -14,7 +14,9 @@
       "Bash(echo:*)",
       "Bash(sqlite3:*)",
       "Bash(find:*)",
-      "mcp__clasi__*"
+      "mcp__clasi__*",
+      "Bash(npx tsc:*)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   },
   "enableAllProjectMcpServers": true,

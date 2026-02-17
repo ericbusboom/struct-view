@@ -26,6 +26,11 @@ export default function FileToolbar() {
     }
   }
 
+  const handleClear = () => {
+    if (!confirm('Clear the entire project? This cannot be undone.')) return
+    useModelStore.getState().clearProject()
+  }
+
   return (
     <div className="file-toolbar">
       <button className="tool-btn" onClick={handleSave} title="Save project to JSON file">
@@ -33,6 +38,9 @@ export default function FileToolbar() {
       </button>
       <button className="tool-btn" onClick={handleLoad} title="Load project from JSON file">
         Load
+      </button>
+      <button className="tool-btn" onClick={handleClear} title="Clear all project data">
+        Clear
       </button>
     </div>
   )

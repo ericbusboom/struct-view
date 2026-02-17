@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+import * as THREE from 'three'
 import type { ThreeEvent } from '@react-three/fiber'
 import { createNode } from '../model'
 import { useEditorStore } from '../store/useEditorStore'
@@ -12,11 +14,21 @@ export default function GroundPlane() {
   const nodes = useModelStore((s) => s.nodes)
   const members = useModelStore((s) => s.members)
   const isFocused = usePlaneStore((s) => s.isFocused)
+  const meshRef = useRef<THREE.Mesh>(null)
+
+  // Disable raycasting entirely when in focus mode so the ground plane
+  // cannot intercept clicks meant for PlanePlacer
+  useEffect(() => {
+    if (!meshRef.current) return
+    if (isFocused) {
+      meshRef.current.raycast = () => {}
+    } else {
+      // Restore default raycast
+      meshRef.current.raycast = THREE.Mesh.prototype.raycast
+    }
+  }, [isFocused])
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
-    // In focus mode, let PlanePlacer handle placement
-    if (isFocused) return
-
     e.stopPropagation()
 
     if (mode === 'add-node') {
@@ -33,7 +45,7 @@ export default function GroundPlane() {
   }
 
   return (
-    <mesh position={[0, 0, 0]} onClick={handleClick}>
+    <mesh ref={meshRef} position={[0, 0, 0]} onClick={handleClick}>
       <planeGeometry args={[200, 200]} />
       <meshBasicMaterial visible={false} />
     </mesh>
