@@ -1,7 +1,7 @@
 ---
-id: "006"
+id: '006'
 title: Viewport UX Polish
-status: active
+status: done
 branch: sprint/006-viewport-ux-polish
 use-cases: []
 ---
