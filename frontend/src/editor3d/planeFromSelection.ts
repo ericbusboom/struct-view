@@ -30,5 +30,24 @@ export function getPlaneFromSelection(): WorkingPlane | null {
   }
 
   if (points.length === 0) return null
-  return createPlaneFromPoints(points.slice(0, 3))
+  const plane = createPlaneFromPoints(points.slice(0, 3))
+
+  // Compute the minimum extent needed to encompass all selection points.
+  // Project every point onto the plane's tangent axes relative to the origin point.
+  let maxU = 0
+  let maxV = 0
+  for (const p of points) {
+    const dx = p.x - plane.point.x
+    const dy = p.y - plane.point.y
+    const dz = p.z - plane.point.z
+    const u = Math.abs(dx * plane.tangentU.x + dy * plane.tangentU.y + dz * plane.tangentU.z)
+    const v = Math.abs(dx * plane.tangentV.x + dy * plane.tangentV.y + dz * plane.tangentV.z)
+    maxU = Math.max(maxU, u)
+    maxV = Math.max(maxV, v)
+  }
+  // Diameter (both sides of origin) + padding so elements aren't at the very edge
+  const extent = Math.max(maxU, maxV) * 2 + 2
+  plane.minExtent = extent
+
+  return plane
 }

@@ -10,6 +10,8 @@ export interface WorkingPlane {
   constraintPoints: Vec3[]
   tangentU: Vec3
   tangentV: Vec3
+  /** Minimum grid extent needed to encompass source geometry (set by planeFromSelection). */
+  minExtent?: number
 }
 
 // --- Vector helpers (pure, no dependencies) ---

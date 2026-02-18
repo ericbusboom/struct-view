@@ -42,7 +42,7 @@ export default function CameraActionExecutor() {
 
     // Capture start state
     startPos.current.copy(camera.position)
-    startUp.current.set(0, 0, 1) // Always start from Z-up
+    startUp.current.copy(camera.up) // Start from the camera's actual up vector
     if (orbitControls?.target) {
       startTarget.current.copy(orbitControls.target)
     } else {
@@ -64,9 +64,10 @@ export default function CameraActionExecutor() {
       )
       endTarget.current.copy(startTarget.current) // keep same orbit target
 
-      // Z-up for side views; for top/bottom (looking along Z), use Y
+      // Z-up for side views; for top/bottom (looking along Z), use +Y as up
+      // so that +X goes right and +Y goes up on screen in plan views.
       if (Math.abs(nz) > 0.99) {
-        endUp.current.set(0, nz > 0 ? -1 : 1, 0) // top: -Y, bottom: +Y
+        endUp.current.set(0, 1, 0)
       } else {
         endUp.current.set(0, 0, 1)
       }

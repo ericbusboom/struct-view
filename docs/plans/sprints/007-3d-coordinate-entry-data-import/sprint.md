@@ -1,12 +1,12 @@
 ---
-id: "006"
+id: "007"
 title: 3D Coordinate Entry + Data Import
 status: planning
-branch: sprint/006-3d-coordinate-entry-data-import
+branch: sprint/007-3d-coordinate-entry-data-import
 use-cases: []
 ---
 
-# Sprint 006: 3D Coordinate Entry + Data Import
+# Sprint 007: 3D Coordinate Entry + Data Import
 
 ## Goals
 
@@ -71,7 +71,7 @@ file import.
 
 - Beam creation from coordinate entry (user creates nodes, then connects
   with `b` key in a plane view or via MCP tools)
-- Coordinate units conversion (imperial/metric switching — Sprint 007)
+- Coordinate units conversion (imperial/metric switching — Sprint 008)
 - Batch node editing (select multiple nodes and shift all by same amount)
 
 ## Test Strategy

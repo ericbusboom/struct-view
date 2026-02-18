@@ -4,9 +4,7 @@ import { useThree } from '@react-three/fiber'
 import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
 import { snapPoint3D } from '../editor3d/snap3d'
-
-const GRID_SIZE = 1.0
-const SNAP_RADIUS = 0.5
+import { useSettingsStore } from '../store/useSettingsStore'
 
 /**
  * Invisible full-scene plane that captures pointer events during node drag.
@@ -18,7 +16,8 @@ export default function NodeDragger() {
   const nodes = useModelStore((s) => s.nodes)
   const members = useModelStore((s) => s.members)
   const updateNode = useModelStore((s) => s.updateNode)
-  const { camera } = useThree()
+  const { camera, gl } = useThree()
+  const snapGridSize = useSettingsStore((s) => s.snapGridSize)
 
   const dragPlane = useRef(new THREE.Plane())
   const raycasterRef = useRef(new THREE.Raycaster())
@@ -41,10 +40,11 @@ export default function NodeDragger() {
   const handlePointerMove = (e: { point: THREE.Vector3; nativeEvent: PointerEvent }) => {
     if (!dragNodeId) return
 
-    // Use the event's ray to intersect our drag plane
+    // Compute NDC relative to the canvas element (not the window)
+    const rect = gl.domElement.getBoundingClientRect()
     const ndc = new THREE.Vector2(
-      (e.nativeEvent.clientX / window.innerWidth) * 2 - 1,
-      -(e.nativeEvent.clientY / window.innerHeight) * 2 + 1,
+      ((e.nativeEvent.clientX - rect.left) / rect.width) * 2 - 1,
+      -((e.nativeEvent.clientY - rect.top) / rect.height) * 2 + 1,
     )
     raycasterRef.current.setFromCamera(ndc, camera)
 
@@ -57,8 +57,8 @@ export default function NodeDragger() {
 
       const otherNodes = nodes.filter((n) => n.id !== dragNodeId)
       const snapped = snapPoint3D(cursor, otherNodes, members, {
-        snapRadius: SNAP_RADIUS,
-        gridSize: GRID_SIZE,
+        snapRadius: snapGridSize / 2,
+        gridSize: snapGridSize,
       })
 
       updateNode(dragNodeId, { position: snapped.point })

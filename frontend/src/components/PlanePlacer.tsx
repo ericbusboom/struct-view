@@ -6,12 +6,10 @@ import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
 import { usePlaneStore } from '../store/usePlaneStore'
 import { snapToPlaneGrid, findNearestOnPlaneNode } from '../editor3d/planeSnap'
-
-const GRID_SIZE = 1.0
-const SNAP_RADIUS = 0.5
+import { useSettingsStore } from '../store/useSettingsStore'
 
 /**
- * Handles node/beam placement and hover highlighting in focus mode.
+ * Handles beam placement and hover highlighting in focus mode.
  * Renders an invisible double-sided plane mesh to catch click/pointer
  * events, then snaps the intersection point to the grid.
  *
@@ -21,6 +19,7 @@ const SNAP_RADIUS = 0.5
 export default function PlanePlacer() {
   const mode = useEditorStore((s) => s.mode)
   const isFocused = usePlaneStore((s) => s.isFocused)
+  const snapGridSize = useSettingsStore((s) => s.snapGridSize)
   const activePlane = usePlaneStore((s) => s.activePlane)
 
   const addNode = useModelStore((s) => s.addNode)
@@ -34,86 +33,66 @@ export default function PlanePlacer() {
   const handleClick = useCallback(
     (e: ThreeEvent<MouseEvent>) => {
       if (!isFocused || !activePlane) return
-      if (mode !== 'add-node' && mode !== 'add-member') return
+      if (mode !== 'add-member') return
 
       e.stopPropagation()
 
-      // e.point is the world-space intersection from R3F's raycaster
       const snapped = snapToPlaneGrid(
         { x: e.point.x, y: e.point.y, z: e.point.z },
         activePlane,
-        GRID_SIZE,
+        snapGridSize,
       )
 
       const nearNodeId = findNearestOnPlaneNode(
         snapped,
         nodes.map((n) => ({ id: n.id, position: n.position })),
         activePlane,
-        SNAP_RADIUS,
+        snapGridSize / 2,
       )
 
-      if (mode === 'add-node') {
-        if (nearNodeId) {
-          console.log(`[place] node snap — reusing existing node ${nearNodeId}`)
-          return
-        }
+      let nodeId: string
+      if (nearNodeId) {
+        nodeId = nearNodeId
+      } else {
         const node = createNode({ position: snapped })
         addNode(node)
-        console.log(
-          `[place] node at (${snapped.x.toFixed(1)}, ${snapped.y.toFixed(1)}, ${snapped.z.toFixed(1)})`,
-        )
-      } else if (mode === 'add-member') {
-        let nodeId: string
-        if (nearNodeId) {
-          nodeId = nearNodeId
-          console.log(`[place] member endpoint — reusing node ${nearNodeId}`)
-        } else {
-          const node = createNode({ position: snapped })
-          addNode(node)
-          nodeId = node.id
-          console.log(
-            `[place] member endpoint — new node at (${snapped.x.toFixed(1)}, ${snapped.y.toFixed(1)}, ${snapped.z.toFixed(1)})`,
-          )
-        }
+        nodeId = node.id
+      }
 
-        if (!memberStartNode) {
-          setMemberStartNode(nodeId)
-          console.log(`[place] member start → ${nodeId}`)
-        } else if (memberStartNode !== nodeId) {
-          const member = createMember(memberStartNode, nodeId)
-          addMember(member)
-          console.log(`[place] member from ${memberStartNode} to ${nodeId}`)
-          setMemberStartNode(null)
-        }
+      if (!memberStartNode) {
+        setMemberStartNode(nodeId)
+      } else if (memberStartNode !== nodeId) {
+        const member = createMember(memberStartNode, nodeId)
+        addMember(member)
+        setMemberStartNode(null)
       }
     },
-    [isFocused, activePlane, mode, nodes, addNode, addMember, memberStartNode, setMemberStartNode],
+    [isFocused, activePlane, mode, nodes, addNode, addMember, memberStartNode, setMemberStartNode, snapGridSize],
   )
 
   const handlePointerMove = useCallback(
     (e: ThreeEvent<PointerEvent>) => {
       if (!isFocused || !activePlane) return
-      if (mode !== 'add-node' && mode !== 'add-member') return
+      if (mode !== 'add-member') return
 
       const snapped = snapToPlaneGrid(
         { x: e.point.x, y: e.point.y, z: e.point.z },
         activePlane,
-        GRID_SIZE,
+        snapGridSize,
       )
       const nearNodeId = findNearestOnPlaneNode(
         snapped,
         nodes.map((n) => ({ id: n.id, position: n.position })),
         activePlane,
-        SNAP_RADIUS,
+        snapGridSize / 2,
       )
 
-      // Only update store when the hovered node changes (avoid thrashing)
       if (nearNodeId !== lastHoverRef.current) {
         lastHoverRef.current = nearNodeId
         setHoverNodeId(nearNodeId)
       }
     },
-    [isFocused, activePlane, mode, nodes, setHoverNodeId],
+    [isFocused, activePlane, mode, nodes, setHoverNodeId, snapGridSize],
   )
 
   if (!isFocused || !activePlane) return null

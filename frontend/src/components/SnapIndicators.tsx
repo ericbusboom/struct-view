@@ -2,9 +2,8 @@ import { useMemo } from 'react'
 import * as THREE from 'three'
 import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
+import { useSettingsStore } from '../store/useSettingsStore'
 import { findGroupSnap } from '../editor3d/groupSnap'
-
-const SNAP_THRESHOLD = 0.5
 const INDICATOR_COLOR = '#00ff88'
 const INDICATOR_RADIUS = 0.12
 const LINE_COLOR = '#00ff88'
@@ -19,15 +18,16 @@ export default function SnapIndicators() {
   const nodes = useModelStore((s) => s.nodes)
   const getNodesByGroupId = useModelStore((s) => s.getNodesByGroupId)
 
-  const isActive = (mode === 'move' || mode === 'rotate') && !!selectedGroupId
+  const snapGridSize = useSettingsStore((s) => s.snapGridSize)
+  const isActive = (mode === 'select' || mode === 'rotate') && !!selectedGroupId
 
   const snap = useMemo(() => {
     if (!isActive || !selectedGroupId) return null
     const trussNodes = getNodesByGroupId(selectedGroupId)
-    return findGroupSnap(trussNodes, nodes, selectedGroupId, SNAP_THRESHOLD)
+    return findGroupSnap(trussNodes, nodes, selectedGroupId, snapGridSize / 2)
     // Re-evaluate whenever node positions change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive, selectedGroupId, nodes])
+  }, [isActive, selectedGroupId, nodes, snapGridSize])
 
   if (!snap) return null
 

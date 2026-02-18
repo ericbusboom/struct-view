@@ -4,9 +4,7 @@ import PlaneSelector from './PlaneSelector'
 
 const TOOLS: { mode: EditorMode; label: string; shortcut: string }[] = [
   { mode: 'select', label: 'Select', shortcut: 'V' },
-  { mode: 'add-node', label: 'Add Node', shortcut: 'N' },
   { mode: 'add-member', label: 'Add Member', shortcut: 'M' },
-  { mode: 'move', label: 'Move', shortcut: 'G' },
   { mode: 'rotate', label: 'Rotate', shortcut: 'R' },
 ]
 

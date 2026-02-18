@@ -5,6 +5,7 @@ import { createMember } from '../model'
 import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
 import { usePlaneStore } from '../store/usePlaneStore'
+import { pressedKeys } from '../utils/pressedKeys'
 
 const NODE_RADIUS = 0.08
 const NODE_RADIUS_SELECTED = 0.1
@@ -76,11 +77,35 @@ export default function NodeMesh({ node }: Props) {
     }
 
     if (mode === 'select') {
+      // B+click: quick-beam from the single selected node to this node
+      if (pressedKeys.has('b') && !e.nativeEvent.shiftKey) {
+        const sel = useEditorStore.getState().selectedNodeIds
+        if (sel.size === 1) {
+          const startId = [...sel][0]
+          if (startId !== node.id) {
+            addMember(createMember(startId, node.id))
+            select(node.id, 'node')
+            return
+          }
+        }
+      }
+
       if (e.nativeEvent.shiftKey) {
         toggleSelect(node.id, 'node')
       } else if (node.groupId) {
         selectGroup(node.groupId)
       } else {
+        // If exactly 1 member is selected and this node is one of its endpoints,
+        // select the node while keeping the member selected (for length editing).
+        const { selectedMemberIds, selectNodeForMember } = useEditorStore.getState()
+        if (selectedMemberIds.size === 1) {
+          const memberId = [...selectedMemberIds][0]
+          const member = useModelStore.getState().members.find((m) => m.id === memberId)
+          if (member && (member.start_node === node.id || member.end_node === node.id)) {
+            selectNodeForMember(node.id)
+            return
+          }
+        }
         select(node.id, 'node')
       }
     } else if (mode === 'add-member') {
@@ -95,9 +120,10 @@ export default function NodeMesh({ node }: Props) {
   }
 
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
-    if (mode === 'move') {
+    // Only start drag on an already-selected node (so first click just selects,
+    // and beam clicks near endpoints aren't swallowed by the drag handler).
+    if (mode === 'select' && !node.groupId && !e.nativeEvent.shiftKey && isSelected) {
       e.stopPropagation()
-      select(node.id, 'node')
       setDragNodeId(node.id)
     }
   }

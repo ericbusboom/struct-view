@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { PlacementPlane } from '../model'
 
-export type EditorMode = 'select' | 'add-node' | 'add-member' | 'move' | 'rotate'
+export type EditorMode = 'select' | 'add-member' | 'rotate'
 
 export interface EditorState {
   mode: EditorMode
@@ -11,7 +11,7 @@ export interface EditorState {
   selectedGroupId: string | null
   /** First node picked in add-member mode */
   memberStartNode: string | null
-  /** Node currently being dragged in move mode */
+  /** Node currently being dragged */
   dragNodeId: string | null
   /** Active constraint plane for 3D movement/rotation */
   activePlane: PlacementPlane
@@ -19,6 +19,8 @@ export interface EditorState {
   rotatePivotNodeId: string | null
   /** Node the cursor is hovering near (for snap highlight) */
   hoverNodeId: string | null
+  /** Dimension overlay enabled */
+  showDimensions: boolean
 
   setMode: (mode: EditorMode) => void
   /** Select a single entity (replaces current selection). */
@@ -37,6 +39,9 @@ export interface EditorState {
   setActivePlane: (plane: PlacementPlane) => void
   setRotatePivotNodeId: (id: string | null) => void
   setHoverNodeId: (id: string | null) => void
+  toggleDimensions: () => void
+  /** Select a node while keeping the current member selection (for member endpoint editing). */
+  selectNodeForMember: (nodeId: string) => void
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
@@ -49,6 +54,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   activePlane: 'XZ' as PlacementPlane,
   rotatePivotNodeId: null,
   hoverNodeId: null,
+  showDimensions: false,
 
   setMode: (mode) =>
     set({ mode, memberStartNode: null, dragNodeId: null, hoverNodeId: null }),
@@ -105,6 +111,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
 
   setHoverNodeId: (id) =>
     set({ hoverNodeId: id }),
+
+  toggleDimensions: () =>
+    set((state) => ({ showDimensions: !state.showDimensions })),
+
+  selectNodeForMember: (nodeId) =>
+    set({ selectedNodeIds: new Set([nodeId]), selectedGroupId: null }),
 }))
 
 // Convenience helpers for components

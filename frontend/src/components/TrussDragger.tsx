@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { useThree } from '@react-three/fiber'
 import { useEditorStore } from '../store/useEditorStore'
 import { useModelStore } from '../store/useModelStore'
+import { useSettingsStore } from '../store/useSettingsStore'
 import { projectToPlane } from '../editor3d/planeMove'
 import { computeGroupCentroid, constrainDeltaToPlane } from '../editor3d/groupMove'
 import { findGroupSnap } from '../editor3d/groupSnap'
@@ -18,12 +19,13 @@ export default function TrussDragger() {
   const getNodesByGroupId = useModelStore((s) => s.getNodesByGroupId)
   const allNodes = useModelStore((s) => s.nodes)
   const updateNode = useModelStore((s) => s.updateNode)
-  const { camera } = useThree()
+  const snapGridSize = useSettingsStore((s) => s.snapGridSize)
+  const { camera, gl } = useThree()
 
   const isDragging = useRef(false)
   const lastHit = useRef<{ x: number; y: number; z: number } | null>(null)
 
-  const isActive = mode === 'move' && !!selectedGroupId
+  const isActive = mode === 'select' && !!selectedGroupId
 
   const getIntersection = useCallback(
     (clientX: number, clientY: number) => {
@@ -32,9 +34,10 @@ export default function TrussDragger() {
       if (trussNodes.length === 0) return null
 
       const centroid = computeGroupCentroid(trussNodes)
+      const rect = gl.domElement.getBoundingClientRect()
       const ndc = new THREE.Vector2(
-        (clientX / window.innerWidth) * 2 - 1,
-        -(clientY / window.innerHeight) * 2 + 1,
+        ((clientX - rect.left) / rect.width) * 2 - 1,
+        -((clientY - rect.top) / rect.height) * 2 + 1,
       )
       const raycaster = new THREE.Raycaster()
       raycaster.setFromCamera(ndc, camera)
@@ -52,7 +55,7 @@ export default function TrussDragger() {
 
       return projectToPlane(rayOrigin, rayDir, centroid, activePlane)
     },
-    [selectedGroupId, getNodesByGroupId, camera, activePlane],
+    [selectedGroupId, getNodesByGroupId, camera, gl, activePlane],
   )
 
   const handlePointerDown = useCallback(
@@ -101,7 +104,7 @@ export default function TrussDragger() {
     if (isDragging.current && selectedGroupId) {
       // Apply snap on release
       const trussNodes = getNodesByGroupId(selectedGroupId)
-      const snap = findGroupSnap(trussNodes, allNodes, selectedGroupId, 0.5)
+      const snap = findGroupSnap(trussNodes, allNodes, selectedGroupId, snapGridSize / 2)
       if (snap) {
         // Re-read truss nodes after potential updates
         const currentNodes = getNodesByGroupId(selectedGroupId)
@@ -118,7 +121,7 @@ export default function TrussDragger() {
     }
     isDragging.current = false
     lastHit.current = null
-  }, [selectedGroupId, getNodesByGroupId, allNodes, updateNode])
+  }, [selectedGroupId, getNodesByGroupId, allNodes, updateNode, snapGridSize])
 
   if (!isActive) return null
 

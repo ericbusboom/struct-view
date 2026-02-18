@@ -1,12 +1,12 @@
 ---
-id: "007"
+id: "008"
 title: Unit Display: Imperial and Metric
 status: planning
-branch: sprint/007-unit-display-imperial-and-metric
+branch: sprint/008-unit-display-imperial-and-metric
 use-cases: []
 ---
 
-# Sprint 007: Unit Display: Imperial and Metric
+# Sprint 008: Unit Display: Imperial and Metric
 
 ## Goals
 

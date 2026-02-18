@@ -19,9 +19,7 @@ import {
 
 const MODE_KEYS: Record<string, EditorMode> = {
   v: 'select',
-  n: 'add-node',
   m: 'add-member',
-  g: 'move',
   r: 'rotate',
 }
 
@@ -33,8 +31,10 @@ const ARROW_DIRS: Record<string, ArrowDir> = {
   ArrowDown: 'down',
 }
 
-export default function KeyboardHandler() {
+export default function KeyboardHandler({ onDuplicate }: { onDuplicate?: () => void }) {
   const setMode = useEditorStore((s) => s.setMode)
+  const onDuplicateRef = useRef(onDuplicate)
+  onDuplicateRef.current = onDuplicate
 
   // Plane rotation state (refs to avoid re-render churn)
   const heldArrows = useRef(new Set<string>())
@@ -208,6 +208,21 @@ export default function KeyboardHandler() {
         } else {
           console.log(`[key] f → no active plane, ignoring`)
         }
+        return
+      }
+
+      // D key — duplicate with offset
+      if (key === 'd' && !e.ctrlKey && !e.metaKey) {
+        const { selectedNodeIds, selectedMemberIds, selectedGroupId } = useEditorStore.getState()
+        if (selectedNodeIds.size > 0 || selectedMemberIds.size > 0 || selectedGroupId) {
+          onDuplicateRef.current?.()
+        }
+        return
+      }
+
+      // L key — toggle dimension overlay
+      if (key === 'l') {
+        useEditorStore.getState().toggleDimensions()
         return
       }
 

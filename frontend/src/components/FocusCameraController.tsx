@@ -12,9 +12,9 @@ const FOCUS_DISTANCE = 15
  * the plane normal, and swaps it into R3F.
  * On unfocus: restores saved perspective camera.
  *
- * TrackballControls settings (rotation lock, target) are managed by a separate
+ * OrbitControls settings (rotation lock, target) are managed by a separate
  * effect that re-applies whenever the controls instance changes (drei
- * recreates TrackballControls when the R3F camera changes).
+ * recreates OrbitControls when the R3F camera changes).
  */
 export default function FocusCameraController() {
   const { camera, controls, set, size } = useThree()
@@ -40,11 +40,11 @@ export default function FocusCameraController() {
       saveCameraState(state)
       savedCamera.current = camera
 
-      // Save TrackballControls target for later restoration
+      // Save OrbitControls target for later restoration
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const trackControls = controls as any
-      if (trackControls?.target) {
-        savedTarget.current.copy(trackControls.target)
+      const orbitControls = controls as any
+      if (orbitControls?.target) {
+        savedTarget.current.copy(orbitControls.target)
       }
 
       // Compute orthographic frustum to match perspective view size at the plane
@@ -117,7 +117,7 @@ export default function FocusCameraController() {
       // Store focus target for the controls effect
       focusTarget.current.set(pt.x, pt.y, pt.z)
 
-      // Swap camera in R3F — this triggers drei's TrackballControls recreation,
+      // Swap camera in R3F — this triggers drei's OrbitControls recreation,
       // which is handled by the secondary effect below.
       set({ camera: orthoCamera })
 
@@ -152,23 +152,23 @@ export default function FocusCameraController() {
     prevFocused.current = isFocused
   }, [isFocused, activePlane, savedCameraState, camera, saveCameraState, controls, set, size])
 
-  // Secondary effect: manage TrackballControls settings.
-  // drei recreates TrackballControls whenever the R3F camera changes (via useMemo
+  // Secondary effect: manage OrbitControls settings.
+  // drei recreates OrbitControls whenever the R3F camera changes (via useMemo
   // on the camera ref). The new instance has default settings (rotation enabled,
   // target at origin). This effect re-applies the correct settings.
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const trackControls = controls as any
-    if (!trackControls) return
+    const orbitControls = controls as any
+    if (!orbitControls) return
 
     if (isFocused) {
-      trackControls.target.copy(focusTarget.current)
-      trackControls.noRotate = true
-      trackControls.update()
+      orbitControls.target.copy(focusTarget.current)
+      orbitControls.enableRotate = false
+      orbitControls.update()
     } else {
-      trackControls.target.copy(savedTarget.current)
-      trackControls.noRotate = false
-      trackControls.update()
+      orbitControls.target.copy(savedTarget.current)
+      orbitControls.enableRotate = true
+      orbitControls.update()
     }
   }, [controls, isFocused])
 

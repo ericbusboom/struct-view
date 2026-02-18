@@ -1,10 +1,9 @@
 import { useMemo, useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { usePlaneStore } from '../store/usePlaneStore'
+import { useSettingsStore } from '../store/useSettingsStore'
 import { getPlaneColor } from '../model'
 
-const GRID_SIZE = 20
-const GRID_DIVISIONS = 20 // 20/20 = 1.0 unit per cell, matching snap grid
 const GRID_OPACITY = 0.25
 
 /**
@@ -17,6 +16,8 @@ const GRID_OPACITY = 0.25
  */
 export default function PlaneGrid() {
   const activePlane = usePlaneStore((s) => s.activePlane)
+  const workPlaneSize = useSettingsStore((s) => s.workPlaneSize)
+  const snapGridSize = useSettingsStore((s) => s.snapGridSize)
   const meshRef = useRef<THREE.Mesh>(null)
   const gridRef = useRef<THREE.GridHelper>(null)
 
@@ -59,17 +60,20 @@ export default function PlaneGrid() {
     return { position: pos, quaternion: q, gridOffset: [fracU, 0, fracV] as const, color: c }
   }, [activePlane])
 
+  const effectiveSize = Math.max(workPlaneSize, activePlane?.minExtent ?? 0)
+  const gridDivisions = Math.round(effectiveSize / snapGridSize)
+
   if (!activePlane) return null
 
   return (
     <group position={[position[0], position[1], position[2]]} quaternion={quaternion}>
       <gridHelper
         ref={gridRef}
-        args={[GRID_SIZE, GRID_DIVISIONS, color, color]}
+        args={[effectiveSize, gridDivisions, color, color]}
         position={[gridOffset[0], gridOffset[1], gridOffset[2]]}
       />
       <mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[GRID_SIZE, GRID_SIZE]} />
+        <planeGeometry args={[effectiveSize, effectiveSize]} />
         <meshBasicMaterial
           color={color}
           transparent
