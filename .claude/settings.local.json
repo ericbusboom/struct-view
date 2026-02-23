@@ -16,7 +16,12 @@
       "Bash(find:*)",
       "mcp__clasi__*",
       "Bash(npx tsc:*)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(/Users/eric/proj/code-projects/struct-view/docs/plans/sprints/006-viewport-ux-polish/usecases.md:*)",
+      "Bash(ls:*)",
+      "Bash(git stash:*)",
+      "Bash(git stash pop:*)",
+      "Bash(git branch:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
